@@ -77,6 +77,9 @@ function MyPage() {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
             setLinkedAccounts(res.data.linkedAccounts || []);
+            setNickname(res.data.linkedAccounts[0].nickname || "정원사");
+            console.log(res.data.linkedAccounts[0].nickname);
+            
         } catch (err) {
             if (err.response?.status === 401) {
                 localStorage.removeItem("accessToken");
@@ -248,6 +251,7 @@ function MyPage() {
         linkedAccounts.map((a) => [a.provider, a])
     );
     const email = linkedAccounts[0]?.email || "이메일 없음";
+
     const days = 97;
     const joinDate = "2026.03.24";
 
