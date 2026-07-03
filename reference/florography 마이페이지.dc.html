@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&amp;family=Gowun+Dodum&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  ::placeholder{color:#9aa394;}
+  .flo-body{max-width:1280px;margin:0 auto;padding:30px 32px 64px;display:grid;grid-template-columns:212px minmax(0,1fr) 200px;gap:30px;align-items:start;}
+  @media(max-width:1140px){.flo-body{grid-template-columns:188px minmax(0,1fr);}.flo-rightrail{display:none !important;}}
+  @media(max-width:720px){.flo-body{grid-template-columns:1fr;padding:22px 18px 48px;}.flo-leftrail{display:none !important;}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#EEF1E6;font-family:'Pretendard',sans-serif;color:#2C3A2E;-webkit-font-smoothing:antialiased;">
+
+  <!-- HEADER -->
+  <header style="position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:rgba(238,241,230,.82);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid #DEE2D2;">
+    <div style="display:flex;align-items:center;gap:18px;">
+      <button onClick="{{ toggleMenu }}" aria-label="메뉴" style="display:flex;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;padding:11px;border:1px solid #D3D9C5;border-radius:12px;background:#F7F8F1;cursor:pointer;" style-hover="background:#EDEFE2;border-color:#A3B18A;">
+        <span style="display:block;height:2px;border-radius:2px;background:#3A5A40;"></span>
+        <span style="display:block;height:2px;border-radius:2px;background:#3A5A40;"></span>
+        <span style="display:block;height:2px;border-radius:2px;background:#3A5A40;"></span>
+      </button>
+      <div style="display:flex;align-items:baseline;gap:10px;">
+        <span style="font-family:'Gowun Batang',serif;font-weight:700;font-size:25px;letter-spacing:.01em;color:#344E41;">florography</span>
+        <span style="font-size:12px;color:#7C8675;letter-spacing:.02em;">마음을 키우는 정원</span>
+      </div>
+    </div>
+    <button style="display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border:1px solid #D3D9C5;border-radius:999px;background:#F7F8F1;cursor:pointer;" style-hover="border-color:#A3B18A;background:#EDEFE2;">
+      <span style="display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#588157;color:#F4F6EE;font-size:14px;font-weight:600;font-family:'Gowun Batang',serif;overflow:hidden;">{{ initial }}</span>
+      <span style="font-size:14px;font-weight:500;color:#34402E;">{{ nickname }}</span>
+      <span style="font-size:10px;color:#8A9480;">▾</span>
+    </button>
+  </header>
+
+  <!-- HAMBURGER -->
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenu }}" style="position:fixed;inset:0;z-index:60;background:rgba(44,58,46,.34);backdrop-filter:blur(2px);">
+      <nav onClick="{{ stop }}" style="position:absolute;top:0;left:0;height:100%;width:320px;background:#F4F6EE;border-right:1px solid #DDE2D0;box-shadow:18px 0 50px rgba(52,78,65,.14);padding:26px 24px;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-family:'Gowun Batang',serif;font-weight:700;font-size:22px;color:#344E41;">florography</span>
+          <button onClick="{{ closeMenu }}" aria-label="닫기" style="width:34px;height:34px;border:none;border-radius:10px;background:#E7EAdc;color:#3A5A40;font-size:16px;cursor:pointer;" style-hover="background:#DCE0CF;">✕</button>
+        </div>
+        <p style="margin:0 0 22px;font-size:12.5px;line-height:1.6;color:#7C8675;">당신의 마음에 물을 주세요,<br>감정이 꽃피는 곳.</p>
+        <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="7">
+          <a href="{{ m.href }}" style="display:flex;align-items:center;gap:14px;padding:13px 14px;border-radius:12px;text-decoration:none;color:#34402E;" style-hover="background:#E7EAdc;">
+            <span style="display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#E2E7D6;font-size:14px;">{{ m.icon }}</span>
+            <span style="display:flex;flex-direction:column;">
+              <span style="font-size:14.5px;font-weight:600;">{{ m.label }}</span>
+              <span style="font-size:11.5px;color:#8A9480;">{{ m.desc }}</span>
+            </span>
+          </a>
+        </sc-for>
+        <div style="margin-top:auto;padding-top:18px;border-top:1px solid #E0E4D4;font-size:11.5px;color:#9aa394;">© 2026 florography</div>
+      </nav>
+    </div>
+  </sc-if>
+
+  <div class="flo-body">
+
+    <!-- LEFT RAIL -->
+    <aside class="flo-leftrail" style="position:sticky;top:96px;display:flex;flex-direction:column;gap:18px;">
+      <a href="florography 편지작성.dc.html" style="display:flex;align-items:center;justify-content:center;gap:9px;padding:15px;border:none;border-radius:16px;background:#3A5A40;color:#F4F6EE;font-size:15px;font-weight:600;font-family:'Pretendard';cursor:pointer;box-shadow:0 8px 20px rgba(58,90,64,.22);text-decoration:none;" style-hover="background:#34503a;">
+        <span style="font-size:16px;">✎</span> 글 쓰기
+      </a>
+      <nav style="display:flex;flex-direction:column;gap:2px;padding:10px;background:#F6F8F0;border:1px solid #E1E5D6;border-radius:16px;">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
+          <a href="{{ n.href }}" style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;text-decoration:none;color:{{ n.color }};font-size:13.5px;font-weight:{{ n.weight }};background:{{ n.bg }};" style-hover="background:#E8EBDD;color:#2C3A2E;">
+            <span style="width:7px;height:7px;border-radius:50%;background:{{ n.dot }};"></span>{{ n.label }}
+          </a>
+        </sc-for>
+      </nav>
+      <div style="padding:16px;background:linear-gradient(160deg,#DDE7CF,#E9EEDD);border:1px solid #D6DEC4;border-radius:16px;">
+        <div style="font-size:11px;letter-spacing:.08em;color:#6E7A62;font-weight:600;">함께한 시간</div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-top:6px;">
+          <span style="font-family:'Gowun Batang',serif;font-size:30px;font-weight:700;color:#3A5A40;">{{ days }}</span>
+          <span style="font-size:12px;color:#7C8675;">일째</span>
+        </div>
+        <div style="margin-top:9px;font-size:11.5px;line-height:1.5;color:#76806A;">{{ joinDate }} 부터 함께 자라고 있어요.</div>
+      </div>
+    </aside>
+
+    <!-- CENTER -->
+    <main style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- 타이틀 -->
+      <div style="padding-bottom:14px;border-bottom:1px solid #D8DEC9;">
+        <div style="display:inline-flex;align-items:center;gap:8px;font-family:'Gowun Batang',serif;font-size:22px;font-weight:700;color:#344E41;">👤 마이페이지</div>
+        <div style="font-size:12.5px;color:#7C8675;margin-top:4px;">프로필과 계정을 관리하고, 내가 남긴 기록을 모아 보세요.</div>
+      </div>
+
+      <!-- 프로필 카드 -->
+      
+
+      <!-- 닉네임 변경 (펼침) -->
+      <sc-if value="{{ editOpen }}" hint-placeholder-val="{{ false }}">
+        <section style="padding:22px;background:#fff;border:1px solid #E5E8DA;border-radius:20px;box-shadow:0 2px 16px rgba(58,90,64,.05);">
+          <div style="font-size:14px;font-weight:700;color:#3A5A40;margin-bottom:14px;">프로필 수정</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+            <label style="font-size:12px;color:#7C8675;">닉네임</label>
+            <div style="display:flex;gap:10px;">
+              <input value="{{ nickDraft }}" onInput="{{ onNick }}" maxlength="12" placeholder="새 닉네임" style="flex:1;min-width:0;padding:12px 14px;border:1px solid #E5E8DA;border-radius:12px;background:#FBFCF7;font-size:14.5px;font-family:'Gowun Batang',serif;color:#2C3A2E;outline:none;" style-focus="border-color:#A3B18A;">
+              <span style="display:grid;place-items:center;padding:0 12px;font-size:11.5px;color:#9aa394;">{{ nickLen }}/12</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#7C8675;margin-bottom:14px;">프로필 사진은 위의 동그란 사진 영역에 이미지를 끌어다 놓거나 클릭해서 바꿀 수 있어요.</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button onClick="{{ cancelEdit }}" style="padding:10px 18px;border:1px solid #DDE3CF;border-radius:12px;background:#F7F9F1;font-size:13px;font-weight:600;color:#4A5440;cursor:pointer;font-family:'Pretendard';" style-hover="background:#EFF4E3;">취소</button>
+            <button onClick="{{ saveNick }}" style="padding:10px 20px;border:none;border-radius:12px;background:#3A5A40;color:#F4F6EE;font-size:13px;font-weight:600;cursor:pointer;font-family:'Pretendard';" style-hover="background:#34503a;">저장</button>
+          </div>
+        </section>
+      </sc-if>
+
+      <!-- 연동 계정 -->
+      <section style="display:flex;gap:24px;align-items:center;padding:24px;background:#fff;border:1px solid #E5E8DA;border-radius:22px;box-shadow:0 2px 16px rgba(58,90,64,.05);flex-wrap:wrap;">
+        <!-- 사진 -->
+        <div style="position:relative;flex-shrink:0;">
+          
+          <span style="position: absolute; bottom: 0; right: 0; display: grid; place-items: center; width: 48px; height: 49px; border-radius: 50%; background: #3A5A40; color: #F4F6EE; font-size: 15px; border: 3px solid #fff; pointer-events: none">📷</span>
+        <x-import id="flo-avatar" shape="circle" placeholder="사진 추가" style="width: 50px; height: 50px; display: block; border-radius: 50%; border: 3px solid #E2E7D6; box-shadow: 0 4px 14px rgba(58,90,64,.12)" hint-size="50px,50px" from="./image-slot.js"></x-import></div>
+        <!-- 정보 -->
+        <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:'Gowun Batang',serif;font-size:24px;font-weight:700;color:#2C3A2E;">{{ nickname }}</span>
+            
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;color:#6E7A62;font-size:13.5px;">✉️ {{ email }}</div>
+          <div style="display:flex;gap:20px;margin-top:8px;">
+            <div style="display:flex;flex-direction:column;"><span style="font-family:'Gowun Batang',serif;font-size:20px;font-weight:700;color:#3A5A40;">{{ postCount }}</span><span style="font-size:11px;color:#9aa394;">기록</span></div>
+            <div style="display:flex;flex-direction:column;"><span style="font-family:'Gowun Batang',serif;font-size:20px;font-weight:700;color:#3A5A40;">{{ lineCount }}</span><span style="font-size:11px;color:#9aa394;">한마디</span></div>
+            <div style="display:flex;flex-direction:column;"><span style="font-family:'Gowun Batang',serif;font-size:20px;font-weight:700;color:#3A5A40;">{{ flowerCount }}</span><span style="font-size:11px;color:#9aa394;">꽃</span></div>
+          </div>
+        </div>
+        <button onClick="{{ openEdit }}" style="align-self:flex-start;display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border:1px solid #DDE3CF;border-radius:12px;background:#F7F9F1;font-size:13px;font-weight:600;color:#4A5440;cursor:pointer;font-family:'Pretendard';" style-hover="border-color:#A3B18A;background:#EFF4E3;">✎ 프로필 수정</button>
+      </section><section style="padding:22px;background:#fff;border:1px solid #E5E8DA;border-radius:20px;box-shadow:0 2px 16px rgba(58,90,64,.05);">
+        <div style="font-size:14px;font-weight:700;color:#3A5A40;margin-bottom:4px;">연동된 계정</div>
+        <div style="font-size:12px;color:#9aa394;margin-bottom:16px;">소셜 계정으로 간편하게 로그인할 수 있어요.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ socials }}" as="s" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid #EAEDE1;border-radius:14px;background:#FBFCF7;">
+              <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:{{ s.brandBg }};color:{{ s.brandColor }};font-size:16px;font-weight:800;font-family:'Pretendard';flex-shrink:0;">{{ s.glyph }}</span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+                <span style="font-size:14px;font-weight:600;color:#34402E;">{{ s.name }}</span>
+                <span style="font-size:12px;color:#9aa394;">{{ s.detail }}</span>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;background:{{ s.stateBg }};font-size:12px;font-weight:600;color:{{ s.stateColor }};">{{ s.stateLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- 내가 쓴 글 / 한마디 -->
+      <section style="padding:22px;background:#fff;border:1px solid #E5E8DA;border-radius:20px;box-shadow:0 2px 16px rgba(58,90,64,.05);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-size:14px;font-weight:700;color:#3A5A40;">내 기록</div>
+          <div style="display:flex;gap:4px;padding:4px;background:#F1F4E8;border:1px solid #E1E5D6;border-radius:11px;">
+            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+              <button onClick="{{ t.pick }}" style="padding:7px 15px;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:'Pretendard';cursor:pointer;background:{{ t.bg }};color:{{ t.color }};">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid #EEF1E6;">
+              <span style="display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:{{ r.iconBg }};font-size:16px;flex-shrink:0;">{{ r.icon }}</span>
+              <span style="flex:1;min-width:0;font-family:'Gowun Batang',serif;font-size:15px;color:#34402E;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.text }}</span>
+              <sc-if value="{{ r.mood }}" hint-placeholder-val="{{ false }}">
+                <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;background:{{ r.moodBg }};flex-shrink:0;">
+                  <span style="width:7px;height:7px;border-radius:50%;background:{{ r.moodDot }};"></span>
+                  <span style="font-size:11px;font-weight:600;color:#56604C;">{{ r.mood }}</span>
+                </span>
+              </sc-if>
+              <span style="font-size:11.5px;color:#9aa394;flex-shrink:0;width:64px;text-align:right;">{{ r.date }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:18px;">
+          <button onClick="{{ prevPage }}" style="display:grid;place-items:center;width:34px;height:34px;border:1px solid #DDE3CF;border-radius:10px;background:#F7F9F1;color:#3A5A40;font-size:13px;cursor:pointer;font-family:'Pretendard';" style-hover="border-color:#A3B18A;background:#EFF4E3;">‹</button>
+          <sc-for list="{{ pages }}" as="pg" hint-placeholder-count="3">
+            <button onClick="{{ pg.go }}" style="min-width:34px;height:34px;padding:0 8px;border:1px solid {{ pg.border }};border-radius:10px;background:{{ pg.bg }};color:{{ pg.color }};font-size:13px;font-weight:{{ pg.weight }};cursor:pointer;font-family:'Pretendard';">{{ pg.n }}</button>
+          </sc-for>
+          <button onClick="{{ nextPage }}" style="display:grid;place-items:center;width:34px;height:34px;border:1px solid #DDE3CF;border-radius:10px;background:#F7F9F1;color:#3A5A40;font-size:13px;cursor:pointer;font-family:'Pretendard';" style-hover="border-color:#A3B18A;background:#EFF4E3;">›</button>
+        </div>
+      </section>
+
+      <!-- 회원 탈퇴 -->
+      <section style="padding:18px 22px;background:#FBF3F1;border:1px solid #ECD9D4;border-radius:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:13.5px;font-weight:700;color:#A85A4E;">회원 탈퇴</div>
+          <div style="font-size:12px;color:#9C7A73;margin-top:3px;">탈퇴 시 정원·기록·꽃 도감이 모두 삭제되며 되돌릴 수 없어요.</div>
+        </div>
+        <button onClick="{{ openLeave }}" style="padding:10px 18px;border:1px solid #E0B5AC;border-radius:12px;background:#fff;font-size:13px;font-weight:600;color:#B5564A;cursor:pointer;font-family:'Pretendard';" style-hover="background:#F7E9E6;">회원 탈퇴</button>
+      </section>
+    </main>
+
+    <!-- ---- RIGHT RAIL ---- -->
+    <aside class="flo-rightrail" style="position:sticky;top:96px;display:flex;flex-direction:column;gap:18px;">
+      <div style="padding:18px;background:#FFFFFF;border:1px solid #E5E8DA;border-radius:18px;box-shadow:0 2px 14px rgba(58,90,64,.05);">
+        <div style="font-size:11px;letter-spacing:.08em;color:#7C8675;font-weight:600;">지난주 피운 꽃</div>
+        <div style="position:relative;height:78px;margin:10px auto 6px;width:78px;">
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:60px;height:60px;">
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(0deg);opacity:.92;"></span>
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(72deg);opacity:.92;"></span>
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(144deg);opacity:.92;"></span>
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(216deg);opacity:.92;"></span>
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(288deg);opacity:.92;"></span>
+            <span style="position:absolute;left:50%;bottom:50%;width:22px;height:22px;border-radius:50%;background:#F2C766;transform:translate(-50%,50%);box-shadow:inset 0 0 0 3px #EAB94E;"></span>
+          </div>
+        </div>
+        <div style="text-align:center;font-family:'Gowun Batang',serif;font-weight:700;font-size:16px;color:#3A5A40;">감사의 꽃</div>
+        <div style="text-align:center;font-size:11.5px;color:#8A9480;margin-top:2px;">꽃말 · 마음을 전하다</div>
+      </div>
+      <div style="padding:18px;background:linear-gradient(165deg,#E6EFD6,#DCE7C8);border:1px solid #D2DCBE;border-radius:18px;">
+        <div style="font-size:11px;letter-spacing:.06em;color:#6E7A62;font-weight:600;margin-bottom:8px;">지난주의 위로</div>
+        <p style="margin:0;font-family:'Gowun Batang',serif;font-size:14px;line-height:1.7;color:#3F4D38;">“기록하는 감정에서,<br>성장하는 감정으로.”</p>
+      </div>
+      <div style="padding:16px;background:#FFFFFF;border:1px solid #E5E8DA;border-radius:18px;box-shadow:0 2px 14px rgba(58,90,64,.05);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <button onClick="{{ prevYear }}" style="display:grid;place-items:center;width:26px;height:26px;border:none;border-radius:8px;background:#EDF1E3;color:#3A5A40;cursor:pointer;font-size:11px;" style-hover="background:#E0E7D1;">◀</button>
+          <span style="font-family:'Gowun Batang',serif;font-size:15px;font-weight:700;color:#3A5A40;">{{ year }}</span>
+          <button onClick="{{ nextYear }}" style="display:grid;place-items:center;width:26px;height:26px;border:none;border-radius:8px;background:#EDF1E3;color:#3A5A40;cursor:pointer;font-size:11px;" style-hover="background:#E0E7D1;">▶</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:5px;">
+          <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
+            <span style="text-align:center;font-size:9.5px;color:#A6AE98;">{{ w }}</span>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;">
+          <sc-for list="{{ railCal }}" as="c" hint-placeholder-count="30">
+            <span style="display:grid;place-items:center;height:22px;border-radius:6px;font-size:10.5px;color:{{ c.color }};background:{{ c.bg }};font-weight:{{ c.weight }};">{{ c.n }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #EEF1E6;">
+          <span style="font-size:10px;color:#9aa394;">작성한 날 · 감정 체크</span>
+          <span style="display:flex;gap:3px;margin-left:auto;">
+            <span style="width:11px;height:11px;border-radius:3px;background:#8694a3;"></span>
+            <span style="width:11px;height:11px;border-radius:3px;background:#94a39a;"></span>
+            <span style="width:11px;height:11px;border-radius:3px;background:#c4b878;"></span>
+            <span style="width:11px;height:11px;border-radius:3px;background:#86a866;"></span>
+            <span style="width:11px;height:11px;border-radius:3px;background:#588157;"></span>
+          </span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- 탈퇴 확인 모달 -->
+  <sc-if value="{{ leaveOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLeave }}" style="position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:24px;background:rgba(44,58,46,.42);backdrop-filter:blur(3px);">
+      <div onClick="{{ stop }}" style="width:100%;max-width:420px;background:#FBFCF7;border:1px solid #E0E6D2;border-radius:22px;box-shadow:0 30px 70px rgba(44,58,46,.3);padding:28px;">
+        <div style="display:grid;place-items:center;width:54px;height:54px;border-radius:50%;background:#FBEDEB;font-size:24px;margin-bottom:14px;">🥀</div>
+        <div style="font-family:'Gowun Batang',serif;font-size:20px;font-weight:700;color:#2C3A2E;">정말 떠나시겠어요?</div>
+        <p style="margin:8px 0 18px;font-size:13.5px;line-height:1.65;color:#6E7A62;">탈퇴하면 그동안 키운 정원과 {{ postCount }}개의 기록, 모아온 꽃이 모두 사라져요. 이 작업은 되돌릴 수 없어요.</p>
+        <label style="display:flex;align-items:center;gap:9px;padding:12px 14px;background:#fff;border:1px solid #E5E8DA;border-radius:12px;cursor:pointer;margin-bottom:16px;">
+          <input type="checkbox" checked="{{ leaveAgree }}" onChange="{{ onAgree }}" style="width:17px;height:17px;accent-color:#B5564A;">
+          <span style="font-size:13px;color:#46503E;">위 내용을 확인했으며 탈퇴에 동의합니다.</span>
+        </label>
+        <div style="display:flex;gap:8px;">
+          <button onClick="{{ closeLeave }}" style="flex:1;padding:12px;border:1px solid #DDE3CF;border-radius:12px;background:#F7F9F1;font-size:14px;font-weight:600;color:#3A5A40;cursor:pointer;font-family:'Pretendard';" style-hover="background:#EFF4E3;">계속 함께하기</button>
+          <button onClick="{{ confirmLeave }}" disabled="{{ leaveDisabled }}" style="flex:1;padding:12px;border:none;border-radius:12px;background:{{ leaveBtnBg }};color:#fff;font-size:14px;font-weight:600;cursor:{{ leaveCursor }};font-family:'Pretendard';">탈퇴하기</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- 토스트 -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:80;padding:11px 22px;background:rgba(44,58,46,.88);color:#F4F6EE;font-size:13px;border-radius:999px;">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:1180},&quot;email&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;minseo.garden@gmail.com&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = {
+    menuOpen:false, editOpen:false, leaveOpen:false, leaveAgree:false,
+    nickname:'민서', nickDraft:'민서', toast:'', year:2026, month:6,
+    tab:0, page:0,
+  };
+  _toastTimer=null;
+
+  toggleMenu(){ this.setState(s=>({menuOpen:!s.menuOpen})); }
+  closeMenu(){ this.setState({menuOpen:false}); }
+  stop(e){ e.stopPropagation(); }
+  showToast(m){ this.setState({toast:m}); clearTimeout(this._toastTimer); this._toastTimer=setTimeout(()=>this.setState({toast:''}),2000); }
+
+  openEdit(){ this.setState(s=>({editOpen:!s.editOpen, nickDraft:s.nickname})); }
+  cancelEdit(){ this.setState({editOpen:false}); }
+  onNick(e){ this.setState({nickDraft:e.target.value}); }
+  saveNick(){
+    const v=(this.state.nickDraft||'').trim(); if(!v){ this.showToast('닉네임을 입력해주세요'); return; }
+    this.setState({nickname:v, editOpen:false}); this.showToast('프로필이 저장되었어요 🌿');
+  }
+
+  openLeave(){ this.setState({leaveOpen:true, leaveAgree:false}); }
+  closeLeave(){ this.setState({leaveOpen:false}); }
+  onAgree(e){ this.setState({leaveAgree:e.target.checked}); }
+  confirmLeave(){ if(!this.state.leaveAgree) return; this.setState({leaveOpen:false}); this.showToast('탈퇴 요청이 접수되었어요. (목업)'); }
+
+  pickTab(i){ this.setState({tab:i, page:0}); }
+  goPage(p){ this.setState({page:p}); }
+  prevPage(){ this.setState(s=>({page:Math.max(0,s.page-1)})); }
+  nextPage(){ this.setState(s=>({page:Math.min(this.totalPages-1,s.page+1)})); }
+  prevYear(){ this.setState(s=>{ let m=s.month-1,y=s.year; if(m<1){m=12;y--;} return {month:m,year:y}; }); }
+  nextYear(){ this.setState(s=>{ let m=s.month+1,y=s.year; if(m>12){m=1;y++;} return {month:m,year:y}; }); }
+
+  get records(){
+    return [
+      {text:'비 오는 냄새가 좋았다.', date:'06.24', mood:'좋음', dot:'#588157', mbg:'#EAF0DE'},
+      {text:'오늘은 생각보다 괜찮은 하루였다.', date:'06.23', mood:'괜찮음', dot:'#7fa05f', mbg:'#EEF2E2'},
+      {text:'조금 지치는 한 주의 끝.', date:'06.21', mood:'가라앉음', dot:'#8a9a8f', mbg:'#EAEEE9'},
+      {text:'창문을 열어두니 마음이 환기됐다.', date:'06.19', mood:'좋음', dot:'#588157', mbg:'#EAF0DE'},
+      {text:'커피 한 잔의 여유가 큰 위로였다.', date:'06.17', mood:'괜찮음', dot:'#7fa05f', mbg:'#EEF2E2'},
+      {text:'별다를 것 없는 평범한 하루.', date:'06.15', mood:'그저 그럼', dot:'#c4b878', mbg:'#F2EFDD'},
+      {text:'오랜만에 친구를 만나 마음이 따뜻했다.', date:'06.13', mood:'좋음', dot:'#588157', mbg:'#EAF0DE'},
+      {text:'할 일이 많아 조금 버거웠던 날.', date:'06.11', mood:'가라앉음', dot:'#8a9a8f', mbg:'#EAEEE9'},
+      {text:'산책길의 풀냄새가 좋았다.', date:'06.09', mood:'괜찮음', dot:'#7fa05f', mbg:'#EEF2E2'},
+      {text:'스스로를 칭찬해준 하루.', date:'06.07', mood:'좋음', dot:'#588157', mbg:'#EAF0DE'},
+      {text:'마음이 차분히 가라앉는 저녁.', date:'06.05', mood:'그저 그럼', dot:'#c4b878', mbg:'#F2EFDD'},
+      {text:'작은 성취가 기뻤던 날.', date:'06.03', mood:'좋음', dot:'#588157', mbg:'#EAF0DE'},
+    ];
+  }
+  get lines(){
+    return [
+      {text:'오늘은 나에게 잘했다고 말해줬다.', date:'06.25', mood:'', dot:'', mbg:''},
+      {text:'작은 한 문장이 쌓여 큰 위로가 된다.', date:'06.22', mood:'', dot:'', mbg:''},
+      {text:'천천히 가도 괜찮아.', date:'06.20', mood:'', dot:'', mbg:''},
+      {text:'마음에 쉼표를 찍으며.', date:'06.18', mood:'', dot:'', mbg:''},
+      {text:'함께라서 다행인 하루.', date:'06.14', mood:'', dot:'', mbg:''},
+      {text:'그날의 노을을 기억해.', date:'06.10', mood:'', dot:'', mbg:''},
+      {text:'작은 용기를 낸 하루.', date:'06.06', mood:'', dot:'', mbg:''},
+    ];
+  }
+  get perPage(){ return 5; }
+  get current(){ return this.state.tab===0 ? this.records : this.lines; }
+  get totalPages(){ return Math.max(1, Math.ceil(this.current.length/this.perPage)); }
+
+  renderVals(){
+    const s=this.state;
+    const email=this.props.email ?? 'minseo.garden@gmail.com';
+
+    const NAVH={'홈':'florography 홈.dc.html','씨앗심기':'florography 홈.dc.html','속마음 편지':'florography 편지목록.dc.html','공유 게시판':'florography 공유게시판.dc.html','꽃 도감':'florography 도감.dc.html','정원':'florography 정원.dc.html','마이페이지':'florography 마이페이지.dc.html'};
+    const MENUH={'홈':'florography 홈.dc.html','씨앗심기':'florography 홈.dc.html','꽃에게 전하는 속마음':'florography 편지작성.dc.html','공유 게시판':'florography 공유게시판.dc.html','주간 꽃 컬렉션':'florography 도감.dc.html','꽃 도감':'florography 도감.dc.html','나만의 정원':'florography 정원.dc.html','감정 리포트':'florography 마이페이지.dc.html'};
+    const menuItems=[
+      {icon:'🏡', label:'홈', desc:'나의 정원 한눈에 보기'},
+      {icon:'🌱', label:'씨앗심기', desc:'오늘의 한 문장 기록'},
+      {icon:'💌', label:'꽃에게 전하는 속마음', desc:'대상에게 쓰는 감정 편지'},
+      {icon:'🌍', label:'공유 게시판', desc:'서로의 정원과 한마디 나누기'},
+      {icon:'🌼', label:'꽃 도감', desc:'피워낸 꽃 모아보기'},
+      {icon:'🪴', label:'나만의 정원', desc:'기록으로 가꾸는 공간'},
+      {icon:'📈', label:'감정 리포트', desc:'월별 감정 변화 살펴보기'},
+    ].map(m=>({...m, href:MENUH[m.label]||'#'}));
+    const navRaw=[
+      {label:'홈', active:false},{label:'속마음 편지', active:false},
+      {label:'공유 게시판', active:false},{label:'꽃 도감', active:false},{label:'마이페이지', active:true},
+    ];
+    const navItems=navRaw.map(n=>({
+      label:n.label, href:NAVH[n.label]||'#', color:n.active?'#2C3A2E':'#46503E', weight:n.active?'700':'500',
+      bg:n.active?'#E4EBD3':'transparent', dot:n.active?'#588157':'#A3B18A',
+    }));
+
+    const socials=[
+      {name:'Google', glyph:'G', brandBg:'#fff', brandColor:'#4285F4', detail:email, connected:true},
+      {name:'카카오', glyph:'K', brandBg:'#FEE500', brandColor:'#3C1E1E', detail:'카카오 계정으로 연결됨', connected:true},
+      {name:'네이버', glyph:'N', brandBg:'#03C75A', brandColor:'#fff', detail:'연결하면 더 편하게 로그인해요', connected:false},
+    ].map(x=>({
+      ...x,
+      stateLabel: x.connected?'연결됨':'연결하기',
+      stateBg: x.connected?'#EAF0DE':'#EEF1E6',
+      stateColor: x.connected?'#46603F':'#7C8675',
+    }));
+
+    const tabLabels=['내가 쓴 글', '한마디'];
+    const tabs=tabLabels.map((label,i)=>({
+      label, pick:()=>this.pickTab(i),
+      bg:s.tab===i?'#3A5A40':'transparent', color:s.tab===i?'#F4F6EE':'#5A6450',
+    }));
+
+    const data=this.current;
+    const page=Math.min(s.page,this.totalPages-1);
+    const slice=data.slice(page*this.perPage,(page+1)*this.perPage);
+    const isLine=s.tab===1;
+    const rows=slice.map(r=>({
+      text:r.text, date:r.date,
+      icon:isLine?'💬':'🌱', iconBg:isLine?'#EFE6F2':'#EAF0DE',
+      mood:r.mood||'', moodDot:r.dot||'#588157', moodBg:r.mbg||'#EAF0DE',
+    }));
+    const pages=Array.from({length:this.totalPages},(_,i)=>({
+      n:i+1, go:()=>this.goPage(i),
+      bg:i===page?'#3A5A40':'#F7F9F1', color:i===page?'#F4F6EE':'#46503E',
+      border:i===page?'#3A5A40':'#DDE3CF', weight:i===page?'700':'500',
+    }));
+
+    const moodColors=['#8694a3','#94a39a','#c4b878','#86a866','#588157'];
+    const isBaseM=(s.year===2026&&s.month===6);
+    const bloomMap=isBaseM?{2:4,5:3,9:2,12:1,14:1,15:2,17:1,18:4,20:4,21:0,22:2,23:1,24:3,25:3,26:4}:{};
+    const weekdays=['일','월','화','수','목','금','토'];
+    const daysInMonth=new Date(s.year,s.month,0).getDate();
+    const firstDow=new Date(s.year,s.month-1,1).getDay();
+    const railCal=[];
+    for(let i=0;i<firstDow;i++) railCal.push({n:'',color:'transparent',bg:'transparent',weight:'400'});
+    for(let d=1;d<=daysInMonth;d++){const has=Object.prototype.hasOwnProperty.call(bloomMap,d);railCal.push({n:d,color:has?'#fff':'#9aa394',bg:has?moodColors[bloomMap[d]]:'transparent',weight:has?'700':'400'});}
+
+    return {
+      nickname:s.nickname, initial:s.nickname.slice(0,1), email,
+      flowerColor:this.props.flowerColor ?? '#E59A91',
+      year:s.year+'년 '+s.month+'월', prevYear:()=>this.prevYear(), nextYear:()=>this.nextYear(), weekdays, railCal,
+      level:3, days:97, joinDate:'2026.03.24',
+      postCount:this.records.length, lineCount:this.lines.length, flowerCount:8,
+      menuOpen:s.menuOpen, toggleMenu:()=>this.toggleMenu(), closeMenu:()=>this.closeMenu(), stop:(e)=>this.stop(e),
+      menuItems, navItems,
+      openEdit:()=>this.openEdit(), editOpen:s.editOpen,
+      nickDraft:s.nickDraft, nickLen:(s.nickDraft||'').length, onNick:(e)=>this.onNick(e),
+      cancelEdit:()=>this.cancelEdit(), saveNick:()=>this.saveNick(),
+      socials, tabs, rows, pages,
+      prevPage:()=>this.prevPage(), nextPage:()=>this.nextPage(),
+      openLeave:()=>this.openLeave(), leaveOpen:s.leaveOpen, closeLeave:()=>this.closeLeave(),
+      leaveAgree:s.leaveAgree, onAgree:(e)=>this.onAgree(e), confirmLeave:()=>this.confirmLeave(),
+      leaveDisabled:!s.leaveAgree, leaveBtnBg:s.leaveAgree?'#B5564A':'#D8B5AE', leaveCursor:s.leaveAgree?'pointer':'not-allowed',
+      toast:s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
