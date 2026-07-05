@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import axios from "axios";
 import * as s from "./styles";
@@ -13,9 +13,10 @@ import {
     WEEKDAYS,
     BLOOM_MAP_2026_06,
 } from "./mockData";
+import { useMe } from "../../hooks/queries/useUser";
+import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
 
 const API_BASE = "http://localhost:8080";
-const PER_PAGE = 5;
 
 const PROVIDERS = {
     google: { glyph: "G", bg: "#fff", color: "#4285F4", label: "Google" },
@@ -33,31 +34,25 @@ function MyPage() {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // 연동 계정 (실제 API)
-    const [linkedAccounts, setLinkedAccounts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    // 연동 계정 (TanStack Query)
+    const meQuery = useMe();
+    const linkedAccounts = meQuery.data?.body?.linkedAccounts || [];
+    const loading = meQuery.isLoading;
+
     const [toast, setToast] = useState(null);
     const [toastExiting, setToastExiting] = useState(false);
+
+    // 내가 쓴 한마디's
+    const seedRecords = useSeedRecord();
+    console.log(seedRecords?.data?.body);
 
     // 헤더 / 드로어
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // 프로필 (닉네임 수정은 목업: 저장 API가 아직 없어 로컬 상태만 갱신)
+    // 프로필 (초기값은 meQuery로 동기화, 저장은 아직 API가 없어 로컬 상태만 갱신)
     const [nickname, setNickname] = useState("정원사");
     const [editOpen, setEditOpen] = useState(false);
     const [nickDraft, setNickDraft] = useState(nickname);
-
-    // 내 기록 (목업 데이터)
-    const [tab, setTab] = useState(0);
-    const [page, setPage] = useState(0);
-
-    // 회원 탈퇴 (목업)
-    const [leaveOpen, setLeaveOpen] = useState(false);
-    const [leaveAgree, setLeaveAgree] = useState(false);
-
-    // 캘린더 (목업)
-    const [year, setYear] = useState(2026);
-    const [month, setMonth] = useState(6);
 
     const accessToken = localStorage.getItem("accessToken");
 
@@ -69,25 +64,6 @@ function MyPage() {
             setTimeout(() => setToast(null), 300);
         }, 3000);
     }, []);
-
-    const fetchLinkedAccounts = useCallback(async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(`${API_BASE}/api/user/linked-accounts`, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            });
-            setLinkedAccounts(res.data.linkedAccounts || []);
-        } catch (err) {
-            if (err.response?.status === 401) {
-                localStorage.removeItem("accessToken");
-                navigate("/", { replace: true });
-                return;
-            }
-            showToast("error", "계정 정보를 불러올 수 없습니다.");
-        } finally {
-            setLoading(false);
-        }
-    }, [accessToken, navigate, showToast]);
 
     useEffect(() => {
         if (!accessToken) {
@@ -108,9 +84,15 @@ function MyPage() {
             showToast("error", ERROR_MESSAGES[reason] || "연동 중 오류가 발생했습니다.");
             setSearchParams({}, { replace: true });
         }
-
-        fetchLinkedAccounts();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // meQuery 응답의 닉네임을 편집 가능한 로컬 상태로 동기화
+    useEffect(() => {
+        const fetchedNickname = meQuery.data?.body?.linkedAccounts?.[0]?.nickname || meQuery.data?.linkedAccounts?.[0]?.nickname;
+        if (fetchedNickname) {
+            setNickname(fetchedNickname);
+        }
+    }, [meQuery.data]);
 
     const handleLink = async (provider) => {
         try {
@@ -135,7 +117,7 @@ function MyPage() {
                 "success",
                 `✓ ${PROVIDERS[provider]?.label || provider} 연동이 해제되었습니다.`
             );
-            fetchLinkedAccounts();
+            meQuery.refetch();
         } catch (err) {
             const msg = err.response?.data?.error || "연동 해제에 실패했습니다.";
             showToast("error", msg);
@@ -174,58 +156,31 @@ function MyPage() {
         showToast("success", "프로필이 저장되었어요 🌿");
     };
 
-    // ─── 회원 탈퇴 ───
-    const openLeave = () => {
-        setLeaveAgree(false);
-        setLeaveOpen(true);
-    };
-    const closeLeave = () => setLeaveOpen(false);
-    const confirmLeave = () => {
-        if (!leaveAgree) return;
-        setLeaveOpen(false);
-        showToast("info", "탈퇴 요청이 접수되었어요. (목업)");
-    };
+    
+    // ─── 내 기록 (목업, 정적 표시) ───
+    const recordRows = seedRecords?.data?.body.map((r) => ({
+        text: r.sentence,
+        date: r.createdDate ? r.createdDate.slice(5).replace('-', '.') : r.createdDate,
+        icon: "🌱",
+        iconBg: "#EAF0DE",
+        mood: r.mood.mood || "",
+        moodStyle: r.mood.mood ? MOOD_STYLES[r.mood.mood] : null,
+    }));
 
-    // ─── 내 기록 ───
-    const pickTab = (i) => {
-        setTab(i);
-        setPage(0);
-    };
-    const current = tab === 0 ? RECORDS : LINES;
-    const totalPages = Math.max(1, Math.ceil(current.length / PER_PAGE));
-    const safePage = Math.min(page, totalPages - 1);
-    const rows = current
-        .slice(safePage * PER_PAGE, (safePage + 1) * PER_PAGE)
-        .map((r) => ({
-            text: r.text,
-            date: r.date,
-            icon: tab === 0 ? "🌱" : "💬",
-            iconBg: tab === 0 ? "#EAF0DE" : "#EFE6F2",
-            mood: r.mood || "",
-            moodStyle: r.mood ? MOOD_STYLES[r.mood] : null,
-        }));
+    // // ─── 내 기록 (목업, 정적 표시) ───
+    // const recordRows = RECORDS.map((r) => ({
+    //     text: r.text,
+    //     date: r.date,
+    //     icon: "🌱",
+    //     iconBg: "#EAF0DE",
+    //     mood: r.mood || "",
+    //     moodStyle: r.mood ? MOOD_STYLES[r.mood] : null,
+    // }));
 
-    // ─── 캘린더 ───
-    const prevYear = () =>
-        setMonth((m) => {
-            if (m <= 1) {
-                setYear((y) => y - 1);
-                return 12;
-            }
-            return m - 1;
-        });
-    const nextYear = () =>
-        setMonth((m) => {
-            if (m >= 12) {
-                setYear((y) => y + 1);
-                return 1;
-            }
-            return m + 1;
-        });
-
-    const railCal = useMemo(() => {
-        const isBaseMonth = year === 2026 && month === 6;
-        const bloomMap = isBaseMonth ? BLOOM_MAP_2026_06 : {};
+    // ─── 캘린더 (목업, 정적 표시) ───
+    const year = 2026;
+    const month = 6;
+    const railCal = (() => {
         const daysInMonth = new Date(year, month, 0).getDate();
         const firstDow = new Date(year, month - 1, 1).getDay();
         const cells = [];
@@ -233,21 +188,25 @@ function MyPage() {
             cells.push({ n: "", color: "transparent", bg: "transparent", weight: 400 });
         }
         for (let d = 1; d <= daysInMonth; d++) {
-            const has = Object.prototype.hasOwnProperty.call(bloomMap, d);
+            const has = Object.prototype.hasOwnProperty.call(
+                BLOOM_MAP_2026_06,
+                d
+            );
             cells.push({
                 n: d,
                 color: has ? "#fff" : "#9aa394",
-                bg: has ? MOOD_COLORS[bloomMap[d]] : "transparent",
+                bg: has ? MOOD_COLORS[BLOOM_MAP_2026_06[d]] : "transparent",
                 weight: has ? 700 : 400,
             });
         }
         return cells;
-    }, [year, month]);
+    })();
 
     const linkedByProvider = Object.fromEntries(
         linkedAccounts.map((a) => [a.provider, a])
     );
     const email = linkedAccounts[0]?.email || "이메일 없음";
+
     const days = 97;
     const joinDate = "2026.03.24";
 
@@ -421,7 +380,7 @@ function MyPage() {
                                 </div>
                                 <div css={s.statItem}>
                                     <span css={s.statValue}>
-                                        {LINES.length}
+                                        {seedRecords?.data?.body.length}
                                     </span>
                                     <span css={s.statLabel}>한마디</span>
                                 </div>
@@ -535,24 +494,10 @@ function MyPage() {
                     <section css={s.sectionStyle}>
                         <div css={s.recordsHeader}>
                             <div css={s.recordsTitle}>내 기록</div>
-                            <div css={s.tabGroup}>
-                                <button
-                                    css={s.tabBtn(tab === 0)}
-                                    onClick={() => pickTab(0)}
-                                >
-                                    내가 쓴 글
-                                </button>
-                                <button
-                                    css={s.tabBtn(tab === 1)}
-                                    onClick={() => pickTab(1)}
-                                >
-                                    한마디
-                                </button>
-                            </div>
                         </div>
 
                         <div>
-                            {rows.map((r, i) => (
+                            {recordRows.map((r, i) => (
                                 <div css={s.recordRow} key={`${r.date}-${i}`}>
                                     <span css={s.recordIcon(r.iconBg)}>
                                         {r.icon}
@@ -578,38 +523,6 @@ function MyPage() {
                                 </div>
                             ))}
                         </div>
-
-                        <div css={s.pagination}>
-                            <button
-                                css={s.pageArrowBtn}
-                                disabled={safePage === 0}
-                                onClick={() =>
-                                    setPage((p) => Math.max(0, p - 1))
-                                }
-                            >
-                                ‹
-                            </button>
-                            {Array.from({ length: totalPages }, (_, i) => (
-                                <button
-                                    key={i}
-                                    css={s.pageNumBtn(i === safePage)}
-                                    onClick={() => setPage(i)}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
-                            <button
-                                css={s.pageArrowBtn}
-                                disabled={safePage === totalPages - 1}
-                                onClick={() =>
-                                    setPage((p) =>
-                                        Math.min(totalPages - 1, p + 1)
-                                    )
-                                }
-                            >
-                                ›
-                            </button>
-                        </div>
                     </section>
 
                     {/* 회원 탈퇴 */}
@@ -621,9 +534,7 @@ function MyPage() {
                                 되돌릴 수 없어요.
                             </div>
                         </div>
-                        <button css={s.leaveBtn} onClick={openLeave}>
-                            회원 탈퇴
-                        </button>
+                        <span css={s.leaveBtn}>회원 탈퇴</span>
                     </section>
                 </main>
 
@@ -660,15 +571,11 @@ function MyPage() {
 
                     <div css={s.rightCard}>
                         <div css={s.calHeader}>
-                            <button css={s.calNavBtn} onClick={prevYear}>
-                                ◀
-                            </button>
+                            <span css={s.calNavBtn}>◀</span>
                             <span css={s.calMonth}>
                                 {year}년 {month}월
                             </span>
-                            <button css={s.calNavBtn} onClick={nextYear}>
-                                ▶
-                            </button>
+                            <span css={s.calNavBtn}>▶</span>
                         </div>
                         <div css={s.calWeekdayRow}>
                             {WEEKDAYS.map((w) => (
@@ -703,51 +610,6 @@ function MyPage() {
                     </div>
                 </aside>
             </div>
-
-            {/* 탈퇴 확인 모달 */}
-            {leaveOpen && (
-                <div css={s.modalOverlay} onClick={closeLeave}>
-                    <div
-                        css={s.modalCard}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div css={s.modalIcon}>🥀</div>
-                        <div css={s.modalTitle}>정말 떠나시겠어요?</div>
-                        <p css={s.modalDesc}>
-                            탈퇴하면 그동안 키운 정원과 {RECORDS.length}개의
-                            기록, 모아온 꽃이 모두 사라져요. 이 작업은 되돌릴
-                            수 없어요.
-                        </p>
-                        <label css={s.modalAgree}>
-                            <input
-                                type="checkbox"
-                                checked={leaveAgree}
-                                onChange={(e) =>
-                                    setLeaveAgree(e.target.checked)
-                                }
-                            />
-                            <span css={s.modalAgreeText}>
-                                위 내용을 확인했으며 탈퇴에 동의합니다.
-                            </span>
-                        </label>
-                        <div css={s.modalActions}>
-                            <button
-                                css={s.modalCancelBtn}
-                                onClick={closeLeave}
-                            >
-                                계속 함께하기
-                            </button>
-                            <button
-                                css={s.modalConfirmBtn(leaveAgree)}
-                                disabled={!leaveAgree}
-                                onClick={confirmLeave}
-                            >
-                                탈퇴하기
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* 토스트 */}
             {toast && (
