@@ -14,6 +14,7 @@ import {
     BLOOM_MAP_2026_06,
 } from "./mockData";
 import { useMe } from "../../hooks/queries/useUser";
+import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
 
 const API_BASE = "http://localhost:8080";
 
@@ -35,11 +36,15 @@ function MyPage() {
 
     // 연동 계정 (TanStack Query)
     const meQuery = useMe();
-    const linkedAccounts = meQuery.data?.linkedAccounts || [];
+    const linkedAccounts = meQuery.data?.body?.linkedAccounts || [];
     const loading = meQuery.isLoading;
 
     const [toast, setToast] = useState(null);
     const [toastExiting, setToastExiting] = useState(false);
+
+    // 내가 쓴 한마디's
+    const seedRecords = useSeedRecord();
+    console.log(seedRecords?.data?.body);
 
     // 헤더 / 드로어
     const [menuOpen, setMenuOpen] = useState(false);
@@ -83,7 +88,7 @@ function MyPage() {
 
     // meQuery 응답의 닉네임을 편집 가능한 로컬 상태로 동기화
     useEffect(() => {
-        const fetchedNickname = meQuery.data?.linkedAccounts?.[0]?.nickname;
+        const fetchedNickname = meQuery.data?.body?.linkedAccounts?.[0]?.nickname || meQuery.data?.linkedAccounts?.[0]?.nickname;
         if (fetchedNickname) {
             setNickname(fetchedNickname);
         }
@@ -151,15 +156,26 @@ function MyPage() {
         showToast("success", "프로필이 저장되었어요 🌿");
     };
 
+    
     // ─── 내 기록 (목업, 정적 표시) ───
-    const recordRows = RECORDS.map((r) => ({
-        text: r.text,
-        date: r.date,
+    const recordRows = seedRecords?.data?.body.map((r) => ({
+        text: r.sentence,
+        date: r.createdDate ? r.createdDate.slice(5).replace('-', '.') : r.createdDate,
         icon: "🌱",
         iconBg: "#EAF0DE",
-        mood: r.mood || "",
-        moodStyle: r.mood ? MOOD_STYLES[r.mood] : null,
+        mood: r.mood.mood || "",
+        moodStyle: r.mood.mood ? MOOD_STYLES[r.mood.mood] : null,
     }));
+
+    // // ─── 내 기록 (목업, 정적 표시) ───
+    // const recordRows = RECORDS.map((r) => ({
+    //     text: r.text,
+    //     date: r.date,
+    //     icon: "🌱",
+    //     iconBg: "#EAF0DE",
+    //     mood: r.mood || "",
+    //     moodStyle: r.mood ? MOOD_STYLES[r.mood] : null,
+    // }));
 
     // ─── 캘린더 (목업, 정적 표시) ───
     const year = 2026;
@@ -364,7 +380,7 @@ function MyPage() {
                                 </div>
                                 <div css={s.statItem}>
                                     <span css={s.statValue}>
-                                        {LINES.length}
+                                        {seedRecords?.data?.body.length}
                                     </span>
                                     <span css={s.statLabel}>한마디</span>
                                 </div>
