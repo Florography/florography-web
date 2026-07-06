@@ -29,7 +29,7 @@ function HomePage() {
 
     const handleSubmit = () => {
         if(!textTrim()) {
-            alert("오늘의 한 문장을 입력해주세요!");
+            alert("오늘의 한 문장을 심어주세요");
             return;
         }
     }
@@ -44,7 +44,7 @@ function HomePage() {
                 </div>
             </div>
             <div>
-                <h3>🌿 전체 감정 기록 목록</h3>
+                <label>오늘의 대표 감정을 골라주세요</label>
                 
                 {isLoading && <div>기록을 불러오는 중입니다...</div>}
 
