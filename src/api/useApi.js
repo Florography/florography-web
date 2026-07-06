@@ -22,3 +22,15 @@ export const getMyRecored = async () => {
         return error.response.data;
     }
 }
+
+
+export const getMyMood = async () => {
+    try{
+        const response = await axiosInstance.get("/api/mood");
+        console.log(response);
+        return response.data;
+
+    } catch(error){
+        return error.response.data;
+    }
+}
