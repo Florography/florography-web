@@ -3,20 +3,16 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router";
 import * as s from "./styles";
 import { useMe } from "../../hooks/queries/useUser";
-import {
-    MENU_ITEMS,
-    NAV_ITEMS,
-    FLOWERS,
-    MOOD_COLORS,
-    WEEKDAYS,
-    BLOOM_MAP_2026_06,
-} from "./mockData";
-import { getFlowerDictionary } from "../../api/useApi";
 import { useFlowerDirectoies } from "../../hooks/queries/flowerDirectory";
+import { MENU_ITEMS, NAV_ITEMS, MOOD_COLORS, WEEKDAYS, BLOOM_MAP_2026_06 } from "./mockData";
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const PETALS = [0, 72, 144, 216, 288];
 const PER_PAGE = 10;
 const FILTER_LABELS = ["전체", "수집한 꽃"];
+
+const flowerImgUrl = (path) => (path ? `${API_BASE}${path}` : path);
 
 function FlowerDirectory() {
     const navigate = useNavigate();
@@ -82,11 +78,15 @@ function FlowerDirectory() {
     const linkedAccounts = meQuery.data?.linkedAccounts || [];
     const userName = linkedAccounts[0]?.nickname || "정원사";
 
-    const collected = FLOWERS.filter((f) => f.got).length;
-    const total = FLOWERS.length;
+    const flowerDirectory = useFlowerDirectoies();
+    const flowers = flowerDirectory.data?.body || [];
 
-    const withIndex = FLOWERS.map((f, i) => ({ ...f, _idx: i }));
-    const filtered = filter === 1 ? withIndex.filter((f) => f.got) : withIndex;
+    // userFlower가 있으면 사용자가 보유(개화)한 꽃으로 간주한다.
+    const collected = flowers.filter((f) => Boolean(f.userFlower)).length;
+    const total = flowers.length;
+
+    const filtered =
+        filter === 1 ? flowers.filter((f) => Boolean(f.userFlower)) : flowers;
     const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
     const safePage = Math.min(page, totalPages - 1);
     const pageItems = filtered.slice(
@@ -94,10 +94,7 @@ function FlowerDirectory() {
         (safePage + 1) * PER_PAGE
     );
 
-    // console.log(meQuery.data);  
-    const flowerDirectory = useFlowerDirectoies();
-    console.log(flowerDirectory?.data?.body);
-    const selectedFlower = selected != null ? FLOWERS[selected] : null;
+    const selectedFlower = flowers.find((f) => f.id === selected) || null;
 
     const railCal = (() => {
         const isBaseMonth = year === 2026 && month === 6;
@@ -260,70 +257,71 @@ function FlowerDirectory() {
 
                     <section css={s.gridSection}>
                         <div css={s.flowerGrid}>
-                            {pageItems.map((f) => {
-                                const locked = !f.got;
-                                const color = locked ? "#CBD2C4" : f.color;
-                                const coreColor = locked ? "#BAC3B2" : f.core;
-                                const coreRing = locked ? "#AAB4A0" : f.ring;
-                                const petalOpacity = locked ? 0.5 : 0.95;
+                            {flowerDirectory.isLoading ? (
+                                <div css={[s.emptyState, s.loadingPulse]}>
+                                    도감을 불러오는 중...
+                                </div>
+                            ) : pageItems.length === 0 ? (
+                                <div css={s.emptyState}>
+                                    표시할 꽃이 없어요
+                                </div>
+                            ) : (
+                                pageItems.map((f) => {
+                                    const locked = !f.userFlower;
+                                    // const locked = false;
+                                    
 
-                                return (
-                                    <button
-                                        key={f._idx}
-                                        css={s.flowerCard(
-                                            locked ? "default" : "pointer"
-                                        )}
-                                        onClick={() =>
-                                            locked
-                                                ? showToast(
-                                                      "아직 피우지 않은 꽃이에요 🌱"
-                                                  )
-                                                : setSelected(f._idx)
-                                        }
-                                    >
-                                        <span
-                                            css={s.flowerImageArea(
-                                                locked ? "#F1F3EC" : "#F6F9F0"
+                                    return (
+                                        <button
+                                            key={f.id}
+                                            css={s.flowerCard(
+                                                locked ? "default" : "pointer"
                                             )}
+                                            onClick={() =>
+                                                locked
+                                                    ? showToast(
+                                                          "아직 피우지 않은 꽃이에요 🌱"
+                                                      )
+                                                    : setSelected(f.id)
+                                            }
                                         >
-                                            <span css={s.petalWrap(62)}>
-                                                {PETALS.map((rotate) => (
-                                                    <span
-                                                        key={rotate}
-                                                        css={s.petal(
-                                                            18,
-                                                            30,
-                                                            color,
-                                                            rotate,
-                                                            petalOpacity
-                                                        )}
-                                                    />
-                                                ))}
-                                                <span
-                                                    css={s.flowerCore(
-                                                        22,
-                                                        coreColor,
-                                                        coreRing,
-                                                        3
+                                            <span
+                                                css={s.flowerImageArea(
+                                                    locked
+                                                        ? "#F1F3EC"
+                                                        : "#F6F9F0"
+                                                )}
+                                            >
+                                                <img
+                                                    src={flowerImgUrl(
+                                                        f.flowerImg
+                                                    )}
+                                                    alt={f.flowerName}
+                                                    css={s.flowerThumbImg(
+                                                        locked
                                                     )}
                                                 />
+                                                {locked && (
+                                                    <span
+                                                        css={s.lockedOverlay}
+                                                    >
+                                                        ?
+                                                    </span>
+                                                )}
                                             </span>
-                                            {locked && (
-                                                <span css={s.lockedOverlay}>
-                                                    ?
-                                                </span>
-                                            )}
-                                        </span>
-                                        <span
-                                            css={s.flowerNameLabel(
-                                                locked ? "#A6AE98" : "#34402E"
-                                            )}
-                                        >
-                                            {locked ? "???" : f.name}
-                                        </span>
-                                    </button>
-                                );
-                            })}
+                                            <span
+                                                css={s.flowerNameLabel(
+                                                    locked
+                                                        ? "#A6AE98"
+                                                        : "#34402E"
+                                                )}
+                                            >
+                                                {locked ? "???" : f.flowerName}
+                                            </span>
+                                        </button>
+                                    );
+                                })
+                            )}
                         </div>
 
                         <div css={s.pagination}>
@@ -465,50 +463,37 @@ function FlowerDirectory() {
                         </button>
                         <div css={s.modalLayout}>
                             <div css={s.modalImageBox}>
-                                <div css={s.petalWrap(150)}>
-                                    {PETALS.map((rotate) => (
-                                        <span
-                                            key={rotate}
-                                            css={s.petal(
-                                                44,
-                                                74,
-                                                selectedFlower.color,
-                                                rotate,
-                                                0.95
-                                            )}
-                                        />
-                                    ))}
-                                    <span
-                                        css={s.flowerCore(
-                                            52,
-                                            selectedFlower.core,
-                                            selectedFlower.ring,
-                                            6
-                                        )}
-                                    />
-                                </div>
+                                <img
+                                    src={flowerImgUrl(
+                                        selectedFlower.flowerImg
+                                    )}
+                                    alt={selectedFlower.flowerName}
+                                    css={s.modalFlowerImg}
+                                />
                             </div>
                             <div css={s.modalInfoCol}>
                                 <div css={s.modalNameBox}>
                                     <div css={s.modalFieldLabel}>꽃 이름</div>
                                     <div css={s.modalName}>
-                                        {selectedFlower.name}
+                                        {selectedFlower.flowerName}
                                     </div>
                                 </div>
                                 <div css={s.modalMeaningBox}>
                                     <div css={s.modalMeaningLabel}>꽃말</div>
                                     <div css={s.modalMeaning}>
-                                        {selectedFlower.meaning}
+                                        {selectedFlower.flowerMeaning}
                                     </div>
                                 </div>
                                 <div css={s.modalMessageBox}>
                                     <p css={s.modalMessage}>
-                                        "{selectedFlower.msg}"
+                                        "{selectedFlower.kindWords}"
                                     </p>
                                 </div>
                                 <div css={s.modalDateRow}>
                                     <span css={s.modalDateBadge}>
-                                        🗓 획득 {selectedFlower.date || "-"}
+                                        🗓 획득{" "}
+                                        {selectedFlower.userFlower
+                                            ?.obtainedAt || "-"}
                                     </span>
                                 </div>
                             </div>

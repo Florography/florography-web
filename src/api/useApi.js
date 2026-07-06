@@ -11,9 +11,7 @@ export const getMyRecored = async () => {
 }
 
 export const getFlowerDictionary = async () => {
-    console.log("디렉터리 서치")
     const response = await axiosInstance.get("api/flowerdictionary");
-    console.log(response.data)
     return response.data;
 }
 

@@ -28,6 +28,23 @@ export const toastOut = keyframes`
     to { opacity: 0; transform: translate(-50%, -20px); }
 `;
 
+export const pulse = keyframes`
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+`;
+
+export const emptyState = css`
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: ${COLORS.textFaint};
+    font-size: 0.9rem;
+`;
+
+export const loadingPulse = css`
+    animation: ${pulse} 1.5s infinite;
+`;
+
 // ─── Page / Header ───
 export const pageStyle = css`
     min-height: 100vh;
@@ -533,6 +550,20 @@ export const flowerCore = (size, color, ring, ringWidth) => css`
     background: ${color};
     transform: translate(-50%, 50%);
     box-shadow: inset 0 0 0 ${ringWidth}px ${ring};
+`;
+
+export const flowerThumbImg = (locked) => css`
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    filter: ${locked ? "grayscale(1)" : "none"};
+    opacity: ${locked ? 0.5 : 1};
+`;
+
+export const modalFlowerImg = css`
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
 `;
 
 export const lockedOverlay = css`

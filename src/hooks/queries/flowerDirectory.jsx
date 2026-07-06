@@ -5,7 +5,7 @@ export const useFlowerDirectoies = () => {
     const accessToken = localStorage.getItem("accessToken");
 
     return useQuery({
-        queryKey: ["seedRecord", accessToken],
+        queryKey: ["flowerDictionary", accessToken],
         queryFn: getFlowerDictionary, 
         retry: 0,
         staleTime: 6000 * 60 * 24,
