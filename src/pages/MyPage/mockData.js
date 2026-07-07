@@ -28,7 +28,7 @@ export const MENU_ITEMS = [
 ];
 
 export const NAV_ITEMS = [
-    { label: "홈", href: "/", active: false },
+    { label: "홈", href: "/home", active: false },
     { label: "속마음 편지", href: null, active: false },
     { label: "공유 게시판", href: null, active: false },
     { label: "꽃 도감", href: null, active: false },
