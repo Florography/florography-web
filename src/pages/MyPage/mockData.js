@@ -17,7 +17,7 @@ export const MENU_ITEMS = [
         desc: "서로의 정원과 한마디 나누기",
         href: null,
     },
-    { icon: "🌼", label: "꽃 도감", desc: "피워낸 꽃 모아보기", href: null },
+    { icon: "🌼", label: "꽃 도감", desc: "피워낸 꽃 모아보기", href: "/flowers" },
     { icon: "🪴", label: "나만의 정원", desc: "기록으로 가꾸는 공간", href: null },
     {
         icon: "📈",
@@ -31,7 +31,7 @@ export const NAV_ITEMS = [
     { label: "홈", href: "/home", active: false },
     { label: "속마음 편지", href: null, active: false },
     { label: "공유 게시판", href: null, active: false },
-    { label: "꽃 도감", href: null, active: false },
+    { label: "꽃 도감", href: "/flowers", active: false },
     { label: "마이페이지", href: "/mypage", active: true },
 ];
 

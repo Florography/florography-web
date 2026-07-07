@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import axios from "axios";
 import * as s from "./styles";
 import {
     MENU_ITEMS,
@@ -15,6 +14,7 @@ import {
 } from "./mockData";
 import { useMe } from "../../hooks/queries/useUser";
 import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
+import { linkAccountRequest, unlinkAccountRequest } from "../../api/useApi";
 
 const API_BASE = "http://localhost:8080";
 
@@ -96,30 +96,24 @@ function MyPage() {
 
     const handleLink = async (provider) => {
         try {
-            const res = await axios.post(
-                `${API_BASE}/api/user/link/${provider}`,
-                {},
-                { headers: { Authorization: `Bearer ${accessToken}` } }
-            );
-            window.location.href = `${API_BASE}${res.data.linkUrl}`;
+            const res = await linkAccountRequest(provider);
+            window.location.assign(`${API_BASE}${res.body.linkUrl}`);
         } catch (err) {
-            const msg = err.response?.data?.error || "연동 요청에 실패했습니다.";
+            const msg = err.response?.data?.message || "연동 요청에 실패했습니다.";
             showToast("error", msg);
         }
     };
 
     const handleUnlink = async (provider) => {
         try {
-            await axios.delete(`${API_BASE}/api/user/link/${provider}`, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            });
+            await unlinkAccountRequest(provider);
             showToast(
                 "success",
                 `✓ ${PROVIDERS[provider]?.label || provider} 연동이 해제되었습니다.`
             );
             meQuery.refetch();
         } catch (err) {
-            const msg = err.response?.data?.error || "연동 해제에 실패했습니다.";
+            const msg = err.response?.data?.message || "연동 해제에 실패했습니다.";
             showToast("error", msg);
         }
     };
@@ -162,7 +156,7 @@ function MyPage() {
         showToast("success", "프로필이 저장되었어요 🌿");
     };
 
-    
+
     // ─── 내 기록 (목업, 정적 표시) ───
     const recordRows = seedRecords?.data?.body.map((r) => ({
         text: r.sentence,
@@ -441,7 +435,7 @@ function MyPage() {
                                                 <div css={s.accountDetail}>
                                                     {connected
                                                         ? account.email ||
-                                                          "이메일 없음"
+                                                        "이메일 없음"
                                                         : "연결하면 더 편하게 로그인해요"}
                                                 </div>
                                             </div>
@@ -463,7 +457,7 @@ function MyPage() {
                                                             }
                                                             title={
                                                                 linkedAccounts.length <=
-                                                                1
+                                                                    1
                                                                     ? "최소 1개의 계정은 연동되어야 합니다"
                                                                     : "연동 해제"
                                                             }
