@@ -1,4 +1,4 @@
-import { axiosInstance } from "./axiosInstance";
+import { axiosInstance } from "./axiosInstance.js";
 
 export const getMeRequest = async () => {
     try{
@@ -15,7 +15,6 @@ export const getMeRequest = async () => {
 export const getMyRecored = async () => {
     try{
         const response = await axiosInstance.get("api/seedrecord");
-        console.log(response);
         return response.data;
 
     } catch(error){
@@ -27,7 +26,6 @@ export const getMyRecored = async () => {
 export const getMyMood = async () => {
     try{
         const response = await axiosInstance.get("/api/mood");
-        console.log(response);
         return response.data;
 
     } catch(error){

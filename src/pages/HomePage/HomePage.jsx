@@ -4,24 +4,29 @@ import * as s from "./styles";
 import { useMood } from "../../hooks/queries/useMood";
 import { useState } from "react";
 import { writeSeedRecord } from "../../api/homeApi";
+import { useMe } from "../../hooks/queries/useUser";
 
 // 1. 프론트엔드에 기분 5단계 정의 (UI 매핑용)
 const MOOD_OPTIONS = [
-    { level: 1, label: "😭 많이 지침" },
-    { level: 2, label: "🙁 가라앉음" },
-    { level: 3, label: "😐 괜찮음" },
-    { level: 4, label: "🙂 좋음" },
-    { level: 5, label: "😆 매우 좋음" },
+    { level: 0, label: "😭" },
+    { level: 1, label: "🙁" },
+    { level: 2, label: "😐" },
+    { level: 3, label: "🙂" },
+    { level: 4, label: "😆" },
 ];
 
 function HomePage() {
     const moodQuery = useMood();
+    const user = useMe();
     const moods = moodQuery.data?.body || []; // 안전하게 빈 배열을 기본값으로 세팅
     const isLoading = moodQuery.isLoading;
 
-    const [selectMood, setSelectMood] = useState(3); //기본값 : 3 (괜찮음)
-
-    const [ inputSeedRecord, setInputSeedRecord ] = useState();
+    console.log(user);
+    const [ inputSeedRecord, setInputSeedRecord ] = useState({
+        userId: user.data?.body?.linkedAccounts[0]?.uid,
+        sentence: "",
+        moodIdx: 3,
+    });
 
     const handleWriteOnClick = () => {
         writeSeedRecord(inputSeedRecord);
@@ -39,7 +44,7 @@ function HomePage() {
             <div css={s.top}>
                 <label>🌱 오늘 하루는 어땠나요?</label>
                 <div>
-                    <input type="text" onChange={(e) => setInputSeedRecord(e.target.value)} placeholder="오늘의 한 문장을 심어보세요" />
+                    <input type="text" onChange={(e) => setInputSeedRecord({ ...inputSeedRecord, sentence: e.target.value })} placeholder="오늘의 한 문장을 심어보세요" />
                     <button onClick={handleWriteOnClick}>입력</button>
                 </div>
             </div>
@@ -50,11 +55,17 @@ function HomePage() {
 
                 {/* 데이터가 출력되는지 확인 */}
                 {!isLoading && moods.map((mood, index) => (
-                    <div key={mood.id || index} style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
-                        <span style={{ fontWeight: "bold" }}>
-                            {mood.mood || "데이터 없음"}
-                        </span>
-                    </div>
+                    <label key={mood.id || index}>
+                        <input
+                            type="radio"
+                            name="mood"
+                            value={mood.id}
+                            checked={inputSeedRecord.moodIdx === mood.id}
+                            onChange={() => setInputSeedRecord({ ...inputSeedRecord, moodIdx: mood.id })}
+                        />
+                        <span>{MOOD_OPTIONS[index]?.label}</span>
+                        <span>{mood.mood || "데이터 없음"}</span>
+                    </label>
                 ))}
             </div>
         </div>
