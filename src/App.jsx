@@ -1,9 +1,11 @@
 import { css, Global } from "@emotion/react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { Route, Routes } from "react-router";
 import InformationPage from "./pages/Information/InformationPage";
 import LoginPage from "./pages/Login/LoginPage";
 import OAuthCallbackPage from "./pages/CallbackPage/OAuthCallbackPage";
 import MyPage from "./pages/MyPage/MyPage";
+
+import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import HomePage from "./pages/HomePage/HomePage";
 
 const globalStyles = css`
@@ -43,6 +45,8 @@ function App() {
                         element={<OAuthCallbackPage />}
                     />
                     <Route path="/mypage" element={<MyPage />} />
+
+                    <Route path="/flowers" element={<FlowerDirectory />} />
                     <Route path="/home" element={<HomePage />} />
                 </Routes>
         </>
