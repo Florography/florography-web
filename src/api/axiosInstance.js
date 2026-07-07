@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080",
+    baseURL: "http://localhost:8080",
     timeout: 5000,
 })
 
@@ -20,7 +20,7 @@ axiosInstance.interceptors.response.use(
     (error) => {
         if (error.response.status === 401) {  //401 인증오류
             localStorage.removeItem("accessToken");
-            window.location.href = "/login";
+            // window.location.href = "/auth/login";
         }
         return Promise.reject(error);
     }
