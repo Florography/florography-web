@@ -125,14 +125,20 @@ function MyPage() {
 
     // ─── 드로어 / 네비게이션 ───
     const goTo = (item) => {
-        setMenuOpen(false);
-        if (item.href) {
-            navigate(item.href);
-        } else {
-            showToast("info", `${item.label} 기능은 준비 중이에요 🌱`);
-        }
-    };
+    setMenuOpen(false);
+    
+    // 라벨이 '정원'이거나 href가 '/home'인 경우 확실하게 /home 이동
+    if (item.label === "홈" || item.href === "/home") {
+        navigate("/home");
+        return;
+    }
 
+    if (item.href) {
+        navigate(item.href);
+    } else {
+        showToast("info", `${item.label} 기능은 준비 중이에요 🌱`);
+    }
+};
     // ─── 프로필 ───
     const openEdit = () => {
         setNickDraft(nickname);
@@ -227,7 +233,9 @@ function MyPage() {
                         <span />
                         <span />
                     </button>
-                    <div css={s.logoGroup}>
+                    <div css={s.logoGroup}
+                        onClick={() => navigate("/home")}
+                    >
                         <span css={s.logoText}>florography</span>
                         <span css={s.logoTagline}>마음을 키우는 정원</span>
                     </div>
