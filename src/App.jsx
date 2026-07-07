@@ -1,12 +1,11 @@
 import { css, Global } from "@emotion/react";
-import { Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import InformationPage from "./pages/Information/InformationPage";
 import LoginPage from "./pages/Login/LoginPage";
 import OAuthCallbackPage from "./pages/CallbackPage/OAuthCallbackPage";
 import MyPage from "./pages/MyPage/MyPage";
-
-import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import HomePage from "./pages/HomePage/HomePage";
+import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 
 const globalStyles = css`
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
@@ -44,9 +43,8 @@ function App() {
                         path="/auth/oauth2/callback"
                         element={<OAuthCallbackPage />}
                     />
-                    <Route path="/mypage" element={<MyPage />} />
-
                     <Route path="/flowers" element={<FlowerDirectory />} />
+                    <Route path="/mypage" element={<MyPage />} />
                     <Route path="/home" element={<HomePage />} />
                 </Routes>
         </>
