@@ -267,7 +267,7 @@ function FlowerDirectory() {
                                 </div>
                             ) : (
                                 pageItems.map((f) => {
-                                    const locked = !f.userFlower;
+                                    const locked = !f.userFlower.id;
                                     // const locked = false;
                                     
 

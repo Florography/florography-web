@@ -12,6 +12,7 @@ export const getMyRecored = async () => {
 
 export const getFlowerDictionary = async () => {
     const response = await axiosInstance.get("api/flowerdictionary");
+    console.log(response.data);
     return response.data;
 }
 
