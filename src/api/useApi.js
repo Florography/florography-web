@@ -1,7 +1,7 @@
 import { axiosInstance } from "./axiosInstance.js";
 
 export const getMeRequest = async () => {
-    const response = await axiosInstance.get("api/user/linked-accounts");
+    const response = await axiosInstance.get("/api/user/linked-accounts");
     return response.data;
 }
 
