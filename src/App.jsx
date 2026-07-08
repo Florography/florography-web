@@ -7,6 +7,7 @@ import MyPage from "./pages/MyPage/MyPage";
 import HomePage from "./pages/HomePage/HomePage";
 import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import ShareBoardPage from "./pages/ShareBoardPage/ShareBoardPage";
+import HeartLetter from "./pages/HeartLetterPage/HeartLetterPage";
 
 const globalStyles = css`
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
@@ -47,6 +48,7 @@ function App() {
                     <Route path="/flowers" element={<FlowerDirectory />} />
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/home" element={<HomePage />} />
+                    <Route path="/heartletter" element={<HeartLetter />} />
                     <Route path="/shareboard" element={<ShareBoardPage />} />
                 </Routes>
         </>

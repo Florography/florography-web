@@ -5,13 +5,19 @@ export const getMeRequest = async () => {
     return response.data;
 }
 
-export const getMyRecored = async () => {
+export const getMyRecord = async () => {
     const response = await axiosInstance.get("api/seedrecord");
     return response.data;
 }
 
 export const getFlowerDictionary = async () => {
     const response = await axiosInstance.get("api/flowerdictionary");
+    console.log(response.data);
+    return response.data;
+}
+
+export const getHeartLetter = async () => {
+    const response = await axiosInstance.get("api/heartletter");
     console.log(response.data);
     return response.data;
 }
