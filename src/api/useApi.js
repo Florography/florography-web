@@ -2,7 +2,7 @@ import { axiosInstance } from "./axiosInstance.js";
 
 export const getMeRequest = async () => {
     try{
-        const response = await axiosInstance.get("api/user/linked-accounts");
+        const response = await axiosInstance.get("/api/user/linked-accounts");
         console.log(response);
         return response.data;
 
@@ -12,9 +12,9 @@ export const getMeRequest = async () => {
 }
 
 
-export const getMyRecored = async () => {
+export const getMyRecord = async () => {
     try{
-        const response = await axiosInstance.get("api/seedrecord");
+        const response = await axiosInstance.get("/api/seedrecord");
         return response.data;
 
     } catch(error){

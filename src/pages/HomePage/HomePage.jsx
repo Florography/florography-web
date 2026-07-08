@@ -22,26 +22,32 @@ function HomePage() {
     const isLoading = moodQuery.isLoading;
 
     console.log(user);
-    const [ inputSeedRecord, setInputSeedRecord ] = useState({
+    const [inputSeedRecord, setInputSeedRecord] = useState({
         userId: user.data?.body?.linkedAccounts[0]?.uid,
         sentence: "",
         moodIdx: 3,
     });
+    const [date, setDate] = useState(new Date().toLocaleDateString());
+    
 
     const handleWriteOnClick = () => {
         writeSeedRecord(inputSeedRecord);
     }
 
     const handleSubmit = () => {
-        if(!textTrim()) {
+        if (!textTrim()) {
             alert("오늘의 한 문장을 심어주세요");
             return;
         }
     }
+    
+    const dateOnChange = (e) => {
+        setDate(e.target.value);
+    }
 
     return (
         <div css={s.pageStyle}>
-            <div css={s.top}>
+            <div>
                 <label>🌱 오늘 하루는 어땠나요?</label>
                 <div>
                     <input type="text" onChange={(e) => setInputSeedRecord({ ...inputSeedRecord, sentence: e.target.value })} placeholder="오늘의 한 문장을 심어보세요" />
@@ -50,7 +56,7 @@ function HomePage() {
             </div>
             <div>
                 <label>오늘의 대표 감정을 골라주세요</label>
-                
+
                 {isLoading && <div>기록을 불러오는 중입니다...</div>}
 
                 {/* 데이터가 출력되는지 확인 */}
@@ -67,6 +73,19 @@ function HomePage() {
                         <span>{mood.mood || "데이터 없음"}</span>
                     </label>
                 ))}
+            </div>
+            <div>
+                그날의 나는?
+                <input type="date" value={date} onChange={dateOnChange} />
+                <div>그날의 한마디
+                    <div></div>
+                </div>
+                <div>그날 쓴 편지
+                    <div></div>
+                </div>
+                <div>그날의 감정 분석
+                    <div></div>
+                </div>
             </div>
         </div>
     );
