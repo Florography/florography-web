@@ -59,3 +59,24 @@ export const deleteComment = async ({boardId, userId, id}) => {
         return error.response.data;
     }
 }
+
+// 게시글 수정
+export const putShareBoard = async ({userId, data}) => {
+    try {
+        const response = await axiosInstance.put(`/api/shareboard/${userId}`, data);
+        return response.data;
+    } catch(error) {
+        return error.response.data;
+    }
+
+}
+
+// 댓글 수정
+export const putComment = async ({userId, data}) => {
+    try {
+        const response = await axiosInstance.put(`/api/shareboard/comments/${userId}`, data);
+        return response.data;
+    } catch(error) {
+        return error.response.data;
+    }
+}
