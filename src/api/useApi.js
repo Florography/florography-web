@@ -23,7 +23,7 @@ export const linkAccountRequest = async (provider) => {
 
 export const unlinkAccountRequest = async (provider) => {
     try{
-        const response = await axiosInstance.get("api/seedrecord");
+        const response = await axiosInstance.get("/api/seedrecord/getuser", { params: data });
         return response.data;
     } catch(error){
         return error.response.data;
