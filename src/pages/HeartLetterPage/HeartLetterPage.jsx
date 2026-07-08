@@ -31,6 +31,7 @@ function HeartLetterPage() {
                             <span>{heartletter.createdAt}</span>
                             <span>{heartletter.title}</span>
                             <span>받는 마음: {heartletter.recipient}</span>
+                            <span>{heartletter.moodIdx}</span>
                         </li>
                     ))
                 ) : (
