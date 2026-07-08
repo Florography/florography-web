@@ -5,6 +5,8 @@ import { useMood } from "../../hooks/queries/useMood";
 import { useState } from "react";
 import { writeSeedRecord } from "../../api/homeApi";
 import { useMe } from "../../hooks/queries/useUser";
+import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
+import { getMyRecord } from "../../api/useApi";
 
 // 1. 프론트엔드에 기분 5단계 정의 (UI 매핑용)
 const MOOD_OPTIONS = [
@@ -18,6 +20,8 @@ const MOOD_OPTIONS = [
 function HomePage() {
     const moodQuery = useMood();
     const user = useMe();
+    const seedrecordData = useSeedRecord({ userId: user.data?.body?.linkedAccounts[0]?.uid })
+
     const moods = moodQuery.data?.body || []; // 안전하게 빈 배열을 기본값으로 세팅
     const isLoading = moodQuery.isLoading;
 
@@ -27,8 +31,9 @@ function HomePage() {
         sentence: "",
         moodIdx: 3,
     });
-    const [date, setDate] = useState(new Date().toLocaleDateString());
-    
+    const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // 오늘 날짜를 기본값으로 설정
+    console.log(seedrecordData);
+    // const [seedRecord, setSeedRecord] = useState({if(seedrecordData.data){}});
 
     const handleWriteOnClick = () => {
         writeSeedRecord(inputSeedRecord);
@@ -78,7 +83,10 @@ function HomePage() {
                 그날의 나는?
                 <input type="date" value={date} onChange={dateOnChange} />
                 <div>그날의 한마디
-                    <div></div>
+                    {(seedrecordData.data?.body ?? []).map((r, i) => (
+                        <div key={i}>{r.sentence}</div>
+                    ))}
+                    {!seedrecordData.data?.body?.length && "데이터 없음"}
                 </div>
                 <div>그날 쓴 편지
                     <div></div>

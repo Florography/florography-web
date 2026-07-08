@@ -43,7 +43,7 @@ function MyPage() {
     const [toastExiting, setToastExiting] = useState(false);
 
     // 내가 쓴 한마디's
-    const seedRecords = useSeedRecord();
+    const seedRecords = useSeedRecord({ userId: linkedAccounts[0]?.uid });
     console.log(seedRecords?.data?.body);
 
     // 헤더 / 드로어

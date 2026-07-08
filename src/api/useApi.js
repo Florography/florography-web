@@ -12,9 +12,9 @@ export const getMeRequest = async () => {
 }
 
 
-export const getMyRecord = async () => {
+export const getMyRecord = async (data) => {
     try{
-        const response = await axiosInstance.get("/api/seedrecord");
+        const response = await axiosInstance.get("/api/seedrecord/getuser", { params: data });
         return response.data;
 
     } catch(error){
