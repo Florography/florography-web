@@ -13,14 +13,14 @@ export const useMe = () => {
     });
 }
 
-export const useMySeedRecord = () => {
-    const accessToken = localStorage.getItem("accessToken");
+// export const useMySeedRecord = () => {
+//     const accessToken = localStorage.getItem("accessToken");
 
-    return useQuery({
-        queryKey: ["mySeedRecord", accessToken],
-        queryFn: getMyRecord,
-        retry: 0,
-        staleTime: 6000 * 60 * 24,
-        gcTime: 6000 * 10,
-    });
-}
+//     return useQuery({
+//         queryKey: ["mySeedRecord", accessToken],
+//         queryFn: getMyRecord,
+//         retry: 0,
+//         staleTime: 6000 * 60 * 24,
+//         gcTime: 6000 * 10,
+//     });
+// }
