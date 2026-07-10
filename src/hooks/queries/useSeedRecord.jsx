@@ -7,7 +7,7 @@ export const useSeedRecord = (data) => {
     return useQuery({
         queryKey: ["seedRecord", seedRecord],
         queryFn: () => getMyRecord(data),
-        enabled: !!data?.userId,
+        enabled: !!data?.uid,
         retry: 0,
         staleTime: 6000 * 60 * 24,
         gcTime: 6000 * 10,

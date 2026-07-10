@@ -18,7 +18,7 @@ export const MENU_ITEMS = [
         href: null,
     },
     { icon: "🌼", label: "꽃 도감", desc: "피워낸 꽃 모아보기", href: "/flowers" },
-    { icon: "🪴", label: "나만의 정원", desc: "기록으로 가꾸는 공간", href: null },
+    { icon: "🪴", label: "나만의 정원", desc: "기록으로 가꾸는 공간", href: "/garden" },
     {
         icon: "📈",
         label: "감정 리포트",

@@ -20,7 +20,9 @@ const MOOD_OPTIONS = [
 function HomePage() {
     const moodQuery = useMood();
     const user = useMe();
+    console.log(user);
     const seedrecordData = useSeedRecord({ userId: user.data?.body?.linkedAccounts[0]?.uid })
+    console.log(seedrecordData);
 
     const moods = moodQuery.data?.body || []; // 안전하게 빈 배열을 기본값으로 세팅
     const isLoading = moodQuery.isLoading;

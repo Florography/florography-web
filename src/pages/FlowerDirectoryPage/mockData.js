@@ -17,7 +17,7 @@ export const MENU_ITEMS = [
         desc: "매주 피어나는 고유한 꽃",
         href: "/flowers",
     },
-    { icon: "🪴", label: "나만의 정원", desc: "기록으로 가꾸는 공간", href: null },
+    { icon: "🪴", label: "나만의 정원", desc: "기록으로 가꾸는 공간", href: "/garden" },
     {
         icon: "📈",
         label: "감정 리포트",
@@ -31,7 +31,7 @@ export const NAV_ITEMS = [
     { label: "속마음 편지", href: null, active: false },
     { label: "공유 게시판", href: null, active: false },
     { label: "꽃 도감", href: "/flowers", active: true },
-    { label: "정원", href: null, active: false },
+    { label: "정원", href: "/garden", active: false },
 ];
 
 export const FLOWERS = [

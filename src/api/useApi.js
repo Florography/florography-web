@@ -5,8 +5,10 @@ export const getMeRequest = async () => {
     return response.data;
 }
 
-export const getMyRecord = async () => {
-    const response = await axiosInstance.get("api/seedrecord");
+export const getMyRecord = async (data) => {
+    console.log("Hello");
+    const response = await axiosInstance.get("api/seedrecord/getuser", {params:data});
+    console.log("Hello");
     return response.data;
 }
 
