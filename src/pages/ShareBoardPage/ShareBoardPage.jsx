@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMe } from "../../hooks/queries/useUser";
 import { useComment, useShareBoard } from "../../hooks/queries/useShareboard";
-import { useCommentDeleteMutation, useCommentPutMutation, useCommentRegisterMutation, useShareBoardDeleteMutation, useShareBoardPutMutation, useShareBoardResisterMutation } from "../../hooks/mutations/useShareBoard";
+import { useCommentDeleteMutation, useCommentPutMutation, useCommentRegisterMutation, useLikeDownMutation, useLikeUpMutation, useShareBoardDeleteMutation, useShareBoardPutMutation, useShareBoardResisterMutation } from "../../hooks/mutations/useShareBoard";
 import { data } from "react-router";
 
 
@@ -10,6 +10,8 @@ function ShareBoardPage() {
     const [editingBoardId, setEditingBoardId] = useState(null);
     // 게시글 수정 입력갑 임시저장 할 상태값
     const [editBody, setEditBody] = useState("");
+    //좋아요 누른 게시글 ID 객체형태로 저장
+    const [likedBoards, setLikedBoards] = useState({});
 
 
     const boardQuery = useShareBoard();
@@ -18,6 +20,8 @@ function ShareBoardPage() {
     const { mutate: registerShareBoard, isPending } = useShareBoardResisterMutation();
     const { mutate: deleteBoard } = useShareBoardDeleteMutation();
     const { mutate: updateBoard } = useShareBoardPutMutation();
+    const { mutate: likeUp } = useLikeUpMutation();
+    const { mutate: likeDown } = useLikeDownMutation();
     //본인인증?
     const [inputSeedRecord, setInputSeedRecord] = useState({
         userId: "",
@@ -114,10 +118,52 @@ function ShareBoardPage() {
         );
     };
 
-    //취소 버튼
+    //수정 취소 버튼
     const handleCancelOnClick = () => {
         setEditingBoardId(null);
     }
+    // 좋아요 증감
+    const handleLikeToggleOnClick = (boardId) => {
+        if(!currentUserId) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+        const reqData = {
+            id: boardId,
+            userId: currentUserId
+        };
+        
+        // 게시글을 좋아요 여부 확인
+        const isCurrentlyLiked = !!likedBoards[boardId];
+        
+
+        if(isCurrentlyLiked) {
+            likeDown(
+                { id: boardId, data: reqData},
+                {
+                    onSuccess: () => {
+                        setLikedBoards(prev => ({
+                            ...prev,
+                            [boardId]: false
+                        }));
+                    }
+                }
+            );
+        } else {
+            likeUp(
+                {id: boardId, data: reqData},
+                {
+                    onSuccess: () => {
+                        setLikedBoards(prev => ({
+                            ...prev,
+                            [boardId]: true
+                        }));
+                    }
+                }
+            );
+        }
+
+    };
 
 
     return (
@@ -152,6 +198,9 @@ function ShareBoardPage() {
                             <>
                                 <div>
                                     <span>좋아요: {board.like || 0}</span>
+                                    <button onClick={() => handleLikeToggleOnClick(board.id)}>
+                                        {!!likedBoards[board.id] ? "❤️ 좋아요 취소" : "🤍 좋아요"}
+                                    </button>
                                     <span>작성일: {board.createdAt}</span>
                                     <button onClick={() => handleDeleteOnClick(board.id, board.userId)}>삭제</button>
                                 </div>

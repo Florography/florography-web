@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { deleteComment, deleteShareBoard, putComment, putShareBoard, registerComment, registerShareBoard } from "../../api/shareboardApi";
+import { deleteComment, deleteShareBoard, putComment, putLikeDown, putLikeUp, putShareBoard, registerComment, registerShareBoard } from "../../api/shareboardApi";
 
 // 게시글 작성
 export const useShareBoardResisterMutation = () => {
@@ -94,6 +94,38 @@ export const useCommentPutMutation = () => {
         },
         onSuccess: (response) => {
             queryClient.invalidateQueries(["comment"]);
+        },
+        onError: (error) => {
+            alert(error.message);
+        }
+    })
+}
+
+//좋아요 증가
+export const useLikeUpMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn:({id, data}) => { putLikeUp({id, data}); },
+        onSuccess: (response) => {
+            queryClient.invalidateQueries(["shareboard"]);
+        },
+        onError: (error) => {
+            alert(error.message);
+        }
+    })
+}
+
+// 좋아요 취소
+export const useLikeDownMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn:({id, data}) => {
+            putLikeDown({id, data});
+        },
+        onSuccess: (response) => {
+            queryClient.invalidateQueries(["shareboard"]);
         },
         onError: (error) => {
             alert(error.message);

@@ -4,6 +4,7 @@ import { axiosInstance } from "./axiosInstance";
 export const getShareBoard = async () => {
     try {
         const response = await axiosInstance.get("/api/shareboard");
+        console.log(response.data)
         return response.data;
     } catch (error) {
         return error.response.data;
@@ -77,6 +78,29 @@ export const putComment = async ({userId, data}) => {
         const response = await axiosInstance.put(`/api/shareboard/comments/${userId}`, data);
         return response.data;
     } catch(error) {
+        return error.response.data;
+    }
+}
+
+// 좋아요 증가
+export const putLikeUp = async ({id, data}) => {
+    try {
+        const response = await axiosInstance.put(`/api/shareboard/${id}/up`, data);
+        return response.data;
+    } catch(error) {
+        //throw error.response?.data || error;
+        return error.response.data;
+    }
+}
+
+// 좋아요 취소
+export const putLikeDown = async ({id, data}) => {
+    try {
+        const response = await axiosInstance.put(`/api/shareboard/${id}/down`, data);
+        console.log("좋아요 취소" + response.data)
+        return response.data;
+    } catch(error) {
+        // throw error.response?.data || error;
         return error.response.data;
     }
 }
