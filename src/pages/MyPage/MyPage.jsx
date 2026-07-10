@@ -133,6 +133,11 @@ function MyPage() {
         return;
     }
 
+    if (item.label === "속마음 편지" || item.href === "/heartletter") {
+        navigate("/heartletter");
+        return;
+    }
+
     if (item.href) {
         navigate(item.href);
     } else {
@@ -158,7 +163,8 @@ function MyPage() {
 
 
     // ─── 내 기록 (목업, 정적 표시) ───
-    const recordRows = seedRecords?.data?.body.map((r) => ({
+    // const recordRows = seedRecords?.data?.body.map((r) => ({
+    const recordRows = (seedRecords?.data?.body || []).map((r) => ({
         text: r.sentence,
         date: r.createdDate ? r.createdDate.slice(5).replace('-', '.') : r.createdDate,
         icon: "🌱",
@@ -382,7 +388,7 @@ function MyPage() {
                                 </div>
                                 <div css={s.statItem}>
                                     <span css={s.statValue}>
-                                        {seedRecords?.data?.body.length}
+                                        {seedRecords?.data?.body?.length || 0}
                                     </span>
                                     <span css={s.statLabel}>한마디</span>
                                 </div>
