@@ -5,6 +5,8 @@ import * as s from "./styles";
 import { useMe } from "../../hooks/queries/useUser";
 import FreeformGarden from "./FreeformGarden";
 import GridGarden from "./GridGarden";
+import { saveGarden } from "../../api/gardenApi";
+import { useGardenStore } from "../../stores/gardenStore";
 import {
     MENU_ITEMS,
     NAV_ITEMS,
@@ -20,6 +22,7 @@ import {
 function GardenPage() {
     const navigate = useNavigate();
     const meQuery = useMe();
+    const getAllGardenData = useGardenStore((state) => state.getAllGardenData);
 
     const [menuOpen, setMenuOpen] = useState(false);
     const [themeIdx, setThemeIdx] = useState(0);
@@ -32,7 +35,7 @@ function GardenPage() {
 
     const toastTimer = useRef(null);
     const accessToken = localStorage.getItem("accessToken");
-
+    
     useEffect(() => {
         if (!accessToken) {
             navigate("/", { replace: true });
@@ -60,9 +63,17 @@ function GardenPage() {
 
     const cycleTheme = () => setThemeIdx((i) => (i + 1) % THEMES.length);
 
-    const handleSave = () => {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 1800);
+    const handleSave = async () => {
+        const gardenData = getAllGardenData();
+        try {
+            await saveGarden(gardenData);
+            setSaved(true);
+            showToast("정원이 저장되었어요 🌸");
+            setTimeout(() => setSaved(false), 1800);
+        } catch (error) {
+            console.error("정원 저장 실패:", error);
+            showToast("저장에 실패했어요");
+        }
     };
 
     const prevYear = () =>

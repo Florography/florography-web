@@ -2,11 +2,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as s from "./styles";
 import { useFlowerDirectoies } from "../../hooks/queries/flowerDirectory";
+import { useGardenStore } from "../../stores/gardenStore";
 
 const CLICK_THRESHOLD = 6; // 이 이하로 움직이면 드래그가 아니라 클릭/탭으로 간주한다.
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-const flowerImgUrl = (path) => (path ? `${API_BASE}${path}` : path);
+const flowerImgUrl = (path) => (path ? `${API_BASE}${path}` : "");
 
 let nextFreeformId = 1;
 
@@ -30,12 +31,18 @@ function FreeformGarden({ theme }) {
     const [drag, setDrag] = useState(null);
 
     const hintTimer = useRef(null);
+    const setFreeformFlowers = useGardenStore((state) => state.setFreeformFlowers);
 
     const showHint = useCallback((msg) => {
         setHint(msg);
         clearTimeout(hintTimer.current);
         hintTimer.current = setTimeout(() => setHint(""), 2000);
     }, []);
+
+    // flowers 상태가 변경될 때마다 스토어에 동기화
+    useEffect(() => {
+        setFreeformFlowers(flowers);
+    }, [flowers, setFreeformFlowers]);
 
     // DB 도감 중 사용자가 실제로 개화(보유)한 꽃만 정원에 심을 수 있다.
     const unlockedFlowers = (flowerDirectory.data?.body || []).filter((f) =>
