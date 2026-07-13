@@ -25,7 +25,15 @@ const DEFAULT_MOODS = [
     { id: 4, mood: "매우 좋음" },
 ];
 
+export const UNDER_NAV_ITEMS = [
+    { label: "글 쓰기", href: "/write", active: false },
+    { label: "꽃 도감", href: "/flowers", active: false },
+    { label: "정원", href: "/garden", active: false },
+];
+
 function HomePage() {
+    const navigate = useNavigate();
+
     const user = useMe();
     const userId = user.data?.body?.linkedAccounts?.[0]?.uid;
 
@@ -35,6 +43,10 @@ function HomePage() {
         sentence: "",
         moodIdx: 3,
     });
+
+    const [toast, setToast] = useState(null);
+
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const moodQuery = useMood();
     const letterQuery = useHeartLetters(userId);
@@ -78,6 +90,31 @@ function HomePage() {
     
     const dateOnChange = (e) => {
         setDate(e.target.value);
+    }
+
+    const goTo = (item) => {
+        setMenuOpen(false);
+
+        if (item.label === "글 쓰기" || item.href === "/write") {
+            navigate("/write");
+            return;
+        }
+
+        if (item.label === "꽃 도감" || item.href === "/flowers") {
+            navigate("/flowers");
+            return;
+        }
+
+        if (item.label === "정원" || item.href === "/garden") {
+            navigate("/garden");
+            return;
+        }
+
+        if (item.href) {
+            Navigate(item.href);
+        } else {
+            showToast("info", `${item.label} 기능은 준비 중이에요 🌱`);
+        }
     }
 
     return (
@@ -172,6 +209,32 @@ function HomePage() {
                         </div>
                     )}
                 </div>
+            </div>
+            <div>-------------------------- 구분 선 --------------------------</div>
+            <div>바로 가기 기능
+                {UNDER_NAV_ITEMS.map((n) => (
+                    <button
+                        onClick={() => goTo(n)}
+                    >
+                        {n.label}
+                    </button>
+                ))}
+                    
+            </div>
+            <div>쓴 글 목록
+                <ul>
+                    {seedRecords && Array.isArray(seedRecords) ? (
+                        seedRecords.map((seedrecord, index) => (
+                            <li key={`${seedrecord.userId}-${index}`}>
+                                <span>{seedrecord.createdDate}</span>
+                                <span>{seedrecord.sentence}</span>
+                                <span>{seedrecord.moodIdx}</span>
+                            </li>
+                        ))
+                    ) : (
+                        <li>작성하신 한마디가 없습니다.</li>
+                    )}
+                </ul>
             </div>
         </div>
     );
