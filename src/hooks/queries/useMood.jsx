@@ -6,7 +6,7 @@ export const useMood = () => {
 
     return useQuery({
         queryKey: ["mood", mood],
-        queryFn: getMyMood,
+        queryFn: getMyMood(),
         retry: 0,
         staleTime: 6000 * 60 * 24,
         gcTime: 6000 * 10,
