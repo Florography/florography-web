@@ -8,7 +8,9 @@ import HomePage from "./pages/HomePage/HomePage";
 import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import ShareBoardPage from "./pages/ShareBoardPage/ShareBoardPage";
 import HeartLetter from "./pages/HeartLetterPage/HeartLetterPage";
-import GardenPage from "./pages/Garden/GardenPage";
+import GardenListPage from "./pages/Garden/GardenListPage";
+import GardenCreatePage from "./pages/Garden/GardenCreatePage";
+import GardenDetailPage from "./pages/Garden/GardenDetailPage";
 
 const globalStyles = css`
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
@@ -51,7 +53,9 @@ function App() {
                     <Route path="/home" element={<HomePage />} />
                     <Route path="/heartletter" element={<HeartLetter />} />
                     <Route path="/shareboard" element={<ShareBoardPage />} />
-                    <Route path="/garden" element={<GardenPage />} />
+                    <Route path="/garden" element={<GardenListPage />} />
+                    <Route path="/garden/new" element={<GardenCreatePage />} />
+                    <Route path="/garden/:gardenId" element={<GardenDetailPage />} />
                 </Routes>
         </>
     );

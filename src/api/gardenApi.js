@@ -9,4 +9,14 @@ export const saveGarden = async (gardenData, userId, name) => {
     };
     const response = await axiosInstance.post("api/garden", payload);
     return response.data;
-}
+};
+
+export const getAllGardens = async () => {
+    const response = await axiosInstance.get("api/garden");
+    return response.data;
+};
+
+export const getGardenById = async (id) => {
+    const response = await axiosInstance.get(`api/garden/${id}`);
+    return response.data;
+};
