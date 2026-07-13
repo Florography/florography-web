@@ -40,37 +40,30 @@ function HomePage() {
     const letterQuery = useHeartLetters(userId);
     const seedrecordQuery = useSeedRecord(userId);
 
-    // console.log("실제 서버 응답 데이터 전체:", seedrecordQuery.data);
-
-    // console.log("SeedRecord 훅 호출용 userId:", userId);
-    // console.log("SeedRecord 전체 응답:", seedrecordQuery);
-
     const { data: letters, isLoading: isLetterLoading } = useHeartLetters(userId);
     const { data: seedRecords, isLoading: isSeedRecordLoading } = useSeedRecord(userId);
 
     const moods = moodQuery.data?.body || DEFAULT_MOODS; // 안전하게 빈 배열을 기본값으로 세팅
     const isLoading = moodQuery.isLoading;
 
-    // console.log("moods 확인:", moods);
-    // console.log("확인 (letters 원본):", letters);
-    
-    const allLetters = letters || [];
-    const filteredLetters = allLetters.filter(letter => 
-        letter.createdAt && letter.createdAt.startsWith(date)
-    );
-    
-    const allSeedRecords = seedrecordQuery.data || [];
+    const allLetters = Array.isArray(letters)
+        ? letters
+        : (letters && Array.isArray(letters) ? letters : []);
 
-    // console.log("현재 달력 날짜:", date);
-    // console.log("백엔드에서 온 편지 원본:", allSeedRecords);
+    const filteredLetters = allLetters.filter(letter => 
+        letter?.createdAt && letter.createdAt.startsWith(date)
+    );
+
+    let allSeedRecords = [];
+    if (seedRecords && typeof seedRecords !== "string") {
+        allSeedRecords = seedRecords.body && Array.isArray(seedRecords.body)
+            ? seedRecords.body
+            : (Array.isArray(seedRecords) ? seedRecords : []);
+    }
 
     const filteredSeedRecords = allSeedRecords.filter(record => 
-        record.createdDate && record.createdDate.startsWith(date)
+        record?.createdDate && record.createdDate.startsWith(date)
     );
-    
-    // console.log(user);
-    // console.log(seedrecordData);
-    // const [seedRecord, setSeedRecord] = useState({if(seedrecordData.data){}});
 
     const handleWriteOnClick = () => {
         writeSeedRecord(inputSeedRecord);
@@ -129,12 +122,14 @@ function HomePage() {
                         <div>로딩 중...</div>
                     ) : (
                         <div>
-                            {filteredSeedRecords && Array.isArray(seedRecords) ? (
-                                filteredSeedRecords.map((seedRecord, index) => (
-                                    <div key={`${seedRecord.id}-${index}`}>
-                                        <span>{seedRecord.sentence}</span>
-                                    </div>
-                                ))
+                            {filteredSeedRecords && filteredSeedRecords.length > 0 ? (
+                                filteredSeedRecords.map((seedRecord, index) => {
+                                    return (
+                                        <div key={`${seedRecord.id}-${index}`}>
+                                            <span>{seedRecord.sentence}</span>
+                                        </div>
+                                    );
+                                })
                             ) : (
                                 <div>해당 날짜에 작성된 한마디가 없습니다.</div>
                             )}
@@ -159,7 +154,23 @@ function HomePage() {
                     )}
                 </div>
                 <div>그날의 감정 분석
-                    <div></div>
+                    {isSeedRecordLoading ? (
+                        <div>로딩 중...</div>
+                    ) : (
+                        <div>
+                            {filteredSeedRecords && filteredSeedRecords.length > 0 ? (
+                                filteredSeedRecords.map((seedRecord, index) => {
+                                    return (
+                                        <div key={`${seedRecord.id}-${index}`}>
+                                            <span>{seedRecord.aiComment}</span>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div>해당 날짜에 작성된 한마디가 없습니다.</div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
