@@ -32,6 +32,7 @@ function GardenPage() {
     const [month, setMonth] = useState(6);
     const [toast, setToast] = useState("");
     const [toastExiting, setToastExiting] = useState(false);
+    const [gardenName, setGardenName] = useState("");
 
     const toastTimer = useRef(null);
     const accessToken = localStorage.getItem("accessToken");
@@ -63,13 +64,48 @@ function GardenPage() {
 
     const cycleTheme = () => setThemeIdx((i) => (i + 1) % THEMES.length);
 
+    const handleGardenNameChange = (e) => {
+        let value = e.target.value;
+        let result = "";
+        let koreanCount = 0;
+        let englishCount = 0;
+
+        for (let char of value) {
+            if (/[가-힯]/.test(char)) {
+                if (koreanCount < 8) {
+                    result += char;
+                    koreanCount++;
+                }
+            } else if (/[a-zA-Z]/.test(char)) {
+                if (englishCount < 16) {
+                    result += char;
+                    englishCount++;
+                }
+            } else {
+                result += char;
+            }
+        }
+        setGardenName(result);
+    };
+
     const handleSave = async () => {
         const gardenData = getAllGardenData();
+        const userId = meQuery.data?.body?.linkedAccounts[0].uid;
+
+        if (!userId) {
+            showToast("사용자 정보를 불러올 수 없어요");
+            return;
+        }
+
         try {
-            await saveGarden(gardenData);
+            if (gardenName === ""){
+                setGardenName("제목없음");
+            }
+            await saveGarden(gardenData, userId, gardenName);
             setSaved(true);
             showToast("정원이 저장되었어요 🌸");
             setTimeout(() => setSaved(false), 1800);
+
         } catch (error) {
             console.error("정원 저장 실패:", error);
             showToast("저장에 실패했어요");
@@ -229,6 +265,14 @@ function GardenPage() {
                     <div css={s.titleBar}>
                         <div>
                             <div css={s.pageTitle}>🪴 마음의 정원</div>
+                            <input
+                                type="text"
+                                value={gardenName}
+                                onChange={handleGardenNameChange}
+                                placeholder="정원 이름을 지어보세요"
+                                css={s.gardenNameInput}
+                                maxLength={24}
+                            />
                             <div css={s.pageSubtitle}>
                                 두 가지 배치 방식을 비교해보는 구상 단계 시안입니다.
                             </div>

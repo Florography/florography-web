@@ -448,6 +448,31 @@ export const pageSubtitle = css`
     margin-top: 4px;
 `;
 
+export const gardenNameInput = css`
+    margin-top: 12px;
+    padding: 10px 14px;
+    border: 2px solid ${COLORS.border};
+    border-radius: 8px;
+    background: ${COLORS.card};
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px;
+    color: ${COLORS.textDark};
+
+    &::placeholder {
+        color: ${COLORS.textMuted};
+    }
+
+    &:focus {
+        outline: none;
+        border-color: ${COLORS.primary};
+        box-shadow: 0 0 0 3px rgba(58, 90, 64, 0.1);
+    }
+
+    &:hover {
+        border-color: ${COLORS.accent};
+    }
+`;
+
 export const titleActions = css`
     display: flex;
     gap: 8px;

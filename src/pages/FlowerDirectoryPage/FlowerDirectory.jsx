@@ -12,7 +12,7 @@ const PETALS = [0, 72, 144, 216, 288];
 const PER_PAGE = 10;
 const FILTER_LABELS = ["전체", "수집한 꽃"];
 
-const flowerImgUrl = (path) => (path ? `${API_BASE}${path}` : "");
+const flowerImgUrl = (path) => (path ? `${API_BASE}${path}` : path);
 
 function FlowerDirectory() {
     const navigate = useNavigate();
@@ -267,7 +267,7 @@ function FlowerDirectory() {
                                 </div>
                             ) : (
                                 pageItems.map((f) => {
-                                    const locked = !f.userFlower.id;
+                                    const locked = true;
                                     // const locked = false;
                                     
 
