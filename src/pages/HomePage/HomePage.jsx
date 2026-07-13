@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router";
 import * as s from "./styles";
 import { useMood } from "../../hooks/queries/useMood";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { writeSeedRecord } from "../../api/homeApi";
 import { useMe } from "../../hooks/queries/useUser";
 import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
@@ -65,28 +65,74 @@ function HomePage() {
     const filteredLetters = allLetters.filter(letter => 
         letter?.createdAt && letter.createdAt.startsWith(date)
     );
-
+    
     let allSeedRecords = [];
     if (seedRecords && typeof seedRecords !== "string") {
         allSeedRecords = seedRecords.body && Array.isArray(seedRecords.body)
-            ? seedRecords.body
-            : (Array.isArray(seedRecords) ? seedRecords : []);
+        ? seedRecords.body
+        : (Array.isArray(seedRecords) ? seedRecords : []);
     }
 
     const filteredSeedRecords = allSeedRecords.filter(record => 
         record?.createdDate && record.createdDate.startsWith(date)
     );
 
-    const handleWriteOnClick = () => {
-        writeSeedRecord(inputSeedRecord);
-    }
+    const existingRecord = filteredSeedRecords[0];
 
-    const handleSubmit = () => {
-        if (!textTrim()) {
-            alert("오늘의 한 문장을 심어주세요");
+    useEffect(() => {
+        if (existingRecord) {
+            setInputSeedRecord({
+                userId: userId,
+                sentence: existingRecord.sentence || "",
+                moodIdx: existingRecord.moodIdx ?? 3,
+            });
+        } else {
+            setInputSeedRecord({
+                userId: userId,
+                sentence: "",
+                moodIdx: 3,
+            });
+        }
+    }, [date, existingRecord, userId]);
+
+    const handleSaveOnClick = async () => {
+        if (!inputSeedRecord.sentence.trim()) {
+            alert("오늘의 한 문장을 심어주세요 🌱");
             return;
         }
-    };
+
+        const payload = {
+            ...inputSeedRecord,
+            userId: userId // 실행 시점의 최신 userId 보장
+        };
+
+        if (existingRecord) {
+            try {
+                await updateSeedRecord({ ...payload, id: existingRecord.id });
+                alert("오늘의 한마디를 수정했습니다! ✨");
+            } catch (error) {
+                alert("수정에 실패했습니다.");
+            }
+        } else {
+            try {
+                await writeSeedRecord(payload);
+                alert("오늘의 한마디를 심었습니다! 🌱");
+            } catch (error) {
+                alert("등록에 실패했습니다.");
+            }
+        }
+    }
+
+    // const handleWriteOnClick = () => {
+    //     writeSeedRecord(inputSeedRecord);
+    // }
+
+    // const handleSubmit = () => {
+    //     if (!textTrim()) {
+    //         alert("오늘의 한 문장을 심어주세요");
+    //         return;
+    //     }
+    // };
     
     const dateOnChange = (e) => {
         setDate(e.target.value);
@@ -120,10 +166,18 @@ function HomePage() {
     return (
         <div css={s.pageStyle}>
             <div>
-                <label>🌱 오늘 하루는 어땠나요?</label>
+                <label>
+                    {existingRecord ? "✏️ 오늘의 한마디를 수정하시겠어요?" : "🌱 오늘 하루는 어땠나요?"}
+                </label>
                 <div>
-                    <input type="text" onChange={(e) => setInputSeedRecord({ ...inputSeedRecord, sentence: e.target.value })} placeholder="오늘의 한 문장을 심어보세요" />
-                    <button onClick={handleWriteOnClick}>입력</button>
+                    <input type="text" 
+                        value={inputSeedRecord.sentence} // value를 제어 컴포넌트로 연결
+                        onChange={(e) => setInputSeedRecord({ ...inputSeedRecord, sentence: e.target.value })} 
+                        placeholder="오늘의 한 문장을 심어보세요" 
+                    />
+                    <button onClick={handleSaveOnClick}>
+                        {existingRecord ? "수정" : "입력"}
+                    </button>
                 </div>
             </div>
             <div>
@@ -151,6 +205,7 @@ function HomePage() {
                     )
                 )}
             </div>
+            <div>-------------------------- 구분 선 --------------------------</div>
             <div>
                 그날의 나는?
                 <input type="date" value={date} onChange={dateOnChange} />
@@ -173,6 +228,7 @@ function HomePage() {
                         </div>
                     )}
                 </div>
+                <div>-------------------------- 구분 선 --------------------------</div>
                 <div>그때 남긴 편지
                     {isLetterLoading ? (
                         <div>로딩 중...</div>
@@ -190,6 +246,7 @@ function HomePage() {
                         </div>
                     )}
                 </div>
+                <div>-------------------------- 구분 선 --------------------------</div>
                 <div>그날의 감정 분석
                     {isSeedRecordLoading ? (
                         <div>로딩 중...</div>
@@ -214,6 +271,7 @@ function HomePage() {
             <div>바로 가기 기능
                 {UNDER_NAV_ITEMS.map((n) => (
                     <button
+                        key={n.label}
                         onClick={() => goTo(n)}
                     >
                         {n.label}
