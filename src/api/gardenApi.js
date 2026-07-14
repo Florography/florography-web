@@ -12,7 +12,9 @@ export const saveGarden = async (gardenData, userId, name) => {
 };
 
 export const getAllGardens = async () => {
+    console.log("Hi");
     const response = await axiosInstance.get("api/garden");
+    console.log(response.data);
     return response.data;
 };
 

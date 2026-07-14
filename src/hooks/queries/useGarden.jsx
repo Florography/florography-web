@@ -6,7 +6,7 @@ export const useAllGardens = () => {
 
     return useQuery({
         queryKey: ["gardens", "all", accessToken],
-        queryFn: getAllGardens,
+        queryFn: () => getAllGardens(),
         retry: 0,
         staleTime: 60 * 60 * 1000,
         gcTime: 10 * 60 * 1000,

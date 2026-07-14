@@ -16,8 +16,9 @@ import {
 
 function GardenListPage() {
     const navigate = useNavigate();
-    const gardensQuery = useAllGardens();
     const meQuery = useMe();
+    const gardensQuery = useAllGardens();
+    console.log(gardensQuery);
     const [currentPage, setCurrentPage] = useState(1);
     const [menuOpen, setMenuOpen] = useState(false);
     const gardens = gardensQuery.data?.body || [];

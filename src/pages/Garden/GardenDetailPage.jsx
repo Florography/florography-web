@@ -52,15 +52,17 @@ function GardenDetailPage() {
         if (gardenQuery.data?.body) {
             const garden = gardenQuery.data.body;
             setGardenName(garden.name || "제목없음");
-
+            console.log(garden.gardenData);
             try {
-                const parsedData = JSON.parse(garden.garden_data);
+                const parsedData = JSON.parse(garden.gardenData);
+                console.log(parsedData.freeformFlowers);
+                // console.log(parsedData.gridGardenData);
                 if (parsedData.freeformFlowers) {
                     setFreeformFlowers(parsedData.freeformFlowers);
                 }
-                if (parsedData.gridGardenData) {
-                    setGridGardenData(parsedData.gridGardenData);
-                }
+                // if (parsedData.gridGardenData) {
+                //     setGridGardenData(parsedData.gridGardenData);
+                // }
             } catch (e) {
                 console.error("정원 데이터 파싱 실패:", e);
             }
