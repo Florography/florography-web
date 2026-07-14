@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMe } from "../../hooks/queries/useUser";
-import { useComment, useShareBoard } from "../../hooks/queries/useShareboard";
+import { useComment, useRankShareBoard, useShareBoard } from "../../hooks/queries/useShareboard";
 import { useCommentDeleteMutation, useCommentPutMutation, useCommentRegisterMutation, useLikeDownMutation, useLikeUpMutation, useShareBoardDeleteMutation, useShareBoardPutMutation, useShareBoardResisterMutation } from "../../hooks/mutations/useShareBoard";
 import { data } from "react-router";
 
@@ -13,9 +13,13 @@ function ShareBoardPage() {
     //좋아요 누른 게시글 ID 객체형태로 저장
     const [likedBoards, setLikedBoards] = useState({});
 
-
+    //게시판
     const boardQuery = useShareBoard();
     const boards = boardQuery.data?.body || [];
+    //인기순위
+    const rankBoardQuery = useRankShareBoard();
+    const ranks = rankBoardQuery.data?.body || [];
+
     const user = useMe();
     const { mutate: registerShareBoard, isPending } = useShareBoardResisterMutation();
     const { mutate: deleteBoard } = useShareBoardDeleteMutation();
@@ -218,6 +222,17 @@ function ShareBoardPage() {
                     </li>
                 ))}
 
+            </ul>
+            <div>
+                <p>인기순위</p>
+            </div>
+            <ul>
+                {ranks.map((rank, index) => (
+                    <li key={rank.id}>
+                        <span><strong>{index + 1}위</strong></span>
+                        <span>{rank.body}</span>
+                    </li>
+                ))}
             </ul>
         </>
     );

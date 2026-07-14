@@ -11,6 +11,16 @@ export const getShareBoard = async () => {
     }
 }
 
+//게시글 인기순위 출력
+export const getRankShareBoard = async () => {
+    try{
+        const response = await axiosInstance.get("/api/shareboard/rank");
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
 //댓글 출력
 export const getComment = async (boardId) => {
     try {

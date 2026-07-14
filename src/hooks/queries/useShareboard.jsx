@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getComment, getShareBoard } from "../../api/shareboardApi";
+import { getComment, getRankShareBoard, getShareBoard } from "../../api/shareboardApi";
 
 export const useShareBoard = () => {
     const accessToken = localStorage.getItem("accessToken");
@@ -19,6 +19,18 @@ export const useComment = (boardId) => {
     return useQuery({
         queryKey: ["comment", accessToken, boardId],
         queryFn: () => getComment(boardId), 
+        retry: 0,
+        staleTime: 6000 * 60 * 24,
+        gcTime: 6000 * 10,
+    });
+}
+
+export const useRankShareBoard = () => {
+    
+
+    return useQuery({
+        queryKey: ["shareboard", "rank"],
+        queryFn: getRankShareBoard, 
         retry: 0,
         staleTime: 6000 * 60 * 24,
         gcTime: 6000 * 10,
