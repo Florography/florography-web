@@ -10,6 +10,15 @@ export const writeSeedRecord = async (data) => {
     }
 }
 
+export const updateSeedRecord = async (data) => {
+    try {
+        const response = await axiosInstance.put("/api/seedrecord", data);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
 export const getSeedRecord = async (data) => {
     try {
         const response = await axiosInstance.get("/api/seedrecord", data);
