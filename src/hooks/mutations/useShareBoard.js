@@ -141,8 +141,9 @@ export const useBoardLikeRegisterMutation = () => {
         mutationFn: (data) => {
             return registerBoardLike(data);
         },
-        onSuccess: (response) => {
-            queryClient.invalidateQueries(["shareboard"]);
+        onSuccess: (response, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["shareboard"]});
+            queryClient.invalidateQueries({ queryKey: ["shareboard", "boardlike", variables.boardId, variables.userId] });
         },
         onError: (error) => {
             alert(error.message);
@@ -155,11 +156,10 @@ export const useBoardLikeDeleteMutation = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({boardId, userId}) => {
-            deleteBoardLike({boardId,userId});
-        },
-        onSuccess: (response) => {
-            queryClient.invalidateQueries(["shareboard"]);
+        mutationFn: deleteBoardLike,
+        onSuccess: (response, variables) => {
+            queryClient.invalidateQueries({queryKey: ["shareboard"]});
+            queryClient.invalidateQueries({ queryKey: ["shareboard", "boardlike", variables.boardId, variables.userId] });
         },
         onError: (error) => {
             alert(error.message);

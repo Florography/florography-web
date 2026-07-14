@@ -37,13 +37,11 @@ export const useRankShareBoard = () => {
 }
 
 // 좋아요 출력
-export const useBoardLike = (boardId) {
+export const useBoardLike = (boardId, userId) => {
     return useQuery({
-        queryKey: ["shareboard", "boardlike", boardId],
-        queryFn: () => getBoardLike(boardId),
-        retry: 0,
-        staleTime: 6000 * 60 * 24,
-        gcTime: 6000 * 10,
+        queryKey: ["shareboard", "boardlike", boardId, userId],
+        queryFn: () => getBoardLike({boardId, userId}),
+        enabled: !!boardId && !!userId,
     });
 }
 

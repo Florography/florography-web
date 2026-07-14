@@ -134,9 +134,9 @@ export const deleteBoardLike = async ({boardId,userId}) => {
     }
 }
 // 좋아요 여부 확인 출력
-export const getBoardLike = async ({boardId}) => {
+export const getBoardLike = async ({boardId, userId}) => {
     try {
-        const response = await axiosInstance.get(`/api/shareboard/boardlike/${boardId}`);
+        const response = await axiosInstance.get(`/api/shareboard/boardlike/${boardId}?userId=${userId}`);
         return response.data;
     } catch (error) {
         return error.response.data;
