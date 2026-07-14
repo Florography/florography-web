@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react";
 import { useMe } from "../../hooks/queries/useUser";
-import { useComment, useRankShareBoard, useShareBoard } from "../../hooks/queries/useShareboard";
-import { useCommentDeleteMutation, useCommentPutMutation, useCommentRegisterMutation, useLikeDownMutation, useLikeUpMutation, useShareBoardDeleteMutation, useShareBoardPutMutation, useShareBoardResisterMutation } from "../../hooks/mutations/useShareBoard";
+import { useBoardLike, useComment, useRankShareBoard, useShareBoard } from "../../hooks/queries/useShareboard";
+import { useBoardLikeDeleteMutation, useBoardLikeRegisterMutation, useCommentDeleteMutation, useCommentPutMutation, useCommentRegisterMutation, useLikeDownMutation, useLikeUpMutation, useShareBoardDeleteMutation, useShareBoardPutMutation, useShareBoardResisterMutation } from "../../hooks/mutations/useShareBoard";
 import { data } from "react-router";
 
 
 function ShareBoardPage() {
-    //수정중 게시글 ID 기억 상태
-    const [editingBoardId, setEditingBoardId] = useState(null);
-    // 게시글 수정 입력갑 임시저장 할 상태값
-    const [editBody, setEditBody] = useState("");
-    //좋아요 누른 게시글 ID 객체형태로 저장
-    const [likedBoards, setLikedBoards] = useState({});
 
     //게시판
     const boardQuery = useShareBoard();
@@ -24,8 +18,7 @@ function ShareBoardPage() {
     const { mutate: registerShareBoard, isPending } = useShareBoardResisterMutation();
     const { mutate: deleteBoard } = useShareBoardDeleteMutation();
     const { mutate: updateBoard } = useShareBoardPutMutation();
-    const { mutate: likeUp } = useLikeUpMutation();
-    const { mutate: likeDown } = useLikeDownMutation();
+
     //본인인증?
     const [inputSeedRecord, setInputSeedRecord] = useState({
         userId: "",
@@ -91,84 +84,6 @@ function ShareBoardPage() {
         });
     };
 
-    // 수정버튼
-    const handleEditStartOnClick = (board) => {
-        setEditingBoardId(board.id);
-        setEditBody(board.body)
-    }
-    //저장버튼
-    const handleSaveOnClick = () => {
-        if (!editBody.trim()) {
-            alert("내용을 입력해 주세요.");
-            return;
-        }
-        const modifyDto = {
-            id: editingBoardId,
-            userId: currentUserId,
-            body: editBody
-        };
-
-        updateBoard(
-            { userId: currentUserId, data: modifyDto },
-            {
-                onSuccess: () => {
-                    setEditingBoardId(null); //수정 성공시 입력창 닫기
-                    setEditBody(""); //임시저장 상태 초기화
-                },
-                onError: (error) => {
-                    alert(error.message);
-                }
-            }
-        );
-    };
-
-    //수정 취소 버튼
-    const handleCancelOnClick = () => {
-        setEditingBoardId(null);
-    }
-    // 좋아요 증감
-    const handleLikeToggleOnClick = (boardId) => {
-        if(!currentUserId) {
-            alert("로그인이 필요합니다.");
-            return;
-        }
-        const reqData = {
-            id: boardId,
-            userId: currentUserId
-        };
-        
-        // 게시글을 좋아요 여부 확인
-        const isCurrentlyLiked = !!likedBoards[boardId];
-        
-
-        if(isCurrentlyLiked) {
-            likeDown(
-                { id: boardId, data: reqData},
-                {
-                    onSuccess: () => {
-                        setLikedBoards(prev => ({
-                            ...prev,
-                            [boardId]: false
-                        }));
-                    }
-                }
-            );
-        } else {
-            likeUp(
-                {id: boardId, data: reqData},
-                {
-                    onSuccess: () => {
-                        setLikedBoards(prev => ({
-                            ...prev,
-                            [boardId]: true
-                        }));
-                    }
-                }
-            );
-        }
-
-    };
-
 
     return (
         <>
@@ -186,40 +101,14 @@ function ShareBoardPage() {
             </div>
             <ul>
                 {boards.map((board) => (
-                    <li key={board.id}>
-                        <p>{board.body}</p>
-                        {editingBoardId === board.id ? (
-                            <>
-                                <div>
-                                    <input type="text" value={editBody} onChange={(e) => setEditBody(e.target.value)} />
-                                </div>
-                                <div>
-                                    <button onClick={handleSaveOnClick}>저장</button>
-                                    <button onClick={handleCancelOnClick}>취소</button>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div>
-                                    <span>좋아요: {board.like || 0}</span>
-                                    <button onClick={() => handleLikeToggleOnClick(board.id)}>
-                                        {!!likedBoards[board.id] ? "❤️ 좋아요 취소" : "🤍 좋아요"}
-                                    </button>
-                                    <span>작성일: {board.createdAt}</span>
-                                    <button onClick={() => handleDeleteOnClick(board.id, board.userId)}>삭제</button>
-                                </div>
-                                <div>
-                                    <button onClick={() => handleEditStartOnClick(board)}>수정</button>
-                                </div>
-                                <div>
-                                    <p>댓글</p>
-                                    <CommentRegister boardId={board.id} user={user} />
-                                    <CommentSelect boardId={board.id} />
-                                </div>
-                            </>
-                        )}
-                        <hr />
-                    </li>
+                    <BoardItem
+                    key={board.id}
+                    board={board}
+                    currentUserId={currentUserId}
+                    user={user}
+                    handleDeleteOnClick={handleDeleteOnClick}
+                    updateBoard={updateBoard}
+                    />
                 ))}
 
             </ul>
@@ -240,6 +129,84 @@ function ShareBoardPage() {
 
 
 export default ShareBoardPage;
+
+function BoardItem({ board, currentUserId, user, handleDeleteOnClick, updateBoard }) {
+    // 실시간 좋아요 여부 DB 조회
+    const { data: likeQueryData } = useBoardLike(board.id, currentUserId);
+    const isLiked = !!likeQueryData?.body; 
+
+    const { mutate: likeUp } = useBoardLikeRegisterMutation();
+    const { mutate: likeDown } = useBoardLikeDeleteMutation();
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [editBody, setEditBody] = useState(board.body);
+
+    // 하트 토글 핸들러 (누르면 증감저장 / 감소삭제)
+    const handleLikeToggle = () => {
+        if (!currentUserId) return alert("로그인이 필요합니다.");
+        
+        if (isLiked) {
+            likeDown({
+                boardId: board.id,
+                userId: currentUserId
+            }); // ❤️ -> 🤍 (취소 및 1 감소)
+        } else {
+            likeUp({ 
+                boardId: board.id,
+                userId: currentUserId
+             }); // 🤍 -> ❤️ (저장 및 1 증가)
+        }
+    };
+
+    const handleSaveClick = () => {
+        if (!editBody.trim()) return alert("내용을 입력해 주세요.");
+        
+        updateBoard(
+            { userId: currentUserId, data: { id: board.id, userId: currentUserId, body: editBody } },
+            {
+                onSuccess: () => setIsEditing(false),
+                onError: (error) => alert(error.message)
+            }
+        );
+    };
+
+    return (
+        <li>
+            {isEditing ? (
+                <>
+                    <input type="text" value={editBody} onChange={(e) => setEditBody(e.target.value)} />
+                    <button onClick={handleSaveClick}>저장</button>
+                    <button onClick={() => setIsEditing(false)}>취소</button>
+                </>
+            ) : (
+                <>
+                    <p>{board.body}</p>
+                    <span>좋아요: {board.like || 0}</span>
+                    
+                    {/* 직관적인 하트 텍스트 변경 */}
+                    <button onClick={handleLikeToggle}>
+                        {isLiked ? "❤️ 좋아요 취소" : "🤍 좋아요"}
+                    </button>
+                    
+                    <span>작성일: {board.createdAt}</span>
+                    
+                    {currentUserId === board.userId && (
+                        <>
+                            <button onClick={() => setIsEditing(true)}>수정</button>
+                            <button onClick={() => handleDeleteOnClick(board.id, board.userId)}>삭제</button>
+                        </>
+                    )}
+                    <div>
+                        <p>댓글</p>
+                        <CommentRegister boardId={board.id} user={user} />
+                        <CommentSelect boardId={board.id} currentUserId={currentUserId} />
+                    </div>
+                </>
+            )}
+            <hr />
+        </li>
+    );
+}
 
 //댓글 출력
 function CommentSelect({ boardId }) {
@@ -364,7 +331,7 @@ function CommentRegister({ boardId, user }) {
                 userId: uid,
             }));
         }
-    }, [user?.data]);
+    }, [user]);
 
     const handleCommentInputChange = (e) => {
         setInputComment((prev) => ({
@@ -375,6 +342,11 @@ function CommentRegister({ boardId, user }) {
 
     const handleCommentSubmit = (e) => {
         e.preventDefault();
+        if (!inputComment.userId) {
+            alert("로그인 정보가 유효하지 않습니다. 다시 시도해 주세요.");
+            return;
+        }
+
         if (!inputComment.body.trim()) {
             alert("댓글을 입력해주세요!");
             return;

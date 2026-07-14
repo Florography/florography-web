@@ -114,3 +114,31 @@ export const putLikeDown = async ({id, data}) => {
         return error.response.data;
     }
 }
+
+// 좋아요 테이블에 추가
+export const registerBoardLike = async (data) => {
+    try {
+        const response = await axiosInstance.post("/api/shareboard/boardlike",data);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+// 좋아요 테이블에 삭제
+export const deleteBoardLike = async ({boardId,userId}) => {
+    try {
+        const response = await axiosInstance.delete(`/api/shareboard/boardlike/${boardId}/${userId}`);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+// 좋아요 여부 확인 출력
+export const getBoardLike = async ({boardId, userId}) => {
+    try {
+        const response = await axiosInstance.get(`/api/shareboard/boardlike/${boardId}?userId=${userId}`);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
