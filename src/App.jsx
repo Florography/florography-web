@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import ShareBoardPage from "./pages/ShareBoardPage/ShareBoardPage";
 import HeartLetter from "./pages/HeartLetterPage/HeartLetterPage";
+import SeedRecordPage from "./pages/SeedRecordPage/SeedRecordPage";
 
 const globalStyles = css`
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
@@ -48,11 +49,12 @@ function App() {
                     <Route path="/flowers" element={<FlowerDirectory />} />
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/home" element={<HomePage />} />
-                    <Route path="/heartletter" element={<HeartLetter />} />
+                    <Route path="/heartletter/letters" element={<HeartLetter />} />
+                    <Route path="/heartletter/seedrecord" element={<SeedRecordPage />} />
                     <Route path="/shareboard" element={<ShareBoardPage />} />
                 </Routes>
         </>
     );
 }
 
-export default App;
+export default App; 
