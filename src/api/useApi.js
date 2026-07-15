@@ -5,10 +5,8 @@ export const getMeRequest = async () => {
     return response.data;
 }
 
-export const getMyRecord = async (data) => {
-    console.log("Hello");
-    const response = await axiosInstance.get("api/seedrecord/getuser", {params:data});
-    console.log("Hello");
+export const getMyRecord = async (userId) => {
+    const response = await axiosInstance.get(`/api/seedrecord/${userId}`);
     return response.data;
 }
 

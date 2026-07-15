@@ -12,15 +12,3 @@ export const useMe = () => {
         gcTime: 6000 * 10,
     });
 }
-
-export const useMySeedRecord = () => {
-    const accessToken = localStorage.getItem("accessToken");
-
-    return useQuery({
-        queryKey: ["mySeedRecord", accessToken],
-        queryFn: getMyRecord,
-        retry: 0,
-        staleTime: 6000 * 60 * 24,
-        gcTime: 6000 * 10,
-    });
-}
