@@ -35,16 +35,7 @@ function SeedRecordPage() {
 
     const [availableWeeks, setAvailableWeeks] = useState([]);
 
-    let allSeedRecords = [];
-    if (seedRecords && typeof seedRecords !== "string") {
-        allSeedRecords = seedRecords.body && Array.isArray(seedRecords.body)
-        ? seedRecords.body
-        : (Array.isArray(seedRecords) ? seedRecords : []);
-    }
-
     const safeRecords = Array.isArray(seedRecords) ? seedRecords : [];
-    
-    // ---------------------------------------------------------------------
 
     // 현재 주 계산
     const currentSunday = new Date(currentMonday);
