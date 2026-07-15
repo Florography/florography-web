@@ -1,40 +1,25 @@
-// 마이페이지 UI 목업용 로컬 데이터.
-// 글/한마디/도감/캘린더 관련 백엔드 API가 아직 없어 reference/florography 마이페이지.dc.html 과 동일하게
-// 하드코딩된 목업 데이터를 사용한다.
+// 마이페이지 고유 목업 데이터
+// 공통 데이터는 src/mockData.js에서 import
 
-export const MENU_ITEMS = [
-    { icon: "🏡", label: "홈", desc: "나의 정원 한눈에 보기", href: "/" },
-    { icon: "🌱", label: "씨앗심기", desc: "오늘의 한 문장 기록", href: null },
-    {
-        icon: "💌",
-        label: "꽃에게 전하는 속마음",
-        desc: "대상에게 쓰는 감정 편지",
-        href: null,
-    },
-    {
-        icon: "🌍",
-        label: "공유 게시판",
-        desc: "서로의 정원과 한마디 나누기",
-        href: null,
-    },
-    { icon: "🌼", label: "꽃 도감", desc: "피워낸 꽃 모아보기", href: "/flowers" },
-    { icon: "🪴", label: "나만의 정원", desc: "기록으로 가꾸는 공간", href: null },
-    {
-        icon: "📈",
-        label: "감정 리포트",
-        desc: "월별 감정 변화 살펴보기",
-        href: null,
-    },
-];
+import {
+    MENU_ITEMS_BASE,
+    NAV_ITEMS_BASE,
+    MOOD_COLORS,
+    MOOD_STYLES,
+    WEEKDAYS,
+    BLOOM_MAP_2026_06,
+} from "../../globalData";
 
-export const NAV_ITEMS = [
-    { label: "홈", href: "/home", active: false },
-    { label: "속마음 편지", href: null, active: false },
-    { label: "공유 게시판", href: null, active: false },
-    { label: "꽃 도감", href: "/flowers", active: false },
-    { label: "마이페이지", href: "/mypage", active: true },
-];
+// 마이페이지에서 사용할 MENU_ITEMS
+export const MENU_ITEMS = MENU_ITEMS_BASE;
 
+export const NAV_ITEMS = NAV_ITEMS_BASE.map(item => ({
+    ...item,
+    active: item.label === null
+}));
+
+
+// 마이페이지 고유 데이터
 export const RECORDS = [
     { text: "비 오는 냄새가 좋았다.", date: "06.24", mood: "좋음" },
     { text: "오늘은 생각보다 괜찮은 하루였다.", date: "06.23", mood: "괜찮음" },
@@ -60,32 +45,5 @@ export const LINES = [
     { text: "작은 용기를 낸 하루.", date: "06.06" },
 ];
 
-export const MOOD_STYLES = {
-    좋음: { dot: "#588157", bg: "#EAF0DE" },
-    괜찮음: { dot: "#7FA05F", bg: "#EEF2E2" },
-    가라앉음: { dot: "#8A9A8F", bg: "#EAEEE9" },
-    "그저 그럼": { dot: "#C4B878", bg: "#F2EFDD" },
-};
-
-export const MOOD_COLORS = ["#8694a3", "#94a39a", "#c4b878", "#86a866", "#588157"];
-
-export const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
-
-// 2026년 6월 기준 목업 개화 캘린더 (day -> moodColors index)
-export const BLOOM_MAP_2026_06 = {
-    2: 4,
-    5: 3,
-    9: 2,
-    12: 1,
-    14: 1,
-    15: 2,
-    17: 1,
-    18: 4,
-    20: 4,
-    21: 0,
-    22: 2,
-    23: 1,
-    24: 3,
-    25: 3,
-    26: 4,
-};
+// 공통 데이터 re-export
+export { MOOD_COLORS, MOOD_STYLES, WEEKDAYS, BLOOM_MAP_2026_06 };
