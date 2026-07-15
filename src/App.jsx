@@ -9,6 +9,12 @@ import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import ShareBoardPage from "./pages/ShareBoardPage/ShareBoardPage";
 import HeartLetter from "./pages/HeartLetterPage/HeartLetterPage";
 import SeedRecordPage from "./pages/SeedRecordPage/SeedRecordPage";
+import GardenListPage from "./pages/Garden/GardenListPage";
+import GardenCreatePage from "./pages/Garden/GardenCreatePage";
+import GardenDetailPage from "./pages/Garden/GardenDetailPage";
+import LeftBar from "./components/SideBar/LeftBar/LeftBar";
+import RightBar from "./components/SideBar/RightBar/RightBar";
+import Header from "./components/Header/Header";
 
 const globalStyles = css`
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
@@ -39,6 +45,9 @@ function App() {
     return (
         <>
             <Global styles={globalStyles} />
+            <Header />
+            <div>
+                <LeftBar />
                 <Routes>
                     <Route path="/" element={<InformationPage />} />
                     <Route path="/login" element={<LoginPage />} />
@@ -52,7 +61,12 @@ function App() {
                     <Route path="/heartletter/letters" element={<HeartLetter />} />
                     <Route path="/heartletter/seedrecord" element={<SeedRecordPage />} />
                     <Route path="/shareboard" element={<ShareBoardPage />} />
+                    <Route path="/garden" element={<GardenListPage />} />
+                    <Route path="/garden/new" element={<GardenCreatePage />} />
+                    <Route path="/garden/:gardenId" element={<GardenDetailPage />} />
                 </Routes>
+                <RightBar />
+            </div>
         </>
     );
 }
