@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import * as s from "./styles";
-import { useHeartLetters } from "../../hooks/queries/useHeartLetter";
-import { useMe } from "../../hooks/queries/useUser";
 import { useMood } from "../../hooks/queries/useMood";
 import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
+import { useMe } from "../../hooks/queries/useUser";
+import * as s from "./styles";
 
 const DEFAULT_MOODS = [
     { id: 0, mood: "많이 지침" },
@@ -21,7 +20,7 @@ const getMondayOfDate = (d) => {
     return new Date(date.setDate(diff));
 };
 
-function HeartLetterPage() {
+function SeedRecordPage() {
     const user = useMe();
 
     const userId = user.data?.body?.linkedAccounts?.[0]?.uid;
@@ -29,22 +28,14 @@ function HeartLetterPage() {
     const moodQuery = useMood();
     const moods = moodQuery.data?.body || DEFAULT_MOODS;
 
-    const { data: letters, isLoading: isLetterLoading, isError: isLetterError } = useHeartLetters(userId);
-    const { data: seedRecords, isLoading: isSeedLoading } = useSeedRecord(userId);
+    const { data: seedRecords, isLoading: isSeedLoading, isError: isSeedError } = useSeedRecord(userId);
 
     const [currentMonday, setCurrentMonday] = useState(() => getMondayOfDate(new Date()));
     const [currentPage, setCurrentPage] = useState(1);
 
     const [availableWeeks, setAvailableWeeks] = useState([]);
 
-    let allSeedRecords = [];
-    if (seedRecords && typeof seedRecords !== "string") {
-        allSeedRecords = seedRecords.body && Array.isArray(seedRecords.body)
-            ? seedRecords.body
-            : (Array.isArray(seedRecords) ? seedRecords : []);
-    }
-
-    const safeLetters = Array.isArray(letters) ? letters : [];
+    const safeRecords = Array.isArray(seedRecords) ? seedRecords : [];
 
     // 현재 주 계산
     const currentSunday = new Date(currentMonday);
@@ -63,73 +54,66 @@ function HeartLetterPage() {
     const isThisWeek = formatDate(currentMonday) === formatDate(thisWeekMonday);
 
     useEffect(() => {
-        if (safeLetters.length === 0) return;
+        if (safeRecords.length === 0) return;
         const weeksSet = new Set();
-        safeLetters.forEach(letter => {
-            if (letter?.createdAt) {
-                const monday = getMondayOfDate(new Date(letter.createdAt));
+        safeRecords.forEach(record => {
+            if (record?.createdDate) {
+                const monday = getMondayOfDate(new Date(record.createdDate));
                 weeksSet.add(formatDate(monday));
             }
         });
         weeksSet.add(formatDate(getMondayOfDate(new Date())));
         const sortedWeeks = Array.from(weeksSet).sort();
         setAvailableWeeks(sortedWeeks);
-    }, [letters]);
+    }, [seedRecords, safeRecords]);
 
-    if (isLetterLoading || isSeedLoading) {
+    if (isSeedLoading) {
         return <div>데이터를 불러오는 중입니다...</div>
     }
 
-    if (isLetterError) {
-        return <div>데이터를 가져오는데 실패했습니다: {isLetterError.message}</div>
+    if (isSeedError) {
+        return <div>데이터를 가져오는데 실패했습니다: {isSeedError.message}</div>
     }
 
     // 선택한 주차의 편지 필터
-    const filteredLetters = (Array.isArray(letters) ? letters : []).filter(letter => {
-        if (!letter?.createdAt) return false;
-        const letterDateStr = letter.createdAt.substring(0, 10);
-        return letterDateStr >= startStr && letterDateStr <= endStr;
+    const filteredRecords = (Array.isArray(seedRecords) ? seedRecords : []).filter(record => {
+        if (!record?.createdDate) return false;
+        const recordDateStr = record.createdDate.substring(0, 10);
+        return recordDateStr >= startStr && recordDateStr <= endStr;
     });
 
-    const ITEMS_PER_PAGE = 7;
-    const totalPages = Math.ceil(filteredLetters.length / ITEMS_PER_PAGE);
-
-    const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
-    const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
-    const currentItems = filteredLetters.slice(indexOfFirstItem, indexOfLastItem);
-
     // 특정 주에 편지가 존재하는지 체크
-    const hasLettersInWeek = (mondayObj) => {
+    const hasRecordsInWeek = (mondayObj) => {
         const sundayObj = new Date(mondayObj);
         sundayObj.setDate(mondayObj.getDate() + 6);
 
         const sStr = formatDate(mondayObj);
         const eStr = formatDate(sundayObj);
 
-        return safeLetters.some(letter => {
-            if (!letter?.createdAt) return false;
-            const letterDateStr = letter.createdAt.substring(0, 10);
-            return letterDateStr >= sStr && letterDateStr <= eStr;
+        return safeRecords.some(record => {
+            if (!record?.createdDate) return false;
+            const recordDateStr = record.createdDate.substring(0, 10);
+            return recordDateStr >= sStr && recordDateStr <= eStr;
         });
     };
 
     const handlePrevWeek = () => {
-        if (safeLetters.length === 0) return;
+        if (safeRecords.length === 0) return;
 
         let tempMonday = new Date(currentMonday);
         let found = false;
 
-        const letterDates = safeLetters
-            .map(l => l.createdAt?.substring(0, 10))
+        const recordDates = safeRecords
+            .map(l => l.createdDate?.substring(0, 10))
             .filter(Boolean)
             .sort();
 
-        if (letterDates.length === 0) return;
-        const oldestLetterMonday = getMondayOfDate(new Date(letterDates[0]));
+        if (recordDates.length === 0) return;
+        const oldestRecordMonday = getMondayOfDate(new Date(recordDates[0]));
 
-        while (tempMonday >= oldestLetterMonday) {
+        while (tempMonday >= oldestRecordMonday) {
             tempMonday.setDate(tempMonday.getDate() - 7);
-            if (hasLettersInWeek(tempMonday)) {
+            if (hasRecordsInWeek(tempMonday)) {
                 found = true;
                 break;
             }
@@ -137,7 +121,6 @@ function HeartLetterPage() {
         
         if (found) {
             setCurrentMonday(tempMonday);
-            setCurrentPage(1);
         } else {
             alert("이전 주에 작성된 편지가 더 이상 없습니다.")
         }
@@ -151,7 +134,7 @@ function HeartLetterPage() {
 
         while (tempMonday < thisWeekMonday) {
             tempMonday.setDate(tempMonday.getDate() + 7);
-            if (hasLettersInWeek(tempMonday)) {
+            if (hasRecordsInWeek(tempMonday)) {
                 found = true;
                 break;
             }
@@ -160,10 +143,8 @@ function HeartLetterPage() {
         // 데이터를 못 찾으면 이번 주로 돌아오도록
         if (found) {
             setCurrentMonday(tempMonday);
-            setCurrentPage(1);
         } else {
             setCurrentMonday(new Date(thisWeekMonday));
-            setCurrentPage(1);
         }
     };
 
@@ -174,66 +155,27 @@ function HeartLetterPage() {
 
     return (
         <div>
-            <h1>나의 편지</h1>
-                <span style={{ fontWeight: "bold" }}>
+            <h1>나의 한마디</h1>
+                <span style={{ fontWeight: "bold"}}>
                     {startStr} (월) ~ {endStr} (일)
                 </span>
             <ul>
-                {currentItems && currentItems.length > 0 ? (
-                    currentItems.map((heartletter, index) => {
-                        const letterDate = heartletter.createdAt?.substring(0, 10);
-
-                        const targetRecord = allSeedRecords.find(record => 
-                            record?.createdDate && record.createdDate.startsWith(letterDate)
-                        );
-
-                        const currentMoodId = targetRecord ? targetRecord.moodIdx : null;
-                        const matchedMood = moods.find(m => Number(m.id) === Number(currentMoodId));
+                {filteredRecords && filteredRecords.length > 0 ? (
+                    seedRecords.map((seedrecord, index) => {
+                        const matchedMood = moods.find(m => Number(m.id) === Number(seedrecord.moodIdx));
 
                         return (
-                            <li key={`${heartletter.userId}-${index}`}>
-                                <span>{heartletter.createdAt}</span>
-                                <span>{heartletter.title}</span>
-                                <span>받는 마음: {heartletter.recipient}</span>
-                                <span>({matchedMood ? matchedMood.mood : "괜찮음"})</span>
-                            </li>
+                            <li key={`${seedrecord.userId || 'record'}-${index}`}>
+                                <span>{seedrecord.createdDate}</span>
+                                <span>{seedrecord.sentence}</span>
+                                <span>({matchedMood ? matchedMood.mood : seedrecord.moodIdx})</span>
+                            </li> 
                         );
                     })
                 ) : (
                     <li>표시할 데이터가 없습니다.</li>
                 )}
             </ul>
-            {totalPages > 1 && (
-                <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "20px" }}>
-                    <button 
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
-                        이전
-                    </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                        <button
-                            key={pageNum}
-                            onClick={() => setCurrentPage(pageNum)}
-                            style={{
-                                fontWeight: currentPage === pageNum ? "bold" : "normal",
-                                backgroundColor: currentPage === pageNum ? "#ddd" : "#fff",
-                                border: "1px solid #ccc",
-                                padding: "5px 10px",
-                                cursor: "pointer"
-                            }}
-                        >
-                            {pageNum}
-                        </button>
-                    ))}
-                    <button
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                    >
-                        다음
-                    </button>
-                </div>
-            )}
             <div style={{ display: "flex", gap: "15px", alignItems: "center", margin: "20px 0" }}>
                 <button onClick={handlePrevWeek}>◀ 이전 주</button>
                 
@@ -265,7 +207,7 @@ function HeartLetterPage() {
                 <button onClick={handleNextWeek} disabled={isThisWeek}>다음 주 ▶</button>
             </div>
         </div>
-    );
-}     
-export default HeartLetterPage;
+    )
+}
 
+export default SeedRecordPage;

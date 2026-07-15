@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import ShareBoardPage from "./pages/ShareBoardPage/ShareBoardPage";
 import HeartLetter from "./pages/HeartLetterPage/HeartLetterPage";
+import SeedRecordPage from "./pages/SeedRecordPage/SeedRecordPage";
 import GardenListPage from "./pages/Garden/GardenListPage";
 import GardenCreatePage from "./pages/Garden/GardenCreatePage";
 import GardenDetailPage from "./pages/Garden/GardenDetailPage";
@@ -57,7 +58,8 @@ function App() {
                     <Route path="/flowers" element={<FlowerDirectory />} />
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/home" element={<HomePage />} />
-                    <Route path="/heartletter" element={<HeartLetter />} />
+                    <Route path="/heartletter/letters" element={<HeartLetter />} />
+                    <Route path="/heartletter/seedrecord" element={<SeedRecordPage />} />
                     <Route path="/shareboard" element={<ShareBoardPage />} />
                     <Route path="/garden" element={<GardenListPage />} />
                     <Route path="/garden/new" element={<GardenCreatePage />} />
@@ -69,4 +71,4 @@ function App() {
     );
 }
 
-export default App;
+export default App; 
