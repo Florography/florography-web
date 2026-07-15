@@ -8,6 +8,9 @@ import HomePage from "./pages/HomePage/HomePage";
 import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import ShareBoardPage from "./pages/ShareBoardPage/ShareBoardPage";
 import HeartLetter from "./pages/HeartLetterPage/HeartLetterPage";
+import LeftBar from "./components/SideBar/LeftBar/LeftBar";
+import RightBar from "./components/SideBar/RightBar/RightBar";
+import Header from "./components/Header/Header";
 
 const globalStyles = css`
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
@@ -38,6 +41,9 @@ function App() {
     return (
         <>
             <Global styles={globalStyles} />
+            <Header />
+            <div>
+                <LeftBar />
                 <Routes>
                     <Route path="/" element={<InformationPage />} />
                     <Route path="/login" element={<LoginPage />} />
@@ -51,6 +57,8 @@ function App() {
                     <Route path="/heartletter" element={<HeartLetter />} />
                     <Route path="/shareboard" element={<ShareBoardPage />} />
                 </Routes>
+                <RightBar />
+            </div>
         </>
     );
 }
