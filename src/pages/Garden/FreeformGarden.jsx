@@ -31,7 +31,17 @@ function FreeformGarden({ theme }) {
     const [drag, setDrag] = useState(null);
 
     const hintTimer = useRef(null);
+    const isLoadingFromStore = useRef(false);
     const setFreeformFlowers = useGardenStore((state) => state.setFreeformFlowers);
+    const storedFlowers = useGardenStore((state) => state.freeformFlowers);
+
+    // 저장된 꽃 데이터 로드 (store으로부터만)
+    useEffect(() => {
+        if (Array.isArray(storedFlowers)) {
+            isLoadingFromStore.current = true;
+            setFlowers(storedFlowers);
+        }
+    }, [storedFlowers]);
 
     const showHint = useCallback((msg) => {
         setHint(msg);
@@ -39,9 +49,13 @@ function FreeformGarden({ theme }) {
         hintTimer.current = setTimeout(() => setHint(""), 2000);
     }, []);
 
-    // flowers 상태가 변경될 때마다 스토어에 동기화
+    // flowers 상태가 변경될 때마다 스토어에 동기화 (사용자 액션일 때만)
     useEffect(() => {
-        setFreeformFlowers(flowers);
+        if (!isLoadingFromStore.current) {
+            setFreeformFlowers(flowers);
+        } else {
+            isLoadingFromStore.current = false;
+        }
     }, [flowers, setFreeformFlowers]);
 
     // DB 도감 중 사용자가 실제로 개화(보유)한 꽃만 정원에 심을 수 있다.

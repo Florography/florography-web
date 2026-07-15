@@ -1,11 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import * as s from "./styles";
 import { useMe } from "../../hooks/queries/useUser";
 import FreeformGarden from "./FreeformGarden";
-import GridGarden from "./GridGarden";
-import { saveGarden } from "../../api/gardenApi";
+import { createGarden, saveGarden } from "../../api/gardenApi";
 import { useGardenStore } from "../../stores/gardenStore";
 import {
     MENU_ITEMS,
@@ -13,7 +13,6 @@ import {
     PETALS,
     WATER_COUNT,
     THEMES,
-    TABS,
     MOOD_COLORS,
     WEEKDAYS,
     BLOOM_MAP_2026_06,
@@ -21,12 +20,13 @@ import {
 
 function GardenCreatePage() {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const meQuery = useMe();
     const getAllGardenData = useGardenStore((state) => state.getAllGardenData);
+    const resetGardenData = useGardenStore((state) => state.resetGardenData);
 
     const [menuOpen, setMenuOpen] = useState(false);
     const [themeIdx, setThemeIdx] = useState(0);
-    const [activeTab, setActiveTab] = useState(TABS[0].key);
     const [saved, setSaved] = useState(false);
     const [year, setYear] = useState(2026);
     const [month, setMonth] = useState(6);
@@ -40,6 +40,9 @@ function GardenCreatePage() {
     useEffect(() => {
         if (!accessToken) {
             navigate("/", { replace: true });
+        } else {
+            // 새 정원 만들기 페이지 진입 시 store 초기화
+            resetGardenData();
         }
     }, [accessToken, navigate]);
 
@@ -101,7 +104,11 @@ function GardenCreatePage() {
             if (gardenName === "") {
                 setGardenName("제목없음");
             }
-            await saveGarden(gardenData, userId, gardenName || "제목없음");
+            await createGarden(gardenData, userId, gardenName || "제목없음");
+
+            // 정원 목록 캐시 무효화 (목록 자동 갱신)
+            await queryClient.invalidateQueries({ queryKey: ["gardens", "all"] });
+
             setSaved(true);
             showToast("정원이 저장되었어요 🌸");
             setTimeout(() => {
@@ -242,23 +249,7 @@ function GardenCreatePage() {
                         </div>
                     </div>
 
-                    <div css={s.tabBar}>
-                        {TABS.map((tab) => (
-                            <button
-                                key={tab.key}
-                                css={s.tabBtn(activeTab === tab.key)}
-                                onClick={() => setActiveTab(tab.key)}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {activeTab === "freeform" ? (
-                        <FreeformGarden theme={theme} />
-                    ) : (
-                        <GridGarden theme={theme} />
-                    )}
+                    <FreeformGarden theme={theme} />
                 </main>
 
                 <aside css={s.rightRail}>

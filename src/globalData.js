@@ -102,25 +102,11 @@ export const THEMES = [
     },
 ];
 
-export const TABS = [
-    { key: "freeform", label: "1번안" },
-    { key: "grid", label: "2번안" },
-];
-
 export const FREEFORM_INITIAL = [
     { id: "f1", x: 82, y: 25, flower: 2 },
     { id: "f2", x: 33, y: 55, flower: 0 },
     { id: "f3", x: 24, y: 72, flower: 5 },
 ];
-
-export const GRID_ROWS = 4;
-export const GRID_COLS = 6;
-
-export const GRID_INITIAL = {
-    2: 2,
-    9: 0,
-    15: 5,
-};
 
 // ─── 도감 꽃 데이터
 export const FLOWERS = [

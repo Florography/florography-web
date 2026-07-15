@@ -1,11 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import * as s from "./styles";
 import { useMe } from "../../hooks/queries/useUser";
 import { useGardenById } from "../../hooks/queries/useGarden";
 import FreeformGarden from "./FreeformGarden";
-import GridGarden from "./GridGarden";
 import { saveGarden } from "../../api/gardenApi";
 import { useGardenStore } from "../../stores/gardenStore";
 import {
@@ -13,7 +13,6 @@ import {
     PETALS,
     WATER_COUNT,
     THEMES,
-    TABS,
     MOOD_COLORS,
     WEEKDAYS,
     BLOOM_MAP_2026_06,
@@ -21,17 +20,17 @@ import {
 
 function GardenDetailPage() {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { gardenId } = useParams();
     const meQuery = useMe();
     const gardenQuery = useGardenById(Number(gardenId));
 
     const setFreeformFlowers = useGardenStore((state) => state.setFreeformFlowers);
-    const setGridGardenData = useGardenStore((state) => state.setGridGardenData);
+    const resetGardenData = useGardenStore((state) => state.resetGardenData);
     const getAllGardenData = useGardenStore((state) => state.getAllGardenData);
 
     const [menuOpen, setMenuOpen] = useState(false);
     const [themeIdx, setThemeIdx] = useState(0);
-    const [activeTab, setActiveTab] = useState(TABS[0].key);
     const [saved, setSaved] = useState(false);
     const [year, setYear] = useState(2026);
     const [month, setMonth] = useState(6);
@@ -45,6 +44,9 @@ function GardenDetailPage() {
     useEffect(() => {
         if (!accessToken) {
             navigate("/", { replace: true });
+        } else {
+            // 정원 상세 페이지 진입 시 store 초기화
+            resetGardenData();
         }
     }, [accessToken, navigate]);
 
@@ -52,22 +54,17 @@ function GardenDetailPage() {
         if (gardenQuery.data?.body) {
             const garden = gardenQuery.data.body;
             setGardenName(garden.name || "제목없음");
-            console.log(garden.gardenData);
+            console.log(garden);
             try {
                 const parsedData = JSON.parse(garden.gardenData);
-                console.log(parsedData.freeformFlowers);
-                // console.log(parsedData.gridGardenData);
                 if (parsedData.freeformFlowers) {
                     setFreeformFlowers(parsedData.freeformFlowers);
                 }
-                // if (parsedData.gridGardenData) {
-                //     setGridGardenData(parsedData.gridGardenData);
-                // }
             } catch (e) {
                 console.error("정원 데이터 파싱 실패:", e);
             }
         }
-    }, [gardenQuery.data, setFreeformFlowers, setGridGardenData]);
+    }, [gardenQuery.data, setFreeformFlowers]);
 
     const showToast = useCallback((msg) => {
         setToastExiting(false);
@@ -84,6 +81,7 @@ function GardenDetailPage() {
     const handleSave = async () => {
         const gardenData = getAllGardenData();
         const userId = meQuery.data?.body?.linkedAccounts[0].uid;
+        const gardenId =  gardenQuery.data.body.id;
 
         if (!userId) {
             showToast("사용자 정보를 불러올 수 없어요");
@@ -91,7 +89,11 @@ function GardenDetailPage() {
         }
 
         try {
-            await saveGarden(gardenData, userId, gardenName);
+            await saveGarden(gardenData, gardenId ,userId, gardenName);
+
+            // 정원 목록과 현재 정원 캐시 무효화 (데이터 자동 갱신)
+            await queryClient.invalidateQueries({ queryKey: ["gardens"] });
+
             setSaved(true);
             showToast("정원이 수정되었어요 🌸");
             setTimeout(() => setSaved(false), 1800);
@@ -230,23 +232,7 @@ function GardenDetailPage() {
                         </div>
                     </div>
 
-                    <div css={s.tabBar}>
-                        {TABS.map((tab) => (
-                            <button
-                                key={tab.key}
-                                css={s.tabBtn(activeTab === tab.key)}
-                                onClick={() => setActiveTab(tab.key)}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {activeTab === "freeform" ? (
-                        <FreeformGarden theme={theme} />
-                    ) : (
-                        <GridGarden theme={theme} />
-                    )}
+                    <FreeformGarden theme={theme} />
                 </main>
 
                 <aside css={s.rightRail}>
