@@ -45,9 +45,9 @@ function App() {
     return (
         <>
             <Global styles={globalStyles} />
-            <Header />
+            {/* <Header /> */}
             <div>
-                <LeftBar />
+                {/* <LeftBar /> */}
                 <Routes>
                     <Route path="/" element={<InformationPage />} />
                     <Route path="/login" element={<LoginPage />} />
