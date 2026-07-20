@@ -160,8 +160,8 @@ function SeedRecordPage() {
                     {startStr} (월) ~ {endStr} (일)
                 </span>
             <ul>
-                {filteredRecords && filteredRecords.length > 0 ? (
-                    seedRecords.map((seedrecord, index) => {
+                {filteredRecords.length > 0 ? (
+                    filteredRecords.map((seedrecord, index) => {
                         const matchedMood = moods.find(m => Number(m.id) === Number(seedrecord.moodIdx));
 
                         return (
@@ -173,7 +173,7 @@ function SeedRecordPage() {
                         );
                     })
                 ) : (
-                    <li>표시할 데이터가 없습니다.</li>
+                    <li>이번 주에 쓴 한마디가 없습니다.</li>
                 )}
             </ul>
             <div style={{ display: "flex", gap: "15px", alignItems: "center", margin: "20px 0" }}>
