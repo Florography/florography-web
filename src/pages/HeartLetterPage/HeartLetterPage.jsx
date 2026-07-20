@@ -200,7 +200,7 @@ function HeartLetterPage() {
                         );
                     })
                 ) : (
-                    <li>표시할 데이터가 없습니다.</li>
+                    <li>이번 주에 쓴 편지가 없습니다.</li>
                 )}
             </ul>
             {totalPages > 1 && (
