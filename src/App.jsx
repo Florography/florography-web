@@ -15,6 +15,7 @@ import GardenDetailPage from "./pages/Garden/GardenDetailPage";
 import LeftBar from "./components/SideBar/LeftBar/LeftBar";
 import RightBar from "./components/SideBar/RightBar/RightBar";
 import Header from "./components/Header/Header";
+import WriteHeartLetter from "./pages/WriteHeartLetter/WriteHeartLetter";
 
 const globalStyles = css`
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
@@ -58,6 +59,7 @@ function App() {
                     <Route path="/flowers" element={<FlowerDirectory />} />
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/home" element={<HomePage />} />
+                    <Route path="/write" element={<WriteHeartLetter />} />
                     <Route path="/heartletter/letters" element={<HeartLetter />} />
                     <Route path="/heartletter/seedrecord" element={<SeedRecordPage />} />
                     <Route path="/shareboard" element={<ShareBoardPage />} />
