@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import FlowerDirectory from "./pages/FlowerDirectoryPage/FlowerDirectory";
 import ShareBoardPage from "./pages/ShareBoardPage/ShareBoardPage";
 import HeartLetter from "./pages/HeartLetterPage/HeartLetterPage";
+import HeartLetterWrite from "./pages/HeartLetterWritePage/HeartLetterWritePage";
 import SeedRecordPage from "./pages/SeedRecordPage/SeedRecordPage";
 import GardenListPage from "./pages/Garden/GardenListPage";
 import GardenCreatePage from "./pages/Garden/GardenCreatePage";
@@ -61,6 +62,7 @@ function App() {
                     <Route path="/home" element={<HomePage />} />
                     <Route path="/write" element={<WriteHeartLetter />} />
                     <Route path="/heartletter/letters" element={<HeartLetter />} />
+                    <Route path="/heartletter/write" element={<HeartLetterWrite />} />
                     <Route path="/heartletter/seedrecord" element={<SeedRecordPage />} />
                     <Route path="/shareboard" element={<ShareBoardPage />} />
                     <Route path="/garden" element={<GardenListPage />} />
