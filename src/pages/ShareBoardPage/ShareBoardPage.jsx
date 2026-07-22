@@ -149,6 +149,7 @@ function ShareBoardPage() {
                     <li key={rank.id}>
                         <span><strong>{index + 1}위</strong></span>
                         <span>{rank.body}</span>
+                        <span>❤️{rank.like}</span>
                     </li>
                 ))}
             </ul>
