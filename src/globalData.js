@@ -26,6 +26,12 @@ export const MENU_ITEMS_BASE = [
     },
 ];
 
+// ─── n월 영문 표기
+export const MonthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
 export const NAV_ITEMS_BASE = [
     { label: "홈", href: "/", active: false },
     { label: "속마음 편지", href: null, active: false },

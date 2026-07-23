@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  @keyframes flo-fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes flo-pop{0%{transform:translate(-50%,-50%) scale(.3);opacity:0;}70%{transform:translate(-50%,-50%) scale(1.12);}100%{transform:translate(-50%,-50%) scale(1);opacity:1;}}
+  @keyframes flo-sway2{0%,100%{transform:translate(-50%,-50%) rotate(-3deg);}50%{transform:translate(-50%,-50%) rotate(3deg);}}
+  .flo-body{max-width:1280px;margin:0 auto;padding:30px 32px 64px;display:grid;grid-template-columns:212px minmax(0,1fr) 196px;gap:30px;align-items:start;}
+  @media(max-width:1140px){.flo-body{grid-template-columns:188px minmax(0,1fr);}.flo-rightrail{display:none !important;}}
+  @media(max-width:720px){.flo-body{grid-template-columns:1fr;padding:22px 18px 48px;}.flo-leftrail{display:none !important;}}
+  .flo-slot.over{box-shadow:0 0 0 4px rgba(88,129,87,.35);background:rgba(255,255,255,.55) !important;}
+  .flo-palette-item:active{cursor:grabbing;}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#EEF1E6;font-family:'Pretendard',sans-serif;color:#2C3A2E;-webkit-font-smoothing:antialiased;">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:rgba(238,241,230,.82);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid #DEE2D2;">
+    <div style="display:flex;align-items:center;gap:18px;">
+      <button onClick="{{ toggleMenu }}" aria-label="메뉴" style="display:flex;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;padding:11px;border:1px solid #D3D9C5;border-radius:12px;background:#F7F8F1;cursor:pointer;" style-hover="background:#EDEFE2;border-color:#A3B18A;">
+        <span style="display:block;height:2px;border-radius:2px;background:#3A5A40;"></span>
+        <span style="display:block;height:2px;border-radius:2px;background:#3A5A40;"></span>
+        <span style="display:block;height:2px;border-radius:2px;background:#3A5A40;"></span>
+      </button>
+      <div style="display:flex;align-items:baseline;gap:10px;">
+        <span style="font-family:'Gowun Batang',serif;font-weight:700;font-size:25px;letter-spacing:.01em;color:#344E41;">florography</span>
+        <span style="font-size:12px;color:#7C8675;letter-spacing:.02em;">마음을 키우는 정원</span>
+      </div>
+    </div>
+    <button style="display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border:1px solid #D3D9C5;border-radius:999px;background:#F7F8F1;cursor:pointer;" style-hover="border-color:#A3B18A;background:#EDEFE2;">
+      <span style="display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#588157;color:#F4F6EE;font-size:14px;font-weight:600;font-family:'Gowun Batang',serif;">{{ initial }}</span>
+      <span style="font-size:14px;font-weight:500;color:#34402E;">{{ userName }}</span>
+      <span style="font-size:10px;color:#8A9480;">▾</span>
+    </button>
+  </header>
+
+  <!-- ============ HAMBURGER MODAL ============ -->
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenu }}" style="position:fixed;inset:0;z-index:60;background:rgba(44,58,46,.34);backdrop-filter:blur(2px);animation:flo-fade .2s ease;">
+      <nav onClick="{{ stop }}" style="position:absolute;top:0;left:0;height:100%;width:320px;background:#F4F6EE;border-right:1px solid #DDE2D0;box-shadow:18px 0 50px rgba(52,78,65,.14);padding:26px 24px;display:flex;flex-direction:column;animation:flo-fade .25s ease;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-family:'Gowun Batang',serif;font-weight:700;font-size:22px;color:#344E41;">florography</span>
+          <button onClick="{{ closeMenu }}" aria-label="닫기" style="width:34px;height:34px;border:none;border-radius:10px;background:#E7EAdc;color:#3A5A40;font-size:16px;cursor:pointer;" style-hover="background:#DCE0CF;">✕</button>
+        </div>
+        <p style="margin:0 0 22px;font-size:12.5px;line-height:1.6;color:#7C8675;">당신의 마음에 물을 주세요,<br>감정이 꽃피는 곳.</p>
+        <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="6">
+          <a href="{{ m.href }}" style="display:flex;align-items:center;gap:14px;padding:13px 14px;border-radius:12px;text-decoration:none;color:#34402E;" style-hover="background:#E7EAdc;">
+            <span style="display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#E2E7D6;font-size:14px;">{{ m.icon }}</span>
+            <span style="display:flex;flex-direction:column;">
+              <span style="font-size:14.5px;font-weight:600;">{{ m.label }}</span>
+              <span style="font-size:11.5px;color:#8A9480;">{{ m.desc }}</span>
+            </span>
+          </a>
+        </sc-for>
+        <div style="margin-top:auto;padding-top:18px;border-top:1px solid #E0E4D4;font-size:11.5px;color:#9aa394;">© 2026 florography</div>
+      </nav>
+    </div>
+  </sc-if>
+
+  <!-- ============ BODY GRID ============ -->
+  <div class="flo-body">
+
+    <!-- ---- LEFT RAIL ---- -->
+    <aside class="flo-leftrail" style="position:sticky;top:96px;display:flex;flex-direction:column;gap:18px;">
+      <a href="florography 편지작성.dc.html" style="display:flex;align-items:center;justify-content:center;gap:9px;padding:15px;border:none;border-radius:16px;background:#3A5A40;color:#F4F6EE;font-size:15px;font-weight:600;font-family:'Pretendard';cursor:pointer;box-shadow:0 8px 20px rgba(58,90,64,.22);text-decoration:none;" style-hover="background:#34503a;">
+        <span style="font-size:16px;">✎</span> 글 쓰기
+      </a>
+      <nav style="display:flex;flex-direction:column;gap:2px;padding:10px;background:#F6F8F0;border:1px solid #E1E5D6;border-radius:16px;">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+          <a href="{{ n.href }}" style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;text-decoration:none;color:{{ n.color }};font-size:13.5px;font-weight:{{ n.weight }};background:{{ n.bg }};" style-hover="background:#E8EBDD;color:#2C3A2E;">
+            <span style="width:7px;height:7px;border-radius:50%;background:{{ n.dot }};"></span>{{ n.label }}
+          </a>
+        </sc-for>
+      </nav>
+      <div style="padding:16px;background:linear-gradient(160deg,#DDE7CF,#E9EEDD);border:1px solid #D6DEC4;border-radius:16px;">
+        <div style="font-size:11px;letter-spacing:.08em;color:#6E7A62;font-weight:600;">오늘의 물 주기</div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-top:6px;">
+          <span style="font-family:'Gowun Batang',serif;font-size:30px;font-weight:700;color:#3A5A40;">{{ water }}</span>
+          <span style="font-size:12px;color:#7C8675;">번째 기록</span>
+        </div>
+        <div style="margin-top:9px;font-size:11.5px;line-height:1.5;color:#76806A;">한 문장이 곧 한 번의 물 주기예요.</div>
+      </div>
+    </aside>
+
+    <!-- ---- CENTER ---- -->
+    <main style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- 타이틀 바 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid #D8DEC9;">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;font-family:'Gowun Batang',serif;font-size:22px;font-weight:700;color:#344E41;">🪴 마음의 정원</div>
+          <div style="font-size:12.5px;color:#7C8675;margin-top:4px;">피워낸 꽃을 빈 자리에 끌어다 놓아 나만의 정원을 가꿔보세요.</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onClick="{{ cycleTheme }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border:1px solid #DDE3CF;border-radius:11px;background:#F7F9F1;font-size:13px;font-weight:600;color:#4A5440;cursor:pointer;font-family:'Pretendard';" style-hover="border-color:#A3B18A;background:#EFF4E3;">🎨 테마 · {{ themeName }}</button>
+          <button onClick="{{ save }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border:none;border-radius:11px;background:#3A5A40;color:#F4F6EE;font-size:13px;font-weight:600;cursor:pointer;font-family:'Pretendard';" style-hover="background:#34503a;">{{ saveLabel }}</button>
+        </div>
+      </div>
+
+      <!-- 정원 캔버스 -->
+      <div style="position:relative;height:560px;border-radius:22px;overflow:hidden;border:1px solid #CBD9B6;box-shadow:inset 0 2px 24px rgba(58,90,64,.12);background:{{ gardenBg }};">
+        <!-- 잔디 디테일 오버레이 -->
+        <div style="position:absolute;inset:0;background:{{ gardenOverlay }};pointer-events:none;"></div>
+
+        <sc-for list="{{ slots }}" as="sl" hint-placeholder-count="8">
+          <div class="flo-slot" onDragOver="{{ sl.onDragOver }}" onDragLeave="{{ sl.onDragLeave }}" onDrop="{{ sl.onDrop }}" onClick="{{ sl.onClick }}" title="{{ sl.title }}" style="position:absolute;left:{{ sl.x }}%;top:{{ sl.y }}%;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:box-shadow .15s ease,background .15s ease;border:{{ sl.border }};background:{{ sl.bg }};">
+            <sc-if value="{{ sl.empty }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size:30px;font-weight:300;color:{{ sl.plusColor }};line-height:1;">+</span>
+            </sc-if>
+            <sc-if value="{{ sl.filled }}" hint-placeholder-val="{{ false }}">
+              <span style="position:relative;width:74px;height:74px;animation:flo-pop .4s ease;">
+                <span style="position:absolute;left:50%;top:50%;width:60px;height:60px;transform:translate(-50%,-50%);animation:flo-sway2 6s ease-in-out infinite;">
+                  <sc-for list="{{ sl.petals }}" as="p" hint-placeholder-count="5">
+                    <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ sl.color }};transform-origin:50% 100%;transform:rotate({{ p }}deg);opacity:.95;"></span>
+                  </sc-for>
+                  <span style="position:absolute;left:50%;bottom:50%;width:22px;height:22px;border-radius:50%;background:#F2C766;transform:translate(-50%,50%);box-shadow:inset 0 0 0 3px #EAB94E;"></span>
+                </span>
+                <span style="position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);width:5px;height:24px;background:linear-gradient(180deg,#6AA05F,#4f7a4d);border-radius:4px;"></span>
+              </span>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <!-- 안내 토스트 -->
+        <sc-if value="{{ hint }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:50%;bottom:16px;transform:translateX(-50%);padding:9px 18px;background:rgba(44,58,46,.86);color:#F4F6EE;font-size:12.5px;border-radius:999px;animation:flo-fade .2s ease;">{{ hint }}</div>
+        </sc-if>
+      </div>
+
+      <!-- 보유중인 꽃 -->
+      <section style="padding:20px;background:#FFFFFF;border:1px solid #E5E8DA;border-radius:22px;box-shadow:0 2px 16px rgba(58,90,64,.05);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="display:inline-flex;align-items:center;gap:8px;font-family:'Gowun Batang',serif;font-size:16px;font-weight:700;color:#3A5A40;">🌸 보유중인 꽃</div>
+          <span style="font-size:11.5px;color:#9aa394;">클릭하거나 정원으로 끌어다 놓으세요</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:12px;">
+          <sc-for list="{{ palette }}" as="f" hint-placeholder-count="8">
+            <div class="flo-palette-item" draggable="true" onDragStart="{{ f.onDragStart }}" onDragEnd="{{ f.onDragEnd }}" onClick="{{ f.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 6px;border-radius:14px;border:1.5px solid {{ f.border }};background:{{ f.bg }};cursor:grab;transition:transform .12s ease;" style-hover="transform:translateY(-3px);">
+              <span style="position:relative;width:44px;height:44px;">
+                <span style="position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);">
+                  <sc-for list="{{ f.petals }}" as="p" hint-placeholder-count="5">
+                    <span style="position:absolute;left:calc(50% - 6px);bottom:50%;width:12px;height:20px;border-radius:50%;background:{{ f.color }};transform-origin:50% 100%;transform:rotate({{ p }}deg);opacity:.95;"></span>
+                  </sc-for>
+                  <span style="position:absolute;left:50%;bottom:50%;width:15px;height:15px;border-radius:50%;background:#F2C766;transform:translate(-50%,50%);box-shadow:inset 0 0 0 2px #EAB94E;"></span>
+                </span>
+              </span>
+              <span style="font-size:11.5px;font-weight:600;color:#56604C;">{{ f.name }}</span>
+              <span style="font-size:10px;color:#9aa394;">보유 {{ f.count }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </main>
+
+    <!-- ---- RIGHT RAIL ---- -->
+    <aside class="flo-rightrail" style="position:sticky;top:96px;display:flex;flex-direction:column;gap:18px;">
+      <div style="padding:18px;background:#FFFFFF;border:1px solid #E5E8DA;border-radius:18px;box-shadow:0 2px 14px rgba(58,90,64,.05);">
+        <div style="font-size:11px;letter-spacing:.08em;color:#7C8675;font-weight:600;">지난주 피운 꽃</div>
+        <div style="position:relative;height:78px;margin:10px auto 6px;width:78px;">
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:60px;height:60px;">
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(0deg);opacity:.92;"></span>
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(72deg);opacity:.92;"></span>
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(144deg);opacity:.92;"></span>
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(216deg);opacity:.92;"></span>
+            <span style="position:absolute;left:calc(50% - 9px);bottom:50%;width:18px;height:30px;border-radius:50%;background:{{ flowerColor }};transform-origin:50% 100%;transform:rotate(288deg);opacity:.92;"></span>
+            <span style="position:absolute;left:50%;bottom:50%;width:22px;height:22px;border-radius:50%;background:#F2C766;transform:translate(-50%,50%);box-shadow:inset 0 0 0 3px #EAB94E;"></span>
+          </div>
+        </div>
+        <div style="text-align:center;font-family:'Gowun Batang',serif;font-weight:700;font-size:16px;color:#3A5A40;">감사의 꽃</div>
+        <div style="text-align:center;font-size:11.5px;color:#8A9480;margin-top:2px;">꽃말 · 마음을 전하다</div>
+      </div>
+      <div style="padding:18px;background:linear-gradient(165deg,#E6EFD6,#DCE7C8);border:1px solid #D2DCBE;border-radius:18px;">
+        <div style="font-size:11px;letter-spacing:.06em;color:#6E7A62;font-weight:600;margin-bottom:8px;">지난주의 위로</div>
+        <p style="margin:0;font-family:'Gowun Batang',serif;font-size:14px;line-height:1.7;color:#3F4D38;">“기록하는 감정에서,<br>성장하는 감정으로.”</p>
+      </div>
+      <div style="padding:16px;background:#FFFFFF;border:1px solid #E5E8DA;border-radius:18px;box-shadow:0 2px 14px rgba(58,90,64,.05);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <button onClick="{{ prevYear }}" style="display:grid;place-items:center;width:26px;height:26px;border:none;border-radius:8px;background:#EDF1E3;color:#3A5A40;cursor:pointer;font-size:11px;" style-hover="background:#E0E7D1;">◀</button>
+          <span style="font-family:'Gowun Batang',serif;font-size:15px;font-weight:700;color:#3A5A40;">{{ year }}</span>
+          <button onClick="{{ nextYear }}" style="display:grid;place-items:center;width:26px;height:26px;border:none;border-radius:8px;background:#EDF1E3;color:#3A5A40;cursor:pointer;font-size:11px;" style-hover="background:#E0E7D1;">▶</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:5px;">
+          <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
+            <span style="text-align:center;font-size:9.5px;color:#A6AE98;">{{ w }}</span>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;">
+          <sc-for list="{{ calDays }}" as="c" hint-placeholder-count="30">
+            <span style="display:grid;place-items:center;height:22px;border-radius:6px;font-size:10.5px;color:{{ c.color }};background:{{ c.bg }};font-weight:{{ c.weight }};">{{ c.n }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #EEF1E6;">
+          <span style="font-size:10px;color:#9aa394;">감정에 따라 색 변화</span>
+          <span style="display:flex;gap:3px;margin-left:auto;">
+            <span style="width:11px;height:11px;border-radius:3px;background:#8694a3;"></span>
+            <span style="width:11px;height:11px;border-radius:3px;background:#94a39a;"></span>
+            <span style="width:11px;height:11px;border-radius:3px;background:#c4b878;"></span>
+            <span style="width:11px;height:11px;border-radius:3px;background:#86a866;"></span>
+            <span style="width:11px;height:11px;border-radius:3px;background:#588157;"></span>
+          </span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:1080},&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;민서&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;flowerColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#E59A91&quot;,&quot;options&quot;:[&quot;#E59A91&quot;,&quot;#D98EB0&quot;,&quot;#E7B36A&quot;,&quot;#9DB6E0&quot;,&quot;#B79AD4&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = {
+    menuOpen:false,
+    year:2026,
+    month:6,
+    theme:0,
+    selectedFlower:null,
+    overIdx:null,
+    hint:'',
+    saved:false,
+    slots:[
+      {x:18,y:22,flower:null},
+      {x:47,y:33,flower:null},
+      {x:82,y:25,flower:2},
+      {x:70,y:48,flower:null},
+      {x:33,y:55,flower:0},
+      {x:60,y:66,flower:null},
+      {x:24,y:72,flower:5},
+      {x:43,y:82,flower:null},
+    ],
+  };
+  _dragId=null;
+  _hintTimer=null;
+
+  toggleMenu(){ this.setState(s=>({menuOpen:!s.menuOpen})); }
+  closeMenu(){ this.setState({menuOpen:false}); }
+  stop(e){ e.stopPropagation(); }
+  prevYear(){ this.setState(s=>{ let m=s.month-1,y=s.year; if(m<1){m=12;y--;} return {month:m,year:y}; }); }
+  nextYear(){ this.setState(s=>{ let m=s.month+1,y=s.year; if(m>12){m=1;y++;} return {month:m,year:y}; }); }
+
+  get flowerTypes(){
+    return [
+      {name:'감사의 꽃', color:'#E59A91', count:3},
+      {name:'위로의 꽃', color:'#D98EB0', count:2},
+      {name:'햇살 꽃',   color:'#E7B36A', count:4},
+      {name:'평온 꽃',   color:'#9DB6E0', count:1},
+      {name:'용기 꽃',   color:'#B79AD4', count:2},
+      {name:'새싹 꽃',   color:'#8AB877', count:5},
+      {name:'기쁨 꽃',   color:'#F0C14B', count:2},
+      {name:'차분 꽃',   color:'#7FA9A0', count:3},
+    ];
+  }
+
+  get themes(){
+    return [
+      {name:'낮 정원',
+        bg:'radial-gradient(130px 130px at 80% 16%, #fcf2bf, transparent 72%), linear-gradient(180deg,#d7eef6 0%,#e6f3df 40%,#cfe6b0 64%,#b6d78d 100%)',
+        overlay:'radial-gradient(180px 80px at 22% 100%, rgba(120,170,100,.45), transparent 70%), radial-gradient(220px 90px at 75% 100%, rgba(110,160,95,.4), transparent 70%)'},
+      {name:'노을 정원',
+        bg:'radial-gradient(150px 150px at 78% 18%, #ffe0a8, transparent 72%), linear-gradient(180deg,#f6dcc6 0%,#f0d9c0 35%,#d9d49e 62%,#bcd28a 100%)',
+        overlay:'radial-gradient(200px 90px at 24% 100%, rgba(150,160,90,.4), transparent 70%), radial-gradient(220px 90px at 76% 100%, rgba(170,150,90,.35), transparent 70%)'},
+      {name:'새벽 정원',
+        bg:'radial-gradient(140px 140px at 80% 16%, #eaf0d2, transparent 72%), linear-gradient(180deg,#dbe6ea 0%,#e2ecdf 42%,#cfe2bd 66%,#bcd79b 100%)',
+        overlay:'radial-gradient(200px 90px at 22% 100%, rgba(120,160,110,.4), transparent 70%), radial-gradient(220px 90px at 78% 100%, rgba(110,150,120,.35), transparent 70%)'},
+    ];
+  }
+
+  cycleTheme(){ this.setState(s=>({theme:(s.theme+1)%this.themes.length})); }
+
+  showHint(msg){
+    this.setState({hint:msg});
+    clearTimeout(this._hintTimer);
+    this._hintTimer=setTimeout(()=>this.setState({hint:''}),2200);
+  }
+
+  save(){
+    this.setState({saved:true});
+    this.showHint('나의 정원이 저장되었어요 🌿');
+    setTimeout(()=>this.setState({saved:false}),1800);
+  }
+
+  pickFlower(id){
+    this.setState(s=>({selectedFlower: s.selectedFlower===id?null:id}));
+  }
+
+  place(idx,flowerId){
+    this.setState(s=>{
+      const slots=[...s.slots];
+      slots[idx]={...slots[idx],flower:flowerId};
+      return {slots, overIdx:null, selectedFlower:null};
+    });
+    this.showHint(this.flowerTypes[flowerId].name+'을(를) 심었어요');
+  }
+
+  slotClick(idx){
+    return ()=>{
+      const slot=this.state.slots[idx];
+      if(slot.flower!=null){
+        // 비우기
+        this.setState(s=>{
+          const slots=[...s.slots];
+          slots[idx]={...slots[idx],flower:null};
+          return {slots};
+        });
+        this.showHint('꽃을 치웠어요');
+      } else if(this.state.selectedFlower!=null){
+        this.place(idx,this.state.selectedFlower);
+      } else {
+        this.showHint('먼저 아래에서 꽃을 선택하세요');
+      }
+    };
+  }
+
+  slotDragOver(idx){ return (e)=>{ e.preventDefault(); if(this.state.overIdx!==idx) this.setState({overIdx:idx}); }; }
+  slotDragLeave(idx){ return ()=>{ if(this.state.overIdx===idx) this.setState({overIdx:null}); }; }
+  slotDrop(idx){ return (e)=>{ e.preventDefault(); if(this._dragId!=null) this.place(idx,this._dragId); this._dragId=null; }; }
+
+  paletteDragStart(id){ return (e)=>{ this._dragId=id; try{ e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text/plain',String(id)); }catch(_){} }; }
+  paletteDragEnd(){ return ()=>{ this._dragId=null; this.setState({overIdx:null}); }; }
+
+  renderVals(){
+    const s=this.state;
+    const userName=this.props.userName ?? '민서';
+    const flowerColor=this.props.flowerColor ?? '#E59A91';
+    const types=this.flowerTypes;
+    const petals=[0,72,144,216,288];
+
+    const NAVH={'홈':'florography 홈.dc.html','씨앗심기':'florography 홈.dc.html','속마음 편지':'florography 편지목록.dc.html','공유 게시판':'florography 공유게시판.dc.html','꽃 도감':'florography 도감.dc.html','정원':'florography 정원.dc.html','마이페이지':'florography 마이페이지.dc.html'};
+    const MENUH={'홈':'florography 홈.dc.html','씨앗심기':'florography 홈.dc.html','꽃에게 전하는 속마음':'florography 편지작성.dc.html','공유 게시판':'florography 공유게시판.dc.html','주간 꽃 컬렉션':'florography 도감.dc.html','꽃 도감':'florography 도감.dc.html','나만의 정원':'florography 정원.dc.html','감정 리포트':'florography 마이페이지.dc.html'};
+    const menuItems=[
+      {icon:'🏡', label:'홈', desc:'나의 정원 한눈에 보기'},
+      {icon:'🌱', label:'씨앗심기', desc:'오늘의 한 문장 기록'},
+      {icon:'💌', label:'꽃에게 전하는 속마음', desc:'대상에게 쓰는 감정 편지'},
+      {icon:'🌼', label:'주간 꽃 컬렉션', desc:'매주 피어나는 고유한 꽃'},
+      {icon:'🪴', label:'나만의 정원', desc:'기록으로 가꾸는 공간'},
+      {icon:'📈', label:'감정 리포트', desc:'월별 감정 변화 살펴보기'},
+    ].map(m=>({...m, href:MENUH[m.label]||'#'}));
+    const navRaw=[
+      {label:'홈', active:false},
+      {label:'속마음 편지', active:false},
+      {label:'공유 게시판', active:false},
+      {label:'꽃 도감', active:false},
+      {label:'정원', active:true},
+    ];
+    const navItems=navRaw.map(n=>({
+      label:n.label,
+      href:NAVH[n.label]||'#',
+      color:n.active?'#2C3A2E':'#46503E',
+      weight:n.active?'700':'500',
+      bg:n.active?'#E4EBD3':'transparent',
+      dot:n.active?'#588157':'#A3B18A',
+    }));
+
+    const theme=this.themes[s.theme];
+
+    const slots=s.slots.map((sl,i)=>{
+      const filled=sl.flower!=null;
+      const over=s.overIdx===i;
+      return {
+        x:sl.x, y:sl.y,
+        empty:!filled, filled,
+        color: filled?types[sl.flower].color:'transparent',
+        petals,
+        plusColor:'rgba(58,90,64,.55)',
+        border: filled?'2px solid transparent':'2px dashed rgba(58,90,64,.55)',
+        bg: over?'rgba(255,255,255,.55)':(filled?'transparent':'rgba(255,255,255,.28)'),
+        title: filled?(types[sl.flower].name+' · 클릭하면 비워요'):'빈 자리 · 꽃을 놓아주세요',
+        onClick:this.slotClick(i),
+        onDragOver:this.slotDragOver(i),
+        onDragLeave:this.slotDragLeave(i),
+        onDrop:this.slotDrop(i),
+      };
+    });
+
+    const palette=types.map((f,i)=>({
+      name:f.name, color:f.color, count:f.count, petals,
+      bg: s.selectedFlower===i?'#EDF2E2':'#FBFCF7',
+      border: s.selectedFlower===i?'#86A866':'#E6EAD9',
+      onClick:()=>this.pickFlower(i),
+      onDragStart:this.paletteDragStart(i),
+      onDragEnd:this.paletteDragEnd(),
+    }));
+
+    // calendar
+    const moodColors=['#8694a3','#94a39a','#c4b878','#86a866','#588157'];
+    const isBaseM=(s.year===2026&&s.month===6);
+    const bloomMap=isBaseM?{2:4,5:3,9:2,12:1,14:1,15:2,17:1,18:4,20:4,21:0,22:2,23:1,24:3,25:3,26:4}:{};
+    const weekdays=['일','월','화','수','목','금','토'];
+    const daysInMonth=new Date(s.year,s.month,0).getDate();
+    const firstDow=new Date(s.year,s.month-1,1).getDay();
+    const calDays=[];
+    for(let i=0;i<firstDow;i++) calDays.push({n:'',color:'transparent',bg:'transparent',weight:'400'});
+    for(let d=1;d<=daysInMonth;d++){
+      const has=Object.prototype.hasOwnProperty.call(bloomMap,d);
+      calDays.push({n:d, color:has?'#fff':'#9aa394', bg:has?moodColors[bloomMap[d]]:'transparent', weight:has?'700':'400'});
+    }
+
+    return {
+      userName, initial:userName.slice(0,1), flowerColor,
+      menuOpen:s.menuOpen, toggleMenu:()=>this.toggleMenu(), closeMenu:()=>this.closeMenu(), stop:(e)=>this.stop(e),
+      menuItems, navItems, water:4,
+      themeName:theme.name, gardenBg:theme.bg, gardenOverlay:theme.overlay,
+      cycleTheme:()=>this.cycleTheme(),
+      save:()=>this.save(), saveLabel:s.saved?'저장됨 ✓':'💾 저장',
+      slots, palette, hint:s.hint,
+      year:s.year+'년 '+s.month+'월', prevYear:()=>this.prevYear(), nextYear:()=>this.nextYear(),
+      weekdays, calDays,
+    };
+  }
+}
+</script>
+</body>
+</html>

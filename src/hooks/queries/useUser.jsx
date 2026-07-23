@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { getMeRequest, getMyRecord } from "../../api/useApi";
+import { getMeRequest } from "../../api/useApi";
 
 export const useMe = () => {
     const accessToken = localStorage.getItem("accessToken");

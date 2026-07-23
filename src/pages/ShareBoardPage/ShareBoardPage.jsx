@@ -3,6 +3,7 @@ import { useMe } from "../../hooks/queries/useUser";
 import { useBoardLike, useComment, useRankShareBoard, useShareBoard } from "../../hooks/queries/useShareboard";
 import { useBoardLikeDeleteMutation, useBoardLikeRegisterMutation, useCommentDeleteMutation, useCommentPutMutation, useCommentRegisterMutation, useLikeDownMutation, useLikeUpMutation, useShareBoardDeleteMutation, useShareBoardPutMutation, useShareBoardResisterMutation } from "../../hooks/mutations/useShareBoard";
 import { data } from "react-router";
+import * as s from "./styles";
 
 
 function ShareBoardPage() {
@@ -105,24 +106,26 @@ function ShareBoardPage() {
 
     return (
         <>
-            <div>
-                <p>게시글 작성</p>
-                <input type="text"
-                    value={inputSeedRecord.body}
-                    onChange={handleBoardInputChange}
-                    placeholder="오늘의 한마디를 나눠보세요."
-                />
-                <button onClick={handleBoardOnClick} >공유</button>
+            <div css={s.composerCard}>
+                <p css={s.composerLabel}>게시글 작성</p>
+                <div css={s.composerRow}>
+                    <input css={s.composerInput} type="text"
+                        value={inputSeedRecord.body}
+                        onChange={handleBoardInputChange}
+                        placeholder="오늘의 한마디를 나눠보세요."
+                    />
+                    <button css={s.composerButton} onClick={handleBoardOnClick} >공유</button>
+                </div>
             </div>
-            <div>
-                <button onClick={handleToggleFilter}>
+            <div css={s.filterRow}>
+                <button css={s.filterButton} onClick={handleToggleFilter}>
                     {isOnlyMyPosts ? "전체 글 보기" : "내가 쓴 글만 보기"}
                 </button>
             </div>
             <div>
-                <p>게시글 출력</p>
+                <p css={s.sectionLabel}>게시글 출력</p>
             </div>
-            <ul>
+            <ul css={s.boardList}>
                 {displayedBoards.length > 0 ? (
                     displayedBoards.map((board) => (
                         <BoardItem
@@ -135,24 +138,24 @@ function ShareBoardPage() {
                         />
                     ))
                 ): (
-                    <p>
+                    <p css={s.boardEmpty}>
                         {isOnlyMyPosts ? "내가 작성한 글이 없습니다." : "등록된 게시글이 없습니다."}
                     </p>
                 )}
             </ul>
             
-            <div>
-                <p>인기순위</p>
+            <div css={s.rankSection}>
+                <p css={s.sectionLabel}>인기순위</p>
+                <ul css={s.rankList}>
+                    {ranks.map((rank, index) => (
+                        <li css={s.rankItem} key={rank.id}>
+                            <span css={s.rankPosition}><strong>{index + 1}위</strong></span>
+                            <span css={s.rankBody}>{rank.body}</span>
+                            <span css={s.rankLike}>❤️{rank.like}</span>
+                        </li>
+                    ))}
+                </ul>
             </div>
-            <ul>
-                {ranks.map((rank, index) => (
-                    <li key={rank.id}>
-                        <span><strong>{index + 1}위</strong></span>
-                        <span>{rank.body}</span>
-                        <span>❤️{rank.like}</span>
-                    </li>
-                ))}
-            </ul>
         </>
     );
 }
@@ -201,39 +204,40 @@ function BoardItem({ board, currentUserId, user, handleDeleteOnClick, updateBoar
     };
 
     return (
-        <li>
+        <li css={s.boardItem}>
             {isEditing ? (
-                <>
-                    <input type="text" value={editBody} onChange={(e) => setEditBody(e.target.value)} />
-                    <button onClick={handleSaveClick}>저장</button>
-                    <button onClick={() => setIsEditing(false)}>취소</button>
-                </>
+                <div css={s.editRow}>
+                    <input css={s.editInput} type="text" value={editBody} onChange={(e) => setEditBody(e.target.value)} />
+                    <button css={s.saveButton} onClick={handleSaveClick}>저장</button>
+                    <button css={s.cancelButton} onClick={() => setIsEditing(false)}>취소</button>
+                </div>
             ) : (
                 <>
-                    <p>{board.body}</p>
-                    <span>좋아요: {board.like || 0}</span>
+                    <p css={s.boardBody}>{board.body}</p>
+                    <div css={s.boardMetaRow}>
+                        <span>좋아요: {board.like || 0}</span>
 
-                    {/* 직관적인 하트 텍스트 변경 */}
-                    <button onClick={handleLikeToggle}>
-                        {isLiked ? "❤️ 좋아요 취소" : "🤍 좋아요"}
-                    </button>
+                        {/* 직관적인 하트 텍스트 변경 */}
+                        <button css={s.likeButton} onClick={handleLikeToggle}>
+                            {isLiked ? "❤️ 좋아요 취소" : "🤍 좋아요"}
+                        </button>
 
-                    <span>작성일: {board.createdAt}</span>
+                        <span>작성일: {board.createdAt}</span>
 
-                    {currentUserId === board.userId && (
-                        <>
-                            <button onClick={() => setIsEditing(true)}>수정</button>
-                            <button onClick={() => handleDeleteOnClick(board.id, board.userId)}>삭제</button>
-                        </>
-                    )}
-                    <div>
-                        <p>댓글</p>
+                        {currentUserId === board.userId && (
+                            <div css={s.boardActions}>
+                                <button css={s.actionButton} onClick={() => setIsEditing(true)}>수정</button>
+                                <button css={[s.actionButton, s.dangerAction]} onClick={() => handleDeleteOnClick(board.id, board.userId)}>삭제</button>
+                            </div>
+                        )}
+                    </div>
+                    <div css={s.commentSection}>
+                        <p css={s.commentTitle}>댓글</p>
                         <CommentRegister boardId={board.id} user={user} />
                         <CommentSelect boardId={board.id} currentUserId={currentUserId} />
                     </div>
                 </>
             )}
-            <hr />
         </li>
     );
 }
@@ -309,28 +313,28 @@ function CommentSelect({ boardId }) {
 
     return (
         <div>
-            <ul>
+            <ul css={s.commentList}>
                 {comments.map((comment, index) => (
-                    <li key={comment.id ?? `comment-fallback-${index}`}>
+                    <li css={s.commentItem} key={comment.id ?? `comment-fallback-${index}`}>
                         {editingCommentId === comment.id ? (
-                            <>
-                                <input type="text"
+                            <div css={s.editRow}>
+                                <input css={s.editInput} type="text"
                                     value={editCommentBody}
                                     onChange={(e) => setEditCommentBody(e.target.value)}
                                 />
-                                <button onClick={handleCommentSave}>저장</button>
-                                <button onClick={handleCommentCancel}>취소</button>
-                            </>
+                                <button css={s.saveButton} onClick={handleCommentSave}>저장</button>
+                                <button css={s.cancelButton} onClick={handleCommentCancel}>취소</button>
+                            </div>
                         ) : (
                             <>
                                 {comment.body}
                                 {currentUserId === comment.userId && (
-                                    <>
-                                        <button onClick={() => handleCommentEditStart(comment)}>수정</button>
-                                        <button onClick={() => handleDeleteComment(comment.id, comment.userId)}>
+                                    <div css={s.commentActions}>
+                                        <button css={s.actionButton} onClick={() => handleCommentEditStart(comment)}>수정</button>
+                                        <button css={[s.actionButton, s.dangerAction]} onClick={() => handleDeleteComment(comment.id, comment.userId)}>
                                             삭제
                                         </button>
-                                    </>
+                                    </div>
                                 )}
 
                             </>
@@ -395,15 +399,16 @@ function CommentRegister({ boardId, user }) {
 
     return (
         <div className="comment-register-container">
-            <form onSubmit={handleCommentSubmit} >
+            <form css={s.commentForm} onSubmit={handleCommentSubmit} >
                 <input
+                    css={s.commentInput}
                     type="text"
                     value={inputComment.body}
                     onChange={handleCommentInputChange}
                     placeholder="댓글을 남겨보세요."
 
                 />
-                <button type="submit" >
+                <button css={s.commentSubmit} type="submit" >
                     입력
                 </button>
             </form>

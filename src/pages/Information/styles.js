@@ -1,330 +1,313 @@
-import { css, keyframes } from "@emotion/react";
+import { css } from "@emotion/react";
+import { colors, font, radius, shadow, transition } from "../../styles/theme";
 
-export const COLORS = {
-    primary: "#4A6B53",
-    primaryLight: "#EBF1ED",
-    accent: "#D4A373",
-    textDark: "#2F3E46",
-    textLight: "#6B7A74",
-    bg: "#FAFAF7",
-    card: "#FFFFFF",
-};
-
-export const float = keyframes`
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-`;
-
-export const pageStyle = css`
-    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
-        Roboto, sans-serif;
-    background-color: ${COLORS.bg};
-    color: ${COLORS.textDark};
-    line-height: 1.6;
-    min-height: 100vh;
-`;
-
-export const headerStyle = css`
-    padding: 1.5rem 2rem;
+export const page = css`
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: absolute;
-    width: 100%;
+    flex-direction: column;
+`;
+
+export const header = css`
+    position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(248, 247, 244, 0.82);
+    backdrop-filter: saturate(140%) blur(12px);
+    border-bottom: 1px solid ${colors.border};
 `;
 
-export const logoStyle = css`
-    font-size: 1.5rem;
+export const logo = css`
+    font-family: ${font.serif};
+    font-size: 22px;
     font-weight: 700;
-    color: ${COLORS.primary};
-    letter-spacing: 1px;
+    color: ${colors.text};
 `;
 
-export const navStyle = css`
-    a {
-        text-decoration: none;
-        color: ${COLORS.textDark};
-        margin-left: 1.5rem;
-        font-weight: 500;
-        font-size: 0.95rem;
-        transition: color 0.3s;
+export const nav = css`
+    display: flex;
+    gap: 28px;
+`;
 
-        &:hover {
-            color: ${COLORS.primary};
-        }
+export const navLink = css`
+    font-size: 14px;
+    font-weight: 500;
+    color: ${colors.subtext};
+
+    &:hover {
+        color: ${colors.text};
     }
 `;
 
-export const heroStyle = css`
-    min-height: 100vh;
+export const hero = css`
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 2rem;
-    background: linear-gradient(
-        180deg,
-        rgba(235, 241, 237, 0.4) 0%,
-        rgba(250, 250, 247, 1) 100%
-    );
-    position: relative;
+    gap: 18px;
+    padding: 120px 24px 100px;
+    max-width: 720px;
+    margin: 0 auto;
 `;
 
-export const heroTagline = css`
-    font-size: 1.2rem;
-    color: ${COLORS.accent};
+export const heroEyebrow = css`
+    font-size: 14px;
     font-weight: 600;
-    margin-bottom: 1rem;
-    letter-spacing: 2px;
+    letter-spacing: 0.04em;
+    color: ${colors.primary};
 `;
 
 export const heroTitle = css`
-    font-size: 3rem;
-    font-weight: 800;
-    color: ${COLORS.primary};
-    line-height: 1.3;
-    margin-bottom: 1.5rem;
-
-    @media (max-width: 768px) {
-        font-size: 2.2rem;
-    }
+    font-family: ${font.serif};
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: ${colors.text};
+    text-wrap: pretty;
 `;
 
 export const heroDesc = css`
-    font-size: 1.1rem;
-    color: ${COLORS.textLight};
-    max-width: 600px;
-    margin-bottom: 2.5rem;
+    font-size: 16px;
+    line-height: 1.8;
+    color: ${colors.subtext};
+    max-width: 560px;
+    text-wrap: pretty;
 `;
 
-export const btnStyle = css`
-    display: inline-block;
-    padding: 0.9rem 2rem;
-    background-color: ${COLORS.primary};
-    color: white;
-    border: none;
-    text-decoration: none;
-    border-radius: 50px;
-    font-size: 1rem;
+export const heroCta = css`
+    margin-top: 12px;
+    padding: 15px 32px;
+    border-radius: ${radius.button};
+    background: ${colors.primary};
+    color: #fff;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(74, 107, 83, 0.2);
-    transition: transform 0.3s, background-color 0.3s;
+    box-shadow: ${shadow.soft};
+    transition: background ${transition}, transform ${transition};
 
     &:hover {
-        background-color: #39533f;
-        transform: translateY(-2px);
+        background: ${colors.primaryHover};
+    }
+
+    &:active {
+        transform: scale(0.98);
     }
 `;
 
-export const containerStyle = css`
-    max-width: 1100px;
+export const main = css`
+    max-width: 1080px;
+    width: 100%;
     margin: 0 auto;
-    padding: 5rem 2rem;
+    padding: 0 24px 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 96px;
 `;
 
 export const sectionTitle = css`
+    font-family: ${font.serif};
+    font-size: 28px;
+    font-weight: 700;
+    color: ${colors.text};
     text-align: center;
-    font-size: 2rem;
-    color: ${COLORS.primary};
-    margin-bottom: 3rem;
-    position: relative;
-
-    &::after {
-        content: "";
-        display: block;
-        width: 40px;
-        height: 3px;
-        background-color: ${COLORS.accent};
-        margin: 0.7rem auto 0;
-        border-radius: 2px;
-    }
+    margin-bottom: 40px;
 `;
 
 export const featuresGrid = css`
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+
+    @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 560px) {
+        grid-template-columns: 1fr;
+    }
 `;
 
 export const featureCard = css`
-    background-color: ${COLORS.card};
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.02);
-    transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px 22px;
+    background: ${colors.surface};
+    border: 1px solid ${colors.border};
+    border-radius: ${radius.card};
+    box-shadow: ${shadow.soft};
+    transition: transform ${transition}, box-shadow ${transition};
 
     &:hover {
-        transform: translateY(-5px);
+        transform: translateY(-4px);
+        box-shadow: ${shadow.hover};
     }
 `;
 
 export const featureIcon = css`
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    display: inline-block;
+    font-size: 28px;
 `;
 
 export const featureTitle = css`
-    font-size: 1.15rem;
-    color: ${COLORS.primary};
-    margin-bottom: 0.5rem;
+    font-size: 16px;
+    font-weight: 700;
+    color: ${colors.text};
 `;
 
 export const featureDesc = css`
-    font-size: 0.9rem;
-    color: ${COLORS.textLight};
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: ${colors.subtext};
+    text-wrap: pretty;
 `;
 
-export const playground = css`
-    background-color: ${COLORS.card};
-    border-radius: 24px;
-    padding: 3rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+export const playgroundGrid = css`
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: center;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 20px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 760px) {
         grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 2rem 1.5rem;
     }
 `;
 
-export const inputBoxTitle = css`
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
-    color: ${COLORS.primary};
-`;
-
-export const inputBoxDesc = css`
-    font-size: 0.95rem;
-    color: ${COLORS.textLight};
-    margin-bottom: 1.5rem;
-`;
-
-export const tabsStyle = css`
+export const playCard = css`
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px;
+    background: ${colors.surface};
+    border: 1px solid ${colors.border};
+    border-radius: ${radius.cardLg};
+    box-shadow: ${shadow.soft};
 `;
 
-export const tabBtn = (active) => css`
-    padding: 0.5rem 1rem;
-    border: 1px solid ${active ? COLORS.primary : "#E0E0E0"};
-    background: ${active ? COLORS.primaryLight : "none"};
-    color: ${active ? COLORS.primary : COLORS.textLight};
-    border-radius: 20px;
+export const playCardTitle = css`
+    font-size: 17px;
+    font-weight: 700;
+    color: ${colors.text};
+`;
+
+export const playCardDesc = css`
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: ${colors.subtext};
+`;
+
+export const tabRow = css`
+    display: flex;
+    gap: 8px;
+`;
+
+export const tabButton = (active) => css`
+    padding: 10px 16px;
+    border-radius: ${radius.pill};
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: ${active ? 600 : 400};
-    transition: all 0.3s;
+    transition: background ${transition}, color ${transition};
+    background: ${active ? colors.primary : colors.hover};
+    color: ${active ? "#fff" : colors.text};
+
+    &:hover {
+        background: ${active ? colors.primaryHover : colors.secondary};
+    }
 `;
 
-export const textareaStyle = css`
-    width: 100%;
-    height: 120px;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1rem;
-    resize: none;
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-    background-color: #fafafa;
-    font-family: inherit;
+export const textarea = css`
+    min-height: 110px;
+    padding: 14px 16px;
+    border-radius: ${radius.input};
+    border: 1px solid ${colors.border};
+    background: ${colors.background};
+    font-size: 14px;
+    line-height: 1.7;
+    color: ${colors.text};
+    resize: vertical;
+    transition: border-color ${transition};
+
+    &::placeholder {
+        color: ${colors.subtext};
+        opacity: 0.7;
+    }
 
     &:focus {
         outline: none;
-        border-color: ${COLORS.primary};
-        background-color: #fff;
+        border-color: ${colors.primary};
     }
 `;
 
-export const submitBtn = css`
-    width: 100%;
-    padding: 0.8rem;
-    background-color: ${COLORS.textDark};
-    color: white;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
+export const analyzeButton = css`
+    padding: 13px;
+    border-radius: ${radius.button};
+    background: ${colors.text};
+    color: #fff;
+    font-size: 14px;
     font-weight: 600;
-    font-size: 0.95rem;
-    transition: background-color 0.3s;
+    cursor: pointer;
+    transition: background ${transition}, transform ${transition};
 
     &:hover {
-        background-color: ${COLORS.primary};
+        background: #3c463f;
+    }
+
+    &:active {
+        transform: scale(0.98);
     }
 `;
 
-export const gardenDisplay = css`
-    background-color: ${COLORS.primaryLight};
-    border-radius: 16px;
-    height: 320px;
+export const resultCard = css`
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 18px;
+    padding: 28px;
+    background: linear-gradient(165deg, ${colors.secondary}, ${colors.primarySoft});
+    border: 1px solid ${colors.border};
+    border-radius: ${radius.cardLg};
+`;
+
+export const resultStatus = css`
+    display: flex;
     align-items: center;
-    position: relative;
-    overflow: hidden;
-    border: 2px dashed rgba(74, 107, 83, 0.2);
+    gap: 12px;
 `;
 
-export const potContainer = css`
+export const resultIcon = css`
+    font-size: 36px;
+`;
+
+export const resultStatusText = css`
+    font-size: 15px;
+    font-weight: 700;
+    color: ${colors.text};
+`;
+
+export const resultText = css`
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: ${colors.text};
+`;
+
+export const footer = css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 24px 56px;
+    border-top: 1px solid ${colors.border};
     text-align: center;
 `;
 
-export const plantIconStyle = css`
-    font-size: 5rem;
-    display: block;
-    margin-bottom: 1rem;
-    animation: ${float} 3s ease-in-out infinite;
+export const footerQuote = css`
+    font-family: ${font.serif};
+    font-size: 15px;
+    color: ${colors.text};
 `;
 
-export const gardenStatusStyle = css`
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: ${COLORS.primary};
-    background: white;
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-`;
-
-export const analysisResultStyle = css`
-    position: absolute;
-    bottom: 1.5rem;
-    font-size: 0.85rem;
-    color: ${COLORS.textLight};
-    text-align: center;
-    width: 100%;
-    padding: 0 1rem;
-`;
-
-export const footerStyle = css`
-    background-color: ${COLORS.primary};
-    color: white;
-    text-align: center;
-    padding: 4rem 2rem;
-    margin-top: 5rem;
-`;
-
-export const footerPhrase = css`
-    font-size: 1.4rem;
-    font-weight: 300;
-    letter-spacing: 3px;
-    margin-bottom: 1.5rem;
-`;
-
-export const footerCopyright = css`
-    font-size: 0.85rem;
-    opacity: 0.7;
+export const footerCopy = css`
+    font-size: 12px;
+    color: ${colors.subtext};
 `;

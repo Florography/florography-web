@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-import { css, keyframes } from "@emotion/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import * as s from "./styles"
@@ -111,17 +109,17 @@ function InformationPage() {
     const goToLogin = () => navigate("/login");
 
     return (
-        <div css={s.pageStyle}>
-            <header css={s.headerStyle}>
-                <div css={s.logoStyle}>florography</div>
-                <nav css={s.navStyle}>
-                    <a href="#features">핵심기능</a>
-                    <a href="#playground">체험하기</a>
+        <div css={s.page}>
+            <header css={s.header}>
+                <div css={s.logo}>florography</div>
+                <nav css={s.nav}>
+                    <a css={s.navLink} href="#features">핵심기능</a>
+                    <a css={s.navLink} href="#playground">체험하기</a>
                 </nav>
             </header>
 
-            <section css={s.heroStyle}>
-                <p css={s.heroTagline}>마음을 키우는 정원</p>
+            <section css={s.hero}>
+                <p css={s.heroEyebrow}>마음을 키우는 정원</p>
                 <h1 css={s.heroTitle}>
                     당신의 마음에 물을 주세요,
                     <br />
@@ -132,82 +130,86 @@ function InformationPage() {
                     성장합니다. AI 감정 분석을 통해 나만의 비밀 정원을 가꾸는
                     게이미피케이션 멘탈케어 서비스를 만나보세요.
                 </p>
-                <button css={s.btnStyle} onClick={goToLogin}>
+                <button css={s.heroCta} onClick={goToLogin}>
                     정원 가꾸러 가기
                 </button>
             </section>
 
-            <main css={s.containerStyle} id="features">
-                <h2 css={s.sectionTitle}>서비스 핵심 기능</h2>
+            <main css={s.main} id="features">
+                <section>
+                    <h2 css={s.sectionTitle}>서비스 핵심 기능</h2>
 
-                <div css={s.featuresGrid}>
-                    {FEATURES.map((feature) => (
-                        <div css={s.featureCard} key={feature.title}>
-                            <span css={s.featureIcon}>{feature.icon}</span>
-                            <h4 css={s.featureTitle}>{feature.title}</h4>
-                            <p css={s.featureDesc}>{feature.desc}</p>
-                        </div>
-                    ))}
-                </div>
-
-                <h2
-                    css={[s.sectionTitle, css`margin-top: 7rem;`]}
-                    id="playground"
-                >
-                    감정 가드닝 미리보기
-                </h2>
-
-                <div css={s.playground}>
-                    <div>
-                        <h3 css={s.inputBoxTitle}>오늘의 마음 기록하기</h3>
-                        <p css={s.inputBoxDesc}>
-                            오늘 하루 느꼈던 마음이나 전하고 싶은 속마음을
-                            적어보세요. AI가 감정을 분석해 식물을 변화시킵니다.
-                        </p>
-
-                        <div css={s.tabsStyle}>
-                            <button
-                                css={s.tabBtn(mode === "seed")}
-                                onClick={() => handleSwitchTab("seed")}
-                            >
-                                🌱 씨앗심기 (한 문장)
-                            </button>
-                            <button
-                                css={s.tabBtn(mode === "letter")}
-                                onClick={() => handleSwitchTab("letter")}
-                            >
-                                ✉️ 속마음 편지
-                            </button>
-                        </div>
-
-                        <textarea
-                            css={s.textareaStyle}
-                            placeholder={PLACEHOLDERS[mode]}
-                            value={moodInput}
-                            onChange={(e) => setMoodInput(e.target.value)}
-                        />
-                        <button css={s.submitBtn} onClick={handleAnalyze}>
-                            기록하고 물 주기
-                        </button>
+                    <div css={s.featuresGrid}>
+                        {FEATURES.map((feature) => (
+                            <div css={s.featureCard} key={feature.title}>
+                                <span css={s.featureIcon}>{feature.icon}</span>
+                                <h4 css={s.featureTitle}>{feature.title}</h4>
+                                <p css={s.featureDesc}>{feature.desc}</p>
+                            </div>
+                        ))}
                     </div>
+                </section>
 
-                    <div css={s.gardenDisplay}>
-                        <div css={s.potContainer}>
-                            <span css={s.plantIconStyle}>{plantIcon}</span>
-                            <span css={s.gardenStatusStyle}>
-                                {gardenStatus}
-                            </span>
+                <section>
+                    <h2
+                        css={s.sectionTitle}
+                        id="playground"
+                    >
+                        감정 가드닝 미리보기
+                    </h2>
+
+                    <div css={s.playgroundGrid}>
+                        <div css={s.playCard}>
+                            <h3 css={s.playCardTitle}>오늘의 마음 기록하기</h3>
+                            <p css={s.playCardDesc}>
+                                오늘 하루 느꼈던 마음이나 전하고 싶은 속마음을
+                                적어보세요. AI가 감정을 분석해 식물을 변화시킵니다.
+                            </p>
+
+                            <div css={s.tabRow}>
+                                <button
+                                    css={s.tabButton(mode === "seed")}
+                                    onClick={() => handleSwitchTab("seed")}
+                                >
+                                    🌱 씨앗심기 (한 문장)
+                                </button>
+                                <button
+                                    css={s.tabButton(mode === "letter")}
+                                    onClick={() => handleSwitchTab("letter")}
+                                >
+                                    ✉️ 속마음 편지
+                                </button>
+                            </div>
+
+                            <textarea
+                                css={s.textarea}
+                                placeholder={PLACEHOLDERS[mode]}
+                                value={moodInput}
+                                onChange={(e) => setMoodInput(e.target.value)}
+                            />
+                            <button css={s.analyzeButton} onClick={handleAnalyze}>
+                                기록하고 물 주기
+                            </button>
                         </div>
-                        <div css={s.analysisResultStyle}>{analysisResult}</div>
+
+                        <div css={s.resultCard}>
+                            <div css={s.resultStatus}>
+                                <span css={s.resultIcon}>{plantIcon}</span>
+                                <span css={s.resultStatusText}>
+                                    {gardenStatus}
+                                </span>
+                            </div>
+                            <div css={s.resultText}>{analysisResult}</div>
+                        </div>
                     </div>
-                </div>
+                </section>
             </main>
 
-            <footer css={s.footerStyle}>
-                <p css={s.footerPhrase}>
+            <footer css={s.footer}>
+                <p css={s.footerQuote}>
                     "기록하는 감정에서, 성장하는 감정으로."
                 </p>
-                <p css={s.footerCopyright}>
+                <p css={s.footerCopy}>
                     &copy; 2026 florography. All 팀원 4인 | Mental Care +
                     Gamification.
                 </p>

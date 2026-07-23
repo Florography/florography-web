@@ -9,9 +9,9 @@ function OAuthCallbackPage() {
         const accessToken = searchParams.get("accessToken");
         if (accessToken) {
             localStorage.setItem("accessToken", accessToken);
-            navigate("/mypage", { replace: true });
+            navigate("/home", { replace: true });
         } else {
-            navigate("/", { replace: true });
+            navigate("/login", { replace: true });
         }
     }, [searchParams, navigate]);
 

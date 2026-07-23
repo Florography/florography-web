@@ -13,7 +13,7 @@ import {
 // 꽃 도감에서 사용할 MENU_ITEMS
 export const MENU_ITEMS = MENU_ITEMS_BASE;
 
-// 꽃 도감에서 사용할 NAV_ITEMS (꽃 도감 탭을 active 상태로)
+// // 꽃 도감에서 사용할 NAV_ITEMS (꽃 도감 탭을 active 상태로)
 export const NAV_ITEMS = NAV_ITEMS_BASE.map(item => ({
     ...item,
     active: item.label === "꽃 도감"
