@@ -3,6 +3,7 @@ import { useMood } from "../../hooks/queries/useMood";
 import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
 import { useMe } from "../../hooks/queries/useUser";
 import * as s from "./styles";
+import { MonthNames } from "../../globalData";
 
 const DEFAULT_MOODS = [
     { id: 0, mood: "많이 지침" },
@@ -68,11 +69,11 @@ function SeedRecordPage() {
     }, [seedRecords, safeRecords]);
 
     if (isSeedLoading) {
-        return <div>데이터를 불러오는 중입니다...</div>
+        return <div css={s.emptyItem}>데이터를 불러오는 중입니다...</div>
     }
 
     if (isSeedError) {
-        return <div>데이터를 가져오는데 실패했습니다: {isSeedError.message}</div>
+        return <div css={s.emptyItem}>데이터를 가져오는데 실패했습니다: {isSeedError.message}</div>
     }
 
     // 선택한 주차의 편지 필터
@@ -118,7 +119,7 @@ function SeedRecordPage() {
                 break;
             }
         }
-        
+
         if (found) {
             setCurrentMonday(tempMonday);
         } else {
@@ -154,57 +155,57 @@ function SeedRecordPage() {
     };
 
     return (
-        <div>
-            <h1>나의 한마디</h1>
-                <span style={{ fontWeight: "bold"}}>
-                    {startStr} (월) ~ {endStr} (일)
-                </span>
-            <ul>
-                {filteredRecords.length > 0 ? (
-                    filteredRecords.map((seedrecord, index) => {
-                        const matchedMood = moods.find(m => Number(m.id) === Number(seedrecord.moodIdx));
+        <div css={s.page}>
+            <h1 css={s.title}>나의 한마디</h1>
+            <span css={s.rangeLabel}>
+                {startStr} (월) ~ {endStr} (일)
+            </span>
+            <div css={s.mainCard}>
+                <ul css={s.recordList}>
+                    {filteredRecords.length > 0 ? (
+                        filteredRecords.map((seedrecord, index) => {
+                            const matchedMood = moods.find(m => Number(m.id) === Number(seedrecord.moodIdx));
+                            const month = seedrecord.createdDate?.substring(5, 7);
+                            const day = seedrecord.createdDate?.substring(8, 10);
 
-                        return (
-                            <li key={`${seedrecord.userId || 'record'}-${index}`}>
-                                <span>{seedrecord.createdDate}</span>
-                                <span>{seedrecord.sentence}</span>
-                                <span>({matchedMood ? matchedMood.mood : seedrecord.moodIdx})</span>
-                            </li> 
-                        );
-                    })
-                ) : (
-                    <li>이번 주에 쓴 한마디가 없습니다.</li>
-                )}
-            </ul>
-            <div style={{ display: "flex", gap: "15px", alignItems: "center", margin: "20px 0" }}>
-                <button onClick={handlePrevWeek}>◀ 이전 주</button>
-                
-                {availableWeeks.length > 1 && (
-                    <div style={{ display: "flex", gap: "6px" }}>
-                        {availableWeeks.map((weeksSet, index) => {
-                            const isCurrentWeekMatch = formatDate(currentMonday) === weeksSet;
                             return (
-                                <button
-                                    key={weeksSet}
-                                    onClick={() => handleGoToWeek(weeksSet)}
-                                    style={{ 
-                                        fontWeight: isCurrentWeekMatch ? "bold" : "normal", 
-                                        backgroundColor: isCurrentWeekMatch ? "#ddd" : "#fff", 
-                                        border: "1px solid #ccc", 
-                                        padding: "6px 12px", 
-                                        cursor: "pointer", 
-                                        borderRadius: "4px" 
-                                    }} 
-                                >
-                                    {index + 1}
-                                </button>
+                                <li css={s.recordListItem} key={`${seedrecord.userId || 'record'}-${index}`}>
+                                    <div css={s.dateLabel}>
+                                        <header>{day}</header>
+                                        <span>{MonthNames[parseInt(month) - 1]}</span>
+                                    </div>
+                                    <span>({matchedMood ? matchedMood.mood : seedrecord.moodIdx})</span>
+                                    <span css={s.sentence}>{seedrecord.sentence}</span>
+                                </li>
                             );
-                        })}
-                    </div>
-                )}
+                        })
+                    ) : (
+                        <li css={s.emptyItem}>이번 주에 쓴 한마디가 없습니다.</li>
+                    )}
+                </ul>
+                <div css={s.weekNav}>
+                    <button css={s.weekNavButton} onClick={handlePrevWeek}>◀ 이전 주</button>
 
-                {/* 현재 기준 다음 주 버튼 비활성화 */}
-                <button onClick={handleNextWeek} disabled={isThisWeek}>다음 주 ▶</button>
+                    {availableWeeks.length > 1 && (
+                        <div css={s.weekDots}>
+                            {availableWeeks.map((weeksSet, index) => {
+                                const isCurrentWeekMatch = formatDate(currentMonday) === weeksSet;
+                                return (
+                                    <button
+                                        css={s.weekDot(isCurrentWeekMatch)}
+                                        key={weeksSet}
+                                        onClick={() => handleGoToWeek(weeksSet)}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* 현재 기준 다음 주 버튼 비활성화 */}
+                    <button css={s.weekNavButton} onClick={handleNextWeek} disabled={isThisWeek}>다음 주 ▶</button>
+                </div>
             </div>
         </div>
     )

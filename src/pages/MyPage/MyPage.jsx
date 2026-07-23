@@ -1,7 +1,5 @@
-/** @jsxImportSource @emotion/react */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import * as s from "./styles";
 import {
     MENU_ITEMS,
     NAV_ITEMS,
@@ -15,6 +13,7 @@ import {
 import { useMe } from "../../hooks/queries/useUser";
 import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
 import { linkAccountRequest, unlinkAccountRequest } from "../../api/useApi";
+import * as s from "./styles";
 
 const API_BASE = "http://localhost:8080";
 
@@ -126,20 +125,20 @@ function MyPage() {
 
     // ─── 드로어 / 네비게이션 ───
     const goTo = (item) => {
-    setMenuOpen(false);
-    
-    // 라벨이 '정원'이거나 href가 '/home'인 경우 확실하게 /home 이동
-    if (item.label === "홈" || item.href === "/home") {
-        navigate("/home");
-        return;
-    }
+        setMenuOpen(false);
 
-    if (item.href) {
-        navigate(item.href);
-    } else {
-        showToast("info", `${item.label} 기능은 준비 중이에요 🌱`);
-    }
-};
+        // 라벨이 '정원'이거나 href가 '/home'인 경우 확실하게 /home 이동
+        if (item.label === "홈" || item.href === "/home") {
+            navigate("/home");
+            return;
+        }
+
+        if (item.href) {
+            navigate(item.href);
+        } else {
+            showToast("info", `${item.label} 기능은 준비 중이에요 🌱`);
+        }
+    };
     // ─── 프로필 ───
     const openEdit = () => {
         setNickDraft(nickname);
@@ -212,122 +211,12 @@ function MyPage() {
     const joinDate = "2026.03.24";
 
     return (
-        <div css={s.pageStyle}>
-            <link
-                rel="stylesheet"
-                href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap"
-            />
-            <link
-                rel="stylesheet"
-                href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
-            />
-
-            {/* 헤더 */}
-            <header css={s.headerStyle}>
-                <div css={s.headerLeft}>
-                    <button
-                        css={s.hamburgerBtn}
-                        aria-label="메뉴"
-                        onClick={() => setMenuOpen(true)}
-                    >
-                        <span />
-                        <span />
-                        <span />
-                    </button>
-                    <div css={s.logoGroup}
-                        onClick={() => navigate("/home")}
-                    >
-                        <span css={s.logoText}>florography</span>
-                        <span css={s.logoTagline}>마음을 키우는 정원</span>
-                    </div>
-                </div>
-                <button css={s.logoutBtn} onClick={handleLogout}>
-                    로그아웃
-                </button>
-            </header>
-
-            {/* 햄버거 드로어 */}
-            {menuOpen && (
-                <div css={s.drawerOverlay} onClick={() => setMenuOpen(false)}>
-                    <nav
-                        css={s.drawerPanel}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div css={s.drawerHeader}>
-                            <span css={s.drawerLogo}>florography</span>
-                            <button
-                                css={s.drawerClose}
-                                aria-label="닫기"
-                                onClick={() => setMenuOpen(false)}
-                            >
-                                ✕
-                            </button>
-                        </div>
-                        <p css={s.drawerDesc}>
-                            당신의 마음에 물을 주세요,
-                            <br />
-                            감정이 꽃피는 곳.
-                        </p>
-                        {MENU_ITEMS.map((m) => (
-                            <button
-                                key={m.label}
-                                css={s.drawerItem}
-                                onClick={() => goTo(m)}
-                            >
-                                <span css={s.drawerItemIcon}>{m.icon}</span>
-                                <span css={s.drawerItemText}>
-                                    <span css={s.drawerItemLabel}>
-                                        {m.label}
-                                    </span>
-                                    <span css={s.drawerItemDesc}>
-                                        {m.desc}
-                                    </span>
-                                </span>
-                            </button>
-                        ))}
-                        <div css={s.drawerFooter}>© 2026 florography</div>
-                    </nav>
-                </div>
-            )}
-
-            <div css={s.bodyGrid}>
-                {/* 좌측 레일 */}
-                <aside css={s.leftRail}>
-                    <button
-                        css={s.writeBtn}
-                        onClick={() => goTo({ label: "글 쓰기", href: null })}
-                    >
-                        ✎ 글 쓰기
-                    </button>
-                    <nav css={s.railNav}>
-                        {NAV_ITEMS.map((n) => (
-                            <button
-                                key={n.label}
-                                css={s.railNavItem(n.active)}
-                                onClick={() => goTo(n)}
-                            >
-                                <span css={s.railNavDot(n.active)} />
-                                {n.label}
-                            </button>
-                        ))}
-                    </nav>
-                    <div css={s.streakWidget}>
-                        <div css={s.streakLabel}>함께한 시간</div>
-                        <div css={s.streakValueRow}>
-                            <span css={s.streakValue}>{days}</span>
-                            <span css={s.streakUnit}>일째</span>
-                        </div>
-                        <div css={s.streakDesc}>
-                            {joinDate} 부터 함께 자라고 있어요.
-                        </div>
-                    </div>
-                </aside>
-
+        <div css={s.page}>
                 {/* 중앙 */}
-                <main css={s.mainCol}>
-                    <div css={s.pageTitleRow}>
-                        <div css={s.pageTitle}>👤 마이페이지</div>
-                        <div css={s.pageSubtitle}>
+                <main css={s.page}>
+                    <div css={s.headerBlock}>
+                        <div css={s.headerTitle}>👤 마이페이지</div>
+                        <div css={s.headerDesc}>
                             프로필과 계정을 관리하고, 내가 남긴 기록을 모아
                             보세요.
                         </div>
@@ -335,9 +224,9 @@ function MyPage() {
 
                     {/* 닉네임 수정 (펼침) */}
                     {editOpen && (
-                        <section css={s.sectionStyle}>
-                            <div css={s.sectionTitle}>프로필 수정</div>
-                            <div css={s.editField}>
+                        <section css={s.editSection}>
+                            <div css={s.editSectionTitle}>프로필 수정</div>
+                            <div css={s.editRow}>
                                 <label css={s.editLabel}>닉네임</label>
                                 <div css={s.editInputRow}>
                                     <input
@@ -349,19 +238,19 @@ function MyPage() {
                                             setNickDraft(e.target.value)
                                         }
                                     />
-                                    <span css={s.editCounter}>
+                                    <span css={s.charCount}>
                                         {nickDraft.length}/12
                                     </span>
                                 </div>
                             </div>
-                            <div css={s.editHint}>
+                            <div css={s.editNote}>
                                 프로필 사진은 준비 중이에요. 곧 만나요 🌱
                             </div>
                             <div css={s.editActions}>
-                                <button css={s.btnGhost} onClick={cancelEdit}>
+                                <button css={s.cancelButton} onClick={cancelEdit}>
                                     취소
                                 </button>
-                                <button css={s.btnPrimary} onClick={saveNick}>
+                                <button css={s.saveButton} onClick={saveNick}>
                                     저장
                                 </button>
                             </div>
@@ -370,47 +259,47 @@ function MyPage() {
 
                     {/* 프로필 카드 */}
                     <section css={s.profileCard}>
-                        <div css={s.avatarCircle}>{nickname.slice(0, 1)}</div>
+                        <div css={s.profileAvatar}>{nickname.slice(0, 1)}</div>
                         <div css={s.profileInfo}>
                             <div css={s.profileName}>{nickname}</div>
                             <div css={s.profileEmail}>✉️ {email}</div>
                             <div css={s.profileStats}>
                                 <div css={s.statItem}>
-                                    <span css={s.statValue}>
+                                    <span css={s.statNumber}>
                                         {RECORDS.length}
                                     </span>
                                     <span css={s.statLabel}>기록</span>
                                 </div>
                                 <div css={s.statItem}>
-                                    <span css={s.statValue}>
+                                    <span css={s.statNumber}>
                                         {seedRecords?.data?.body.length}
                                     </span>
                                     <span css={s.statLabel}>한마디</span>
                                 </div>
                                 <div css={s.statItem}>
-                                    <span css={s.statValue}>8</span>
+                                    <span css={s.statNumber}>8</span>
                                     <span css={s.statLabel}>꽃</span>
                                 </div>
                             </div>
                         </div>
-                        <button css={s.editProfileBtn} onClick={openEdit}>
+                        <button css={s.editProfileButton} onClick={openEdit}>
                             ✎ 프로필 수정
                         </button>
                     </section>
 
                     {/* 연동된 계정 */}
-                    <section css={s.sectionStyle}>
+                    <section css={s.section}>
                         <div css={s.sectionTitle}>연동된 계정</div>
                         <div css={s.sectionDesc}>
                             소셜 계정으로 간편하게 로그인할 수 있어요.
                         </div>
 
                         {loading ? (
-                            <div css={[s.emptyState, s.loadingPulse]}>
+                            <div css={s.sectionDesc}>
                                 계정 정보를 불러오는 중...
                             </div>
                         ) : (
-                            <div css={s.accountList}>
+                            <div css={s.providerList}>
                                 {Object.keys(PROVIDERS).map((provider) => {
                                     const config = PROVIDERS[provider];
                                     const account = linkedByProvider[provider];
@@ -418,40 +307,35 @@ function MyPage() {
 
                                     return (
                                         <div
-                                            css={s.accountItem}
+                                            css={s.providerRow}
                                             key={provider}
                                         >
                                             <div
-                                                css={s.providerIcon(
-                                                    config.bg,
-                                                    config.color
-                                                )}
+                                                css={s.providerGlyph(config.bg, config.color)}
                                             >
                                                 {config.glyph}
                                             </div>
-                                            <div css={s.accountInfo}>
-                                                <div css={s.accountName}>
+                                            <div css={s.providerInfo}>
+                                                <div css={s.providerLabel}>
                                                     {config.label}
                                                 </div>
-                                                <div css={s.accountDetail}>
+                                                <div css={s.providerSub}>
                                                     {connected
                                                         ? account.email ||
                                                         "이메일 없음"
                                                         : "연결하면 더 편하게 로그인해요"}
                                                 </div>
                                             </div>
-                                            <div css={s.accountRight}>
+                                            <div css={s.providerActions}>
                                                 {connected ? (
                                                     <>
                                                         <span
-                                                            css={s.stateBadge(
-                                                                true
-                                                            )}
+                                                            css={s.connectedBadge}
                                                         >
                                                             연결됨
                                                         </span>
                                                         <button
-                                                            css={s.unlinkBtn}
+                                                            css={s.unlinkButton}
                                                             disabled={
                                                                 linkedAccounts.length <=
                                                                 1
@@ -473,9 +357,7 @@ function MyPage() {
                                                     </>
                                                 ) : (
                                                     <button
-                                                        css={s.stateBadge(
-                                                            false
-                                                        )}
+                                                        css={s.linkButton}
                                                         onClick={() =>
                                                             handleLink(
                                                                 provider
@@ -494,30 +376,26 @@ function MyPage() {
                     </section>
 
                     {/* 내 기록 */}
-                    <section css={s.sectionStyle}>
-                        <div css={s.recordsHeader}>
-                            <div css={s.recordsTitle}>내 기록</div>
+                    <section css={s.section}>
+                        <div>
+                            <div css={s.sectionTitle}>내 기록</div>
                         </div>
 
-                        <div>
+                        <div css={s.recordsList}>
                             {recordRows?.map((r, i) => (
                                 <div css={s.recordRow} key={`${r.date}-${i}`}>
-                                    <span css={s.recordIcon(r.iconBg)}>
+                                    <span css={s.recordIcon}>
                                         {r.icon}
                                     </span>
                                     <span css={s.recordText}>{r.text}</span>
                                     {r.mood && (
                                         <span
-                                            css={s.recordMood(
-                                                r.moodStyle.bg
-                                            )}
+                                            css={s.moodBadge(r.moodStyle?.bg)}
                                         >
                                             <span
-                                                css={s.recordMoodDot(
-                                                    r.moodStyle.dot
-                                                )}
+                                                css={s.moodDot(r.moodStyle?.dot)}
                                             />
-                                            <span css={s.recordMoodLabel}>
+                                            <span>
                                                 {r.mood}
                                             </span>
                                         </span>
@@ -529,99 +407,27 @@ function MyPage() {
                     </section>
 
                     {/* 회원 탈퇴 */}
-                    <section css={s.leaveSection}>
-                        <div css={s.leaveInfo}>
-                            <div css={s.leaveTitle}>회원 탈퇴</div>
-                            <div css={s.leaveDesc}>
+                    <section css={s.dangerSection}>
+                        <div>
+                            <div css={s.dangerTitle}>회원 탈퇴</div>
+                            <div css={s.dangerDesc}>
                                 탈퇴 시 정원·기록·꽃 도감이 모두 삭제되며
                                 되돌릴 수 없어요.
                             </div>
                         </div>
-                        <span css={s.leaveBtn}>회원 탈퇴</span>
+                        <span css={s.dangerButton}>회원 탈퇴</span>
                     </section>
                 </main>
 
-                {/* 우측 레일 */}
-                <aside css={s.rightRail}>
-                    <div css={s.rightCard}>
-                        <div css={s.flowerCardLabel}>지난주 피운 꽃</div>
-                        <div css={s.flowerStage}>
-                            <div css={s.flowerBloom}>
-                                {[0, 72, 144, 216, 288].map((rotate) => (
-                                    <span
-                                        key={rotate}
-                                        css={s.flowerPetal(
-                                            "#E59A91",
-                                            rotate
-                                        )}
-                                    />
-                                ))}
-                                <span css={s.flowerCenter} />
-                            </div>
-                        </div>
-                        <div css={s.flowerName}>감사의 꽃</div>
-                        <div css={s.flowerMeaning}>꽃말 · 마음을 전하다</div>
+                {/* 토스트 */}
+                {toast && (
+                    <div css={s.toast(toast.type)}>
+                        {toast.message}
                     </div>
-
-                    <div css={s.quoteCard}>
-                        <div css={s.quoteLabel}>지난주의 위로</div>
-                        <p css={s.quoteText}>
-                            "기록하는 감정에서,
-                            <br />
-                            성장하는 감정으로."
-                        </p>
-                    </div>
-
-                    <div css={s.rightCard}>
-                        <div css={s.calHeader}>
-                            <span css={s.calNavBtn}>◀</span>
-                            <span css={s.calMonth}>
-                                {year}년 {month}월
-                            </span>
-                            <span css={s.calNavBtn}>▶</span>
-                        </div>
-                        <div css={s.calWeekdayRow}>
-                            {WEEKDAYS.map((w) => (
-                                <span css={s.calWeekday} key={w}>
-                                    {w}
-                                </span>
-                            ))}
-                        </div>
-                        <div css={s.calGrid}>
-                            {railCal.map((c, i) => (
-                                <span
-                                    css={s.calDay(c.color, c.bg, c.weight)}
-                                    key={i}
-                                >
-                                    {c.n}
-                                </span>
-                            ))}
-                        </div>
-                        <div css={s.calLegend}>
-                            <span css={s.calLegendLabel}>
-                                작성한 날 · 감정 체크
-                            </span>
-                            <span css={s.calLegendDots}>
-                                {MOOD_COLORS.map((c) => (
-                                    <span
-                                        css={s.calLegendDot(c)}
-                                        key={c}
-                                    />
-                                ))}
-                            </span>
-                        </div>
-                    </div>
-                </aside>
+                )}
             </div>
-
-            {/* 토스트 */}
-            {toast && (
-                <div css={s.toastStyle(toast.type, toastExiting)}>
-                    {toast.message}
-                </div>
-            )}
-        </div>
     );
-}
 
+
+}
 export default MyPage;

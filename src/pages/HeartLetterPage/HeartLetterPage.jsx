@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import * as s from "./styles";
 import { useHeartLetters } from "../../hooks/queries/useHeartLetter";
 import { useMe } from "../../hooks/queries/useUser";
 import { useMood } from "../../hooks/queries/useMood";
 import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
+import * as s from "./styles";
+import { MonthNames } from "../../globalData";
 
 const DEFAULT_MOODS = [
     { id: 0, mood: "많이 지침" },
@@ -77,11 +78,11 @@ function HeartLetterPage() {
     }, [letters]);
 
     if (isLetterLoading || isSeedLoading) {
-        return <div>데이터를 불러오는 중입니다...</div>
+        return <div css={s.emptyItem}>데이터를 불러오는 중입니다...</div>
     }
 
     if (isLetterError) {
-        return <div>데이터를 가져오는데 실패했습니다: {isLetterError.message}</div>
+        return <div css={s.emptyItem}>데이터를 가져오는데 실패했습니다: {isLetterError.message}</div>
     }
 
     // 선택한 주차의 편지 필터
@@ -134,7 +135,7 @@ function HeartLetterPage() {
                 break;
             }
         }
-        
+
         if (found) {
             setCurrentMonday(tempMonday);
             setCurrentPage(1);
@@ -173,99 +174,96 @@ function HeartLetterPage() {
     };
 
     return (
-        <div>
-            <h1>나의 편지</h1>
-                <span style={{ fontWeight: "bold" }}>
-                    {startStr} (월) ~ {endStr} (일)
-                </span>
-            <ul>
-                {currentItems && currentItems.length > 0 ? (
-                    currentItems.map((heartletter, index) => {
-                        const letterDate = heartletter.createdAt?.substring(0, 10);
+        <div css={s.page}>
+            <h1 css={s.title}>나의 편지</h1>
+            <span css={s.rangeLabel}>
+                {startStr} (월) ~ {endStr} (일)
+            </span>
+            <div css={s.mainCard}>
+                <ul css={s.recordList}>
+                    {currentItems && currentItems.length > 0 ? (
+                        currentItems.map((heartletter, index) => {
+                            const letterDate = heartletter.createdAt?.substring(0, 10);
+                            const month = heartletter.createdAt?.substring(5, 7);
+                            const day = heartletter.createdAt?.substring(8, 10);
 
-                        const targetRecord = allSeedRecords.find(record => 
-                            record?.createdDate && record.createdDate.startsWith(letterDate)
-                        );
-
-                        const currentMoodId = targetRecord ? targetRecord.moodIdx : null;
-                        const matchedMood = moods.find(m => Number(m.id) === Number(currentMoodId));
-
-                        return (
-                            <li key={`${heartletter.userId}-${index}`}>
-                                <span>{heartletter.createdAt}</span>
-                                <span>{heartletter.title}</span>
-                                <span>받는 마음: {heartletter.recipient}</span>
-                                <span>({matchedMood ? matchedMood.mood : "괜찮음"})</span>
-                            </li>
-                        );
-                    })
-                ) : (
-                    <li>이번 주에 쓴 편지가 없습니다.</li>
-                )}
-            </ul>
-            {totalPages > 1 && (
-                <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "20px" }}>
-                    <button 
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
-                        이전
-                    </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                        <button
-                            key={pageNum}
-                            onClick={() => setCurrentPage(pageNum)}
-                            style={{
-                                fontWeight: currentPage === pageNum ? "bold" : "normal",
-                                backgroundColor: currentPage === pageNum ? "#ddd" : "#fff",
-                                border: "1px solid #ccc",
-                                padding: "5px 10px",
-                                cursor: "pointer"
-                            }}
-                        >
-                            {pageNum}
-                        </button>
-                    ))}
-                    <button
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                    >
-                        다음
-                    </button>
-                </div>
-            )}
-            <div style={{ display: "flex", gap: "15px", alignItems: "center", margin: "20px 0" }}>
-                <button onClick={handlePrevWeek}>◀ 이전 주</button>
-                
-                {availableWeeks.length > 1 && (
-                    <div style={{ display: "flex", gap: "6px" }}>
-                        {availableWeeks.map((weeksSet, index) => {
-                            const isCurrentWeekMatch = formatDate(currentMonday) === weeksSet;
-                            return (
-                                <button
-                                    key={weeksSet}
-                                    onClick={() => handleGoToWeek(weeksSet)}
-                                    style={{ 
-                                        fontWeight: isCurrentWeekMatch ? "bold" : "normal", 
-                                        backgroundColor: isCurrentWeekMatch ? "#ddd" : "#fff", 
-                                        border: "1px solid #ccc", 
-                                        padding: "6px 12px", 
-                                        cursor: "pointer", 
-                                        borderRadius: "4px" 
-                                    }} 
-                                >
-                                    {index + 1}
-                                </button>
+                            const targetRecord = allSeedRecords.find(record =>
+                                record?.createdDate && record.createdDate.startsWith(letterDate)
                             );
-                        })}
+
+                            const currentMoodId = targetRecord ? targetRecord.moodIdx : null;
+                            const matchedMood = moods.find(m => Number(m.id) === Number(currentMoodId));
+
+                            return (
+                                <li css={s.recordListItem} key={`${heartletter.userId}-${index}`}>
+                                    <div css={s.dateLabel}>
+                                        <header>{day}</header>
+                                        <span>{MonthNames[parseInt(month) - 1]}</span>
+                                    </div>
+                                    <span>({matchedMood ? matchedMood.mood : "괜찮음"})</span>
+                                    <div css={s.sentenceGroup}>
+                                        <span css={s.recipient}>받는이: {heartletter.recipient}</span>
+                                        <span css={s.sentence}>{heartletter.title}</span>
+                                    </div>
+                                </li>
+                            );
+                        })
+                    ) : (
+                        <li css={s.emptyItem}>이번 주에 쓴 편지가 없습니다.</li>
+                    )}
+                </ul>
+                {totalPages > 1 && (
+                    <div css={s.pagination}>
+                        <button
+                            css={s.pageButton}
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            이전
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                            <button
+                                css={s.pageButton}
+                                key={pageNum}
+                                onClick={() => setCurrentPage(pageNum)}
+                            >
+                                {pageNum}
+                            </button>
+                        ))}
+                        <button
+                            css={s.pageButton}
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                        >
+                            다음
+                        </button>
                     </div>
                 )}
+                <div css={s.weekNav}>
+                    <button css={s.weekNavButton} onClick={handlePrevWeek}>◀ 이전 주</button>
 
-                {/* 현재 기준 다음 주 버튼 비활성화 */}
-                <button onClick={handleNextWeek} disabled={isThisWeek}>다음 주 ▶</button>
+                    {availableWeeks.length > 1 && (
+                        <div css={s.weekDots}>
+                            {availableWeeks.map((weeksSet, index) => {
+                                const isCurrentWeekMatch = formatDate(currentMonday) === weeksSet;
+                                return (
+                                    <button
+                                        css={s.weekDot(isCurrentWeekMatch)}
+                                        key={weeksSet}
+                                        onClick={() => handleGoToWeek(weeksSet)}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* 현재 기준 다음 주 버튼 비활성화 */}
+                    <button css={s.weekNavButton} onClick={handleNextWeek} disabled={isThisWeek}>다음 주 ▶</button>
+                </div>
             </div>
         </div>
     );
-}     
+}
 export default HeartLetterPage;
-

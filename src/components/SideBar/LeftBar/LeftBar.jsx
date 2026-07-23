@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import * as s from "./styles";
 
 function LeftBar() {
     const tabList = [
@@ -7,6 +8,7 @@ function LeftBar() {
         {name: "속마음 편지", path: "/heartletter"},
         {name: "공유 게시판", path: "/shareboard"},
         {name: "꽃 도감", path: "/flowers"},
+        {name: "정원", path: "/garden"},
     ]
 
     const navigate = useNavigate();
@@ -21,20 +23,24 @@ function LeftBar() {
         }
     };
 
+    const handleWriteOnClick = () => {
+        navigate("/write");
+    };
+
     return (
-        <>
-            <div>글 쓰기</div>
-            <ul>
+        <aside css={s.sidebar}>
+            <div css={s.writeButton} onClick={handleWriteOnClick}>글 쓰기</div>
+            <ul css={s.menu}>
                 {tabList.map((tab, index) => (
-                    <div key={index}>
-                    <li key={index} onClick={() => handleTabClick(tab.path)}>
+                    <div css={s.menuItemWrap} key={index}>
+                    <li css={s.menuItem} key={index} onClick={() => handleTabClick(tab.path)}>
                         {tab.name}
                     </li>
                     {
                         tab.path === "/heartletter" && heartLetterToggle && (
-                            <ul>
-                                <li onClick={() => navigate("/heartletter/seedrecord")}>나의 한마디</li>
-                                <li onClick={() => navigate("/heartletter/letters")}>내가 쓴 편지</li>
+                            <ul css={s.submenu}>
+                                <li css={s.submenuItem} onClick={() => navigate("/heartletter/seedrecord")}>나의 한마디</li>
+                                <li css={s.submenuItem} onClick={() => navigate("/heartletter/letters")}>내가 쓴 편지</li>
                             </ul>
                         )
                     }
@@ -42,7 +48,7 @@ function LeftBar() {
                 ))
                 }
             </ul>
-        </>
+        </aside>
     )
 }
 

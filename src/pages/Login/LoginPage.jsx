@@ -1,186 +1,8 @@
-/** @jsxImportSource @emotion/react */
-import { css, keyframes } from "@emotion/react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import * as s from "./styles";
 
 const API_BASE = "http://localhost:8080";
-
-const float = keyframes`
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-`;
-
-const shimmer = keyframes`
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-`;
-
-const fadeIn = keyframes`
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-`;
-
-const containerStyle = css`
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #0a0a0f;
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(
-                circle at 30% 40%,
-                rgba(167, 139, 250, 0.08) 0%,
-                transparent 50%
-            ),
-            radial-gradient(
-                circle at 70% 60%,
-                rgba(244, 114, 182, 0.06) 0%,
-                transparent 50%
-            );
-        pointer-events: none;
-    }
-`;
-
-const cardStyle = css`
-    position: relative;
-    z-index: 1;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    padding: 3rem 2.5rem;
-    width: 100%;
-    max-width: 420px;
-    backdrop-filter: blur(20px);
-    animation: ${fadeIn} 0.6s ease-out;
-`;
-
-const logoStyle = css`
-    text-align: center;
-    margin-bottom: 2.5rem;
-`;
-
-const logoText = css`
-    font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #a78bfa, #f472b6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.03em;
-    animation: ${float} 3s ease-in-out infinite;
-`;
-
-const subtitleStyle = css`
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-    letter-spacing: 0.05em;
-`;
-
-const dividerStyle = css`
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    color: rgba(255, 255, 255, 0.25);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-
-    &::before,
-    &::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.1),
-            transparent
-        );
-    }
-`;
-
-const btnBase = css`
-    width: 100%;
-    padding: 0.9rem 1.5rem;
-    border: none;
-    border-radius: 14px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    font-family: "Inter", sans-serif;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 0.85rem;
-
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-
-    svg {
-        width: 20px;
-        height: 20px;
-        flex-shrink: 0;
-    }
-`;
-
-const googleBtn = css`
-    ${btnBase};
-    background: #fff;
-    color: #1f1f1f;
-
-    &:hover {
-        background: #f8f8f8;
-    }
-`;
-
-const naverBtn = css`
-    ${btnBase};
-    background: #03c75a;
-    color: #fff;
-
-    &:hover {
-        background: #02b351;
-    }
-`;
-
-const kakaoBtn = css`
-    ${btnBase};
-    background: #fee500;
-    color: #191919;
-
-    &:hover {
-        background: #fdd800;
-    }
-`;
-
-const footerStyle = css`
-    margin-top: 2rem;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.2);
-    font-size: 0.7rem;
-    letter-spacing: 0.05em;
-`;
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -197,16 +19,16 @@ function LoginPage() {
     };
 
     return (
-        <div css={containerStyle}>
-            <div css={cardStyle}>
-                <div css={logoStyle}>
-                    <div css={logoText}>🌸 Florography</div>
-                    <div css={subtitleStyle}>소셜 계정으로 시작하기</div>
+        <div css={s.page}>
+            <div css={s.card}>
+                <div css={s.heading}>
+                    <div css={s.brand}>🌸 Florography</div>
+                    <div css={s.subtitle}>소셜 계정으로 시작하기</div>
                 </div>
 
-                <div css={dividerStyle}>소셜 로그인</div>
+                <div css={s.divider}>소셜 로그인</div>
 
-                <button css={googleBtn} onClick={() => handleLogin("google")}>
+                <button css={s.googleButton} onClick={() => handleLogin("google")}>
                     <svg viewBox="0 0 24 24">
                         <path
                             fill="#4285F4"
@@ -228,7 +50,7 @@ function LoginPage() {
                     Google로 계속하기
                 </button>
 
-                <button css={naverBtn} onClick={() => handleLogin("naver")}>
+                <button css={s.naverButton} onClick={() => handleLogin("naver")}>
                     <svg viewBox="0 0 24 24">
                         <path
                             fill="#fff"
@@ -238,7 +60,7 @@ function LoginPage() {
                     Naver로 계속하기
                 </button>
 
-                <button css={kakaoBtn} onClick={() => handleLogin("kakao")}>
+                <button css={s.kakaoButton} onClick={() => handleLogin("kakao")}>
                     <svg viewBox="0 0 24 24">
                         <path
                             fill="#191919"
@@ -248,7 +70,7 @@ function LoginPage() {
                     Kakao로 계속하기
                 </button>
 
-                <div css={footerStyle}>
+                <div css={s.devNote}>
                     계정 연동 테스트 페이지 • Dev Only
                 </div>
             </div>

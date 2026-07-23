@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import * as s from "./styles";
 import { createWrite, updateWrite } from "../../api/heartletterApi";
 import { useMe } from "../../hooks/queries/useUser";
+import * as s from "./styles";
+import { useNavigate } from "react-router";
 
 function getThemeBgColor(themeId) {
     switch (Number(themeId)) {
@@ -23,6 +24,7 @@ function WriteHeartLetter({ existingData, todayWrtie, userId, onSaveSuccess }) {
     const user = useMe();
     const currentUserId = user.data?.body?.linkedAccounts?.[0]?.uid;
     const editorRef = useRef(null);
+    const navigate = useNavigate();
 
     const [inputWrite, setInputWrite] = useState({
         userId: "",
@@ -129,8 +131,9 @@ function WriteHeartLetter({ existingData, todayWrtie, userId, onSaveSuccess }) {
 
             if (response) {
                 console.log("DB", response);
-                alert(todayWrtie ? "편지가 수정되었습니다." : "편지가 등록되었습니다.");
+                alert(todayWrtie ? "편지가 수정되었습니다." : "편지가 편지를 보냈어요. 💌");
                 if (onSaveSuccess) onSaveSuccess(response);
+                navigate("/heartletter/letters");
             }
         } catch (error) {
             console.error("Db 저장 중 오류 발생: ", error);
@@ -143,26 +146,27 @@ function WriteHeartLetter({ existingData, todayWrtie, userId, onSaveSuccess }) {
     };
 
     return (
-        <div>
+        <div css={s.container}>
             {/* Header 영역 */}
-            <header>
+            <header css={s.header}>
                 <div>
-                    <h2>{todayWrtie ? "💌 마음의 편지 수정" : "💌 마음의 편지 작성"}</h2>
-                    <p>전하고 싶은 마음을 편지에 담아보세요.</p>
+                    <h2 css={s.headerTitle}>{todayWrtie ? "💌 마음의 편지 수정" : "💌 마음의 편지 작성"}</h2>
+                    <p css={s.headerDesc}>전하고 싶은 마음을 편지에 담아보세요.</p>
                 </div>
                 <div>
-                    <button onClick={handleSaveOnClick}>
+                    <button css={s.submitButton} onClick={handleSaveOnClick}>
                         ✍️ {todayWrtie ? "수정" : "작성 완료"}
                     </button>
                 </div>
             </header>
 
-            <hr />
+            <hr css={s.divider} />
 
-            <div>
-                <div>
+            <div css={s.toolRow}>
+                <div css={s.themeGroup}>
                     <label>🎨 테마 · 편지지</label>
                     <select 
+                        css={s.themeSelect}
                         name="paper_theme" 
                         value={inputWrite.paper_theme} 
                         onChange={handleInputChange}
@@ -175,29 +179,30 @@ function WriteHeartLetter({ existingData, todayWrtie, userId, onSaveSuccess }) {
                     </select>
                 </div>
                 {/* 텍스트 서식 버튼 */}
-                <div>
-                    <span>서식</span>
-                    <button type="button" onClick={() => applyFormat("bold")}>
+                <div css={s.formatGroup}>
+                    <span css={s.formatLabel}>서식</span>
+                    <button css={s.formatButton} type="button" onClick={() => applyFormat("bold")}>
                         <b>B</b>
                     </button>
-                    <button type="button" onClick={() => applyFormat("italic")}>
+                    <button css={s.formatButton} type="button" onClick={() => applyFormat("italic")}>
                         <i>I</i>
                     </button>
-                    <button type="button" onClick={() => applyFormat("underline")}>
+                    <button css={s.formatButton} type="button" onClick={() => applyFormat("underline")}>
                         <u>U</u>
                     </button>
                 </div>
                 {/* 폰트 크기 조절 */}
-                <div>
+                <div css={s.sizeGroup}>
                     <span>크기</span>
-                    <button type="button" onClick={() => handleFontSize(-2)}>-</button>
+                    <button css={s.sizeButton} type="button" onClick={() => handleFontSize(-2)}>-</button>
                     <span>{inputWrite.font_size}px</span>
-                    <button type="button" onClick={() => handleFontSize(2)}>+</button>
+                    <button css={s.sizeButton} type="button" onClick={() => handleFontSize(2)}>+</button>
                 </div>
             </div>
             {/* 입력 영역 */}
-            <div>
+            <div css={s.inputRow}>
                 <input 
+                    css={s.textInput}
                     type="text" 
                     name="recipient"
                     placeholder="받는 사람 (예: 사랑하는 부모님께)"
@@ -205,6 +210,7 @@ function WriteHeartLetter({ existingData, todayWrtie, userId, onSaveSuccess }) {
                     onChange={handleInputChange}
                 />
                 <input 
+                    css={s.textInput}
                     type="text" 
                     name="title"
                     placeholder="편지 제목을 입력하세요."
@@ -213,46 +219,31 @@ function WriteHeartLetter({ existingData, todayWrtie, userId, onSaveSuccess }) {
                 />
             </div>
             {/* 2단 구성: 작성창 & 👁 실시간 미리보기 */}
-            <div>
+            <div css={s.editorGrid}>
                 <div
                     ref={editorRef}
                     contentEditable
                     onInput={handleEditorInput}
                     suppressContentEditableWarning={true}
+                    css={s.editorPane}
                     style={{
-                        flex: 1,
-                        minHeight: "300px",
-                        padding: "15px",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        outline: "none",
                         fontSize: `${inputWrite.font_size}px`,
                         textAlign: inputWrite.textAlign,
-                        overflowY: "auto",
-                        backgroundColor: "#fff",
+                        backgroundColor: getThemeBgColor(inputWrite.paper_theme),
                     }}
                 />
                 {/* 미리보기 창 */}
-                <div
-                    style={{
-                        flex: 1,
-                        minHeight: "300px",
-                        padding: "20px",
-                        border: "1px solid #ccc",
-                        color: "#000000",
-                        borderRadius: "8px",
-                        backgroundColor: getThemeBgColor(inputWrite.paper_theme),
-                    }}
+                <div css={s.previewPane}
                 >
-                    <h3>👁 미리보기</h3>
-                    <hr />
-                    <h4>To. {inputWrite.recipient || "받는 사람"}</h4>
-                    <h5>{inputWrite.title || "제목 없음"}</h5>
+                    <h3 css={s.previewHeading}>👁 미리보기</h3>
+                    <hr css={s.divider} />
+                    <h4 css={s.previewTo}>To. {inputWrite.recipient || "받는 사람"}</h4>
+                    <h5 css={s.previewTitle}>{inputWrite.title || "제목 없음"}</h5>
                     
                     {/* HTML 서식이 포함된 미리보기 출력 */}
                     <div
+                        css={s.previewBody}
                         style={{
-                            color: "#000000",
                             fontSize: `${inputWrite.font_size}px`,
                             textAlign: inputWrite.textAlign,
                             wordBreak: "break-word",

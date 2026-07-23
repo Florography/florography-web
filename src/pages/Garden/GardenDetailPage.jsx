@@ -1,15 +1,13 @@
-/** @jsxImportSource @emotion/react */
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import * as s from "./styles";
 import { useMe } from "../../hooks/queries/useUser";
 import { useGardenById } from "../../hooks/queries/useGarden";
 import FreeformGarden from "./FreeformGarden";
 import { saveGarden } from "../../api/gardenApi";
 import { useGardenStore } from "../../stores/gardenStore";
 import {
-    NAV_ITEMS,
+    // NAV_ITEMS,
     PETALS,
     WATER_COUNT,
     THEMES,
@@ -17,6 +15,7 @@ import {
     WEEKDAYS,
     BLOOM_MAP_2026_06,
 } from "./mockData";
+import * as s from "./styles";
 
 function GardenDetailPage() {
     const navigate = useNavigate();
@@ -148,85 +147,47 @@ function GardenDetailPage() {
     })();
 
     if (gardenQuery.isLoading) {
-        return <div css={s.pageStyle}>로딩 중...</div>;
+        return <div css={s.emptyState}>로딩 중...</div>;
     }
 
     return (
-        <div css={s.pageStyle}>
-            <link
-                rel="stylesheet"
-                href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap"
-            />
-            <link
-                rel="stylesheet"
-                href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
-            />
+        <div>
 
-            <header css={s.headerStyle}>
+            <header css={s.pageHeader}>
                 <div css={s.headerLeft}>
                     <button
-                        css={s.hamburgerBtn}
+                        css={s.backButton}
                         aria-label="돌아가기"
                         onClick={() => navigate("/garden")}
                     >
                         ←
                     </button>
-                    <div css={s.logoGroup}>
-                        <span css={s.logoText}>{gardenName}</span>
-                        <span css={s.logoTagline}>정원 보기</span>
+                    <div css={s.headerTitleGroup}>
+                        <span css={s.headerTitle}>{gardenName}</span>
+                        <span css={s.headerSubtitle}>정원 보기</span>
                     </div>
                 </div>
-                <button css={s.userPill} onClick={() => navigate("/mypage")}>
-                    <span css={s.userAvatar}>{userName.slice(0, 1)}</span>
-                    <span css={s.userName}>{userName}</span>
-                    <span css={s.userChevron}>▾</span>
+                <button css={s.profileButton} onClick={() => navigate("/mypage")}>
+                    <span css={s.profileInitial}>{userName.slice(0, 1)}</span>
+                    <span css={s.profileName}>{userName}</span>
+                    <span css={s.profileArrow}>▾</span>
                 </button>
             </header>
 
-            <div css={s.bodyGrid}>
-                <aside css={s.leftRail}>
-                    <button css={s.writeBtn} onClick={() => navigate("/heartletter")}>
-                        ✎ 글 쓰기
-                    </button>
-                    <nav css={s.railNav}>
-                        {NAV_ITEMS.map((n) => (
-                            <button
-                                key={n.label}
-                                css={s.railNavItem(n.active)}
-                                onClick={() => {
-                                    if (n.href) navigate(n.href);
-                                }}
-                            >
-                                <span css={s.railNavDot(n.active)} />
-                                {n.label}
-                            </button>
-                        ))}
-                    </nav>
-                    <div css={s.waterWidget}>
-                        <div css={s.waterLabel}>오늘의 물 주기</div>
-                        <div css={s.waterValueRow}>
-                            <span css={s.waterValue}>{WATER_COUNT}</span>
-                            <span css={s.waterUnit}>번째 기록</span>
-                        </div>
-                        <div css={s.waterDesc}>
-                            한 문장이 곧 한 번의 물 주기예요.
-                        </div>
-                    </div>
-                </aside>
-
-                <main css={s.mainCol}>
-                    <div css={s.titleBar}>
-                        <div>
-                            <div css={s.pageTitle}>🪴 {gardenName}</div>
-                            <div css={s.pageSubtitle}>
+            <div>
+                <main css={s.main}>
+                    <div css={s.mainTitleBar}>
+                        <div css={s.mainTitleGroup}>
+                            <div css={s.mainTitle}>🪴 {gardenName}</div>
+                            <div css={s.mainSubtitle}>
                                 생성일: {gardenQuery.data?.body?.createdAt ? new Date(gardenQuery.data.body.createdAt).toLocaleDateString() : ""}
                             </div>
                         </div>
-                        <div css={s.titleActions}>
-                            <button css={s.themeBtn} onClick={cycleTheme}>
+                        <div css={s.mainActions}>
+                            <button css={s.themeButton} onClick={cycleTheme}>
                                 🎨 테마 · {theme.name}
                             </button>
-                            <button css={s.saveBtn} onClick={handleSave}>
+                            <button css={s.saveButton} onClick={handleSave}>
                                 {saved ? "저장됨 ✓" : "💾 저장"}
                             </button>
                         </div>
@@ -234,68 +195,9 @@ function GardenDetailPage() {
 
                     <FreeformGarden theme={theme} />
                 </main>
-
-                <aside css={s.rightRail}>
-                    <div css={s.rightCard}>
-                        <div css={s.weeklyFlowerLabel}>지난주 피운 꽃</div>
-                        <div css={s.weeklyFlowerStage}>
-                            <div css={s.weeklyFlowerBloom}>
-                                {PETALS.map((deg) => (
-                                    <span
-                                        key={deg}
-                                        css={s.petal(18, 30, "#E59A91", deg, 0.92)}
-                                    />
-                                ))}
-                                <span
-                                    css={s.flowerCore(22, "#F2C766", "#EAB94E", 3)}
-                                />
-                            </div>
-                        </div>
-                        <div css={s.weeklyFlowerName}>감사의 꽃</div>
-                        <div css={s.weeklyFlowerMeaning}>꽃말 · 마음을 전하다</div>
-                    </div>
-
-                    <div css={s.rightCard}>
-                        <div css={s.calHeader}>
-                            <button css={s.calNavBtn} onClick={prevYear}>
-                                ◀
-                            </button>
-                            <span css={s.calMonth}>
-                                {year}년 {month}월
-                            </span>
-                            <button css={s.calNavBtn} onClick={nextYear}>
-                                ▶
-                            </button>
-                        </div>
-                        <div css={s.calWeekdayRow}>
-                            {WEEKDAYS.map((w) => (
-                                <span css={s.calWeekday} key={w}>
-                                    {w}
-                                </span>
-                            ))}
-                        </div>
-                        <div css={s.calGrid}>
-                            {railCal.map((c, i) => (
-                                <span css={s.calDay(c.color, c.bg, c.weight)} key={i}>
-                                    {c.n}
-                                </span>
-                            ))}
-                        </div>
-                        <div css={s.calLegend}>
-                            <span css={s.calLegendLabel}>
-                                감정에 따라 색 변화
-                            </span>
-                            <span css={s.calLegendDots}>
-                                {MOOD_COLORS.map((c) => (
-                                    <span css={s.calLegendDot(c)} key={c} />
-                                ))}
-                            </span>
-                        </div>
-                    </div>
-                </aside>
             </div>
 
-            {toast && <div css={s.toastStyle(toastExiting)}>{toast}</div>}
+            {toast && <div css={s.toast}>{toast}</div>}
         </div>
     );
 }

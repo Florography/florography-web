@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as s from "./styles";
 import { useFlowerDirectoies } from "../../hooks/queries/flowerDirectory";
