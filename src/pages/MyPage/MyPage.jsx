@@ -15,7 +15,7 @@ import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
 import { linkAccountRequest, unlinkAccountRequest } from "../../api/useApi";
 import * as s from "./styles";
 
-const API_BASE = "http://localhost:8080";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const PROVIDERS = {
     google: { glyph: "G", bg: "#fff", color: "#4285F4", label: "Google" },

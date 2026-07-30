@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { getSeedRecord } from "../../api/seedRecordApi";
+import { getSeedRecord } from "../../api/seedrecordApi";
 
 export const useSeedRecord = (userId) => {
     const accessToken = localStorage.getItem("accessToken");
