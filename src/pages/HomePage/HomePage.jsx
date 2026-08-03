@@ -42,6 +42,8 @@ function HomePage() {
     const userId = user.data?.body?.linkedAccounts?.[0]?.uid;
 
     const [date, setDate] = useState(todayStr); // 오늘 날짜를 기본값으로 설정
+    const [selectedDateRecord, setSelectedDateRecord] = useState(null);
+    const [isLoadingDateRecord, setIsLoadingDateRecord] = useState(false);
     const [inputSeedRecord, setInputSeedRecord] = useState({
         userId: userId,
         sentence: "",
@@ -169,8 +171,23 @@ function HomePage() {
         }
     }
 
-    const dateOnChange = (e) => {
-        setDate(e.target.value);
+    const dateOnChange = async (e) => {
+        const selectedDate = e.target.value;
+        setDate(selectedDate);
+
+        // 선택한 날짜의 기록을 API에서 조회
+        if (userId) {
+            setIsLoadingDateRecord(true);
+            try {
+                const data = await getSeedRecordByDate(userId, selectedDate);
+                setSelectedDateRecord(data && data.length > 0 ? data[0] : null);
+            } catch (error) {
+                console.error("날짜별 기록 조회 실패:", error);
+                setSelectedDateRecord(null);
+            } finally {
+                setIsLoadingDateRecord(false);
+            }
+        }
     }
 
     const goTo = (item) => {
@@ -238,18 +255,14 @@ function HomePage() {
                     </div>
                     <div css={s.historyBlock}>
                         <span css={s.historyBlockTitle}>그때 남긴 한마디</span>
-                        {isSeedRecordLoading ? (
+                        {isLoadingDateRecord ? (
                             <div css={s.mutedText}>로딩 중...</div>
                         ) : (
                             <div css={s.historyBlock}>
-                                {filteredSeedRecords && filteredSeedRecords.length > 0 ? (
-                                    filteredSeedRecords.map((seedRecord, index) => {
-                                        return (
-                                            <div css={s.recordChip} key={`${seedRecord.id}-${index}`}>
-                                                <span>{seedRecord.sentence}</span>
-                                            </div>
-                                        );
-                                    })
+                                {selectedDateRecord ? (
+                                    <div css={s.recordChip} key={`${selectedDateRecord.id}`}>
+                                        <span>{selectedDateRecord.sentence}</span>
+                                    </div>
                                 ) : (
                                     <div css={s.emptyText}>해당 날짜에 작성된 한마디가 없습니다.</div>
                                 )}
