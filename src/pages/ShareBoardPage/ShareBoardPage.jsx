@@ -123,7 +123,7 @@ function ShareBoardPage() {
                 </button>
             </div>
             <div>
-                <p css={s.sectionLabel}>게시글 출력</p>
+                <p css={s.sectionLabel}>게시글 목록</p>
             </div>
             <ul css={s.boardList}>
                 {displayedBoards.length > 0 ? (
