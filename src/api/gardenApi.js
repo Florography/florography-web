@@ -8,7 +8,7 @@ export const saveGarden = async (gardenData, id, userId, name) => {
         gardenData: JSON.stringify(gardenData),
         createdAt: new Date().toISOString()
     };
-    const response = await axiosInstance.put("api/garden", payload);
+    const response = await axiosInstance.put("/api/garden", payload);
     return response.data;
 };
 
@@ -19,19 +19,19 @@ export const createGarden = async(gardenData, userId, name) => {
         gardenData: JSON.stringify(gardenData),
         createdAt: new Date().toISOString()
     };
-    const response = await axiosInstance.post("api/garden", payload);
+    const response = await axiosInstance.post("/api/garden", payload);
     return response.data;
 
 }
 
 export const getAllGardens = async () => {
     console.log("Hi");
-    const response = await axiosInstance.get("api/garden");
+    const response = await axiosInstance.get("/api/garden");
     console.log(response.data);
     return response.data;
 };
 
 export const getGardenById = async (id) => {
-    const response = await axiosInstance.get(`api/garden/${id}`);
+    const response = await axiosInstance.get(`/api/garden/${id}`);
     return response.data;
 };
