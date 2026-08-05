@@ -11,19 +11,19 @@ export const getMyRecord = async (userId) => {
 }
 
 export const getFlowerDictionary = async () => {
-    const response = await axiosInstance.get("api/flowerdictionary");
+    const response = await axiosInstance.get("/api/flowerdictionary");
     console.log(response.data);
     return response.data;
 }
 
 export const getHeartLetter = async () => {
-    const response = await axiosInstance.get("api/heartletter");
+    const response = await axiosInstance.get("/api/heartletter");
     console.log(response.data);
     return response.data;
 }
 
 export const linkAccountRequest = async (provider) => {
-    const response = await axiosInstance.post(`api/user/link/${provider}`);
+    const response = await axiosInstance.post(`/api/user/link/${provider}`);
     return response.data;
 }
 
