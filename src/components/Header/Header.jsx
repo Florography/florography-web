@@ -21,7 +21,7 @@ function Header() {
             <div css={s.header}>
                 <div css={s.headerContent}>
                     <div css={s.logo} onClick={handleLogoClick}>
-                        로고
+                        florography
                     </div>
                     <div css={s.spacer}></div>
                     <div css={s.profile} onClick={handleProfileClick}>

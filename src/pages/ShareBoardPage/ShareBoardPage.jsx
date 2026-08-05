@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMe } from "../../hooks/queries/useUser";
-import { useBoardLike, useComment, useRankShareBoard, useShareBoard } from "../../hooks/queries/useShareboard";
+import { useBoardLike, useComment, useShareBoard } from "../../hooks/queries/useShareboard";
 import { useBoardLikeDeleteMutation, useBoardLikeRegisterMutation, useCommentDeleteMutation, useCommentPutMutation, useCommentRegisterMutation, useLikeDownMutation, useLikeUpMutation, useShareBoardDeleteMutation, useShareBoardPutMutation, useShareBoardResisterMutation } from "../../hooks/mutations/useShareBoard";
 import { data } from "react-router";
 import * as s from "./styles";
@@ -11,9 +11,6 @@ function ShareBoardPage() {
     //게시판
     const boardQuery = useShareBoard();
     const boards = boardQuery.data?.body || [];
-    //인기순위
-    const rankBoardQuery = useRankShareBoard();
-    const ranks = rankBoardQuery.data?.body || [];
 
     const user = useMe();
     const { mutate: registerShareBoard, isPending } = useShareBoardResisterMutation();
@@ -143,19 +140,6 @@ function ShareBoardPage() {
                     </p>
                 )}
             </ul>
-            
-            <div css={s.rankSection}>
-                <p css={s.sectionLabel}>인기순위</p>
-                <ul css={s.rankList}>
-                    {ranks.map((rank, index) => (
-                        <li css={s.rankItem} key={rank.id}>
-                            <span css={s.rankPosition}><strong>{index + 1}위</strong></span>
-                            <span css={s.rankBody}>{rank.body}</span>
-                            <span css={s.rankLike}>❤️{rank.like}</span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
         </>
     );
 }
