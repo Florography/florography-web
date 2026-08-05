@@ -167,11 +167,11 @@ function GardenDetailPage() {
                         <span css={s.headerSubtitle}>정원 보기</span>
                     </div>
                 </div>
-                <button css={s.profileButton} onClick={() => navigate("/mypage")}>
+                {/* <button css={s.profileButton} onClick={() => navigate("/mypage")}>
                     <span css={s.profileInitial}>{userName.slice(0, 1)}</span>
                     <span css={s.profileName}>{userName}</span>
                     <span css={s.profileArrow}>▾</span>
-                </button>
+                </button> */}
             </header>
 
             <div>

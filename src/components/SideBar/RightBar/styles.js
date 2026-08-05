@@ -20,7 +20,7 @@ export const section = css`
     background: #ffffff;
     border-radius: ${radius.sm};
     box-shadow: ${shadow.soft};
-    gap: 12px;
+    gap: 4px;
 `;
 
 export const title = css`
@@ -95,7 +95,7 @@ export const calendarNavButton = css`
     cursor: pointer;
     font-size: 16px;
     color: ${colors.subtext};
-    padding: 4px 8px;
+    padding: 2px 8px;
     border-radius: ${radius.sm};
     
     &:hover {
@@ -121,12 +121,11 @@ export const calendarWeekday = css`
     font-size: 12px;
     font-weight: 600;
     color: ${colors.subtext};
-    padding-bottom: 8px;
 `;
 
 export const calendarDay = css`
     font-size: 12px;
-    padding: 6px 0;
+    padding: 2px 0;
     border-radius: ${radius.sm};
     color: ${colors.text};
     cursor: pointer;
