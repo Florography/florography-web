@@ -2,7 +2,7 @@ import { axiosInstance } from "./axiosInstance";
 
 export const createWrite = async (payload) => {
     try {
-        const response = await axiosInstance.post("/api/heartletter", payload);
+        const response = await axiosInstance.post("api/heartletter", payload);
         console.log(response.data);
         return response.data.body;
     } catch (error) {
@@ -12,7 +12,7 @@ export const createWrite = async (payload) => {
 
 export const updateWrite = async (data) => {
     try {
-        const response = await axiosInstance.put("/api/heartletter", data);
+        const response = await axiosInstance.put("api/heartletter", data);
         console.log(response.data);
         return response.data.body;
     } catch (error) {
@@ -22,7 +22,7 @@ export const updateWrite = async (data) => {
 
 export const getHeartLetter = async (userId) => {
     try {
-        const response = await axiosInstance.get(`/api/heartletter/${userId}`);
+        const response = await axiosInstance.get(`api/heartletter/${userId}`);
         console.log(response.data);
         return response.data.body;
     } catch (error) {

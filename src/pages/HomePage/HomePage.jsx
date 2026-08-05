@@ -8,6 +8,7 @@ import { useHeartLetters } from "../../hooks/queries/useHeartLetter";
 import { useQueryClient } from "@tanstack/react-query";
 import * as s from "./styles";
 import { MonthNames } from "../../globalData";
+import { getSeedRecordByDate } from "../../api/seedrecordApi";
 
 // 1. 프론트엔드에 기분 5단계 정의 (UI 매핑용)
 const MOOD_OPTIONS = [
@@ -255,14 +256,26 @@ function HomePage() {
                     </div>
                     <div css={s.historyBlock}>
                         <span css={s.historyBlockTitle}>그때 남긴 한마디</span>
-                        {isLoadingDateRecord ? (
+                        {isSeedRecordLoading ? (
                             <div css={s.mutedText}>로딩 중...</div>
                         ) : (
                             <div css={s.historyBlock}>
-                                {selectedDateRecord ? (
+                                {/* {selectedDateRecord ? (
                                     <div css={s.recordChip} key={`${selectedDateRecord.id}`}>
                                         <span>{selectedDateRecord.sentence}</span>
                                     </div>
+                                ) : (
+                                    <div css={s.emptyText}>해당 날짜에 작성된 한마디가 없습니다.</div>
+                                )}
+                                 */}
+                                 {filteredSeedRecords && filteredSeedRecords.length > 0 ? (
+                                    filteredSeedRecords.map((seedRecord, index) => {
+                                        return (
+                                            <div css={s.recordChip} key={`${seedRecord.id}-${index}`}>
+                                                <span>{seedRecord.sentence}</span>
+                                            </div>
+                                        );
+                                    })
                                 ) : (
                                     <div css={s.emptyText}>해당 날짜에 작성된 한마디가 없습니다.</div>
                                 )}
