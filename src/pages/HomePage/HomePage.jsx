@@ -169,8 +169,23 @@ function HomePage() {
         }
     }
 
-    const dateOnChange = (e) => {
-        setDate(e.target.value);
+    const dateOnChange = (e) => {       
+        const selectedDate = e.target.value;
+        setDate(selectedDate);
+
+        // 선택한 날짜의 기록을 API에서 조회
+        if (userId) {
+            setIsLoadingDateRecord(true);
+            try {
+                const data = await getSeedRecordByDate(userId, selectedDate);
+                setSelectedDateRecord(data && data.length > 0 ? data[0] : null);
+            } catch (error) {
+                console.error("날짜별 기록 조회 실패:", error);
+                setSelectedDateRecord(null);
+            } finally {
+                setIsLoadingDateRecord(false);
+            }
+        }
     }
 
     const goTo = (item) => {
