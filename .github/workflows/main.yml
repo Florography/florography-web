@@ -20,7 +20,7 @@ jobs:
             echo "EOF" >> $GITHUB_ENV
             echo "DOCKER_USERNAME=${{secrets.DOCKER_USERNAME_JO}}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{secrets.DOCKER_PASSWORD_JO}}" >> $GITHUB_ENV
-            echo "ENV_DEVELOPMENT=${{secrets.ENV_DEVELOPMENT_JO}}" >> $GITHUB_ENV
+            echo "EVN_PRODUCTION=${{secrets.ENV_PRODUCTION_JO}}" >> $GITHUB_ENV
             echo "REACT_ENV=${{secrets.REACT_ENV_JO}}" >> $GITHUB_ENV
           
           elif [ ${{github.ref}} == 'refs/heads/deploy-jh' ]; then
@@ -31,7 +31,7 @@ jobs:
             echo "EOF" >> $GITHUB_ENV
             echo "DOCKER_USERNAME=${{secrets.DOCKER_USERNAME_JH}}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{secrets.DOCKER_PASSWORD_JH}}" >> $GITHUB_ENV
-            echo "ENV_DEVELOPMENT=${{secrets.ENV_DEVELOPMENT_JH}}" >> $GITHUB_ENV
+            echo "EVN_PRODUCTION=${{secrets.EVN_PRODUCTION_JH}}" >> $GITHUB_ENV
             echo "REACT_ENV=${{secrets.REACT_ENV_JH}}" >> $GITHUB_ENV
           
           elif [ ${{github.ref}} == 'refs/heads/deploy-hj' ]; then
@@ -42,7 +42,7 @@ jobs:
             echo "EOF" >> $GITHUB_ENV
             echo "DOCKER_USERNAME=${{secrets.DOCKER_USERNAME_HJ}}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{secrets.DOCKER_PASSWORD_HJ}}" >> $GITHUB_ENV
-            echo "ENV_DEVELOPMENT=${{secrets.ENV_DEVELOPMENT_HJ}}" >> $GITHUB_ENV
+            echo "EVN_PRODUCTION=${{secrets.EVN_PRODUCTION_HJ}}" >> $GITHUB_ENV
             echo "REACT_ENV=${{secrets.REACT_ENV_HJ}}" >> $GITHUB_ENV
           
           elif [ ${{github.ref}} == 'refs/heads/deploy-wr' ]; then
@@ -53,7 +53,7 @@ jobs:
             echo "EOF" >> $GITHUB_ENV
             echo "DOCKER_USERNAME=${{secrets.DOCKER_USERNAME_WR}}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{secrets.DOCKER_PASSWORD_WR}}" >> $GITHUB_ENV
-            echo "ENV_DEVELOPMENT=${{secrets.ENV_DEVELOPMENT_WR}}" >> $GITHUB_ENV
+            echo "EVN_PRODUCTION=${{secrets.EVN_PRODUCTION_WR}}" >> $GITHUB_ENV
             echo "REACT_ENV=${{secrets.REACT_ENV_WR}}" >> $GITHUB_ENV
             
           fi
@@ -74,7 +74,7 @@ jobs:
 
       - name: Springboot Build and Docker image build and push
         run: |
-          echo ${{env.ENV_DEVELOPMENT}} | base64 --decode > C:\project\florography-web\.env.production
+          echo ${{env.EVN_PRODUCTION}} | base64 --decode > C:\project\florography-web\.env.production
           echo "${{env.DOCKER_PASSWORD}}" | docker login -u ${{env.DOCKER_USERNAME}} --password-stdin
           
           docker build -t ${{env.DOCKER_USERNAME}}/spring-app:latest .
