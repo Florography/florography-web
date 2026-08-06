@@ -1,46 +1,94 @@
 import { useEffect, useState } from "react";
+import { registerShareBoard } from "../../api/shareboardApi";
 import { useMe } from "../../hooks/queries/useUser";
 import { useBoardLike, useComment, useShareBoard } from "../../hooks/queries/useShareboard";
 import { useBoardLikeDeleteMutation, useBoardLikeRegisterMutation, useCommentDeleteMutation, useCommentPutMutation, useCommentRegisterMutation, useLikeDownMutation, useLikeUpMutation, useShareBoardDeleteMutation, useShareBoardPutMutation, useShareBoardResisterMutation } from "../../hooks/mutations/useShareBoard";
 import { data } from "react-router";
 import * as s from "./styles";
+import { useGardenById, useGardenByUserId } from "../../hooks/queries/useGarden";
+import { FLOWER_TYPES } from "../../globalData";
+import { useFlowerDirectoies } from "../../hooks/queries/flowerDirectory";
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+const flowerImgUrl = (path) => (path ? `${API_BASE}${path}` : "");
+
+const modalOverlayStyle = {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+};
+
+const modalContentStyle = {
+    backgroundColor: "#fff",
+    padding: "20px",
+    borderRadius: "12px",
+    width: "90%",
+    maxWidth: "400px",
+    boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
+};
 
 
 function ShareBoardPage() {
+
 
     //게시판
     const boardQuery = useShareBoard();
     const boards = boardQuery.data?.body || [];
 
     const user = useMe();
+    const currentUserId = user.data?.body?.linkedAccounts?.[0]?.uid
+        ? String(user.data.body.linkedAccounts[0].uid)
+        : "";
+    if (currentUserId) {
+        console.log("길이:", currentUserId.length);
+        console.log("값:", currentUserId);
+    }
     const { mutate: registerShareBoard, isPending } = useShareBoardResisterMutation();
     const { mutate: deleteBoard } = useShareBoardDeleteMutation();
     const { mutate: updateBoard } = useShareBoardPutMutation();
 
+    //정원 첨부 모드 온/오프 상태
+    const [isGardenAttached, setIsGardenAttached] = useState(false);
+    const [isGardenModalOpen, setIsGardenModalOpen] = useState(false);
+    const [selectedGarden, setSelectedGarden] = useState(null);
+    // 정원버튼 클릭시 에만 api 조회를 위한 useGardenById호출
+    const gardenQuery = useGardenByUserId(currentUserId);
+    console.log(gardenQuery);
+    const gardenList = Array.isArray(gardenQuery.data?.body)
+        ? gardenQuery.data?.body
+        : gardenQuery.data?.body ? [gardenQuery.data.body] : [];
+
+
     //본인글만 보기 필터상태관리
     const [isOnlyMyPosts, setIsOnlyMyPosts] = useState(false);
 
-    //본인인증?
+
     const [inputSeedRecord, setInputSeedRecord] = useState({
         userId: "",
         body: "",
         like: 0,
         typeId: 1,
+        gardenImg: null,
     });
 
     useEffect(() => {
-        const uid = user.data?.body?.linkedAccounts?.[0]?.uid;
 
-        if (uid) {
+
+        if (currentUserId) {
             setInputSeedRecord((prev) => ({
                 ...prev,
-                userId: uid,
+                userId: currentUserId,
             }));
         }
-    }, [user.data]); // user.data가 들어오거나 변경될 때마다 실행
+    }, [currentUserId]); // 가 들어오거나 변경될 때마다 실행
 
-    // 현재 로그인한 유저 uid 구하기 
-    const currentUserId = user.data?.body?.linkedAccounts?.[0]?.uid;
 
     //본인글만보기 필터
     const displayedBoards = isOnlyMyPosts
@@ -53,6 +101,50 @@ function ShareBoardPage() {
             return;
         }
         setIsOnlyMyPosts((prev) => !prev)
+    };
+
+    // 정원 선택 처리 함수
+    const handleSelectGarden = (garden) => {
+        setSelectedGarden(garden);
+        setIsGardenAttached(true);
+        setIsGardenModalOpen(false); // 선택 완료 후 모달 닫기
+
+        // garden.gardenData 내부 형태 예시: { freeformFlowers: [{ id: 1, flower: 1, x: 20, y: 30 }] }
+        const rawData = garden.gardenData || garden.gardenImg || garden;
+
+
+        const gardenDataPayload = typeof rawData === "object"
+            ? JSON.stringify(rawData)
+            : rawData;
+
+        setInputSeedRecord((prev) => ({
+            ...prev,
+            typeId: 2, // 정원 첨부 시 타입 변경 (예시)
+            gardenImg: gardenDataPayload, // 좌표 문자열 저장
+        }));
+    };
+
+    //나의 정원 버튼 선택/ 취소 토글
+    const handleToggleGarden = () => {
+        if (!currentUserId) {
+            alert("로그인이 필요한 기능입니다.");
+            return;
+        }
+
+        if (selectedGarden || isGardenAttached) {
+            // 이미 첨부된 정원이 있다면 해제
+            setSelectedGarden(null);
+            setIsGardenAttached(false);
+            setIsGardenModalOpen(false);
+            setInputSeedRecord((prev) => ({
+                ...prev,
+                typeId: 1,
+                gardenImg: null,
+            }));
+        } else {
+            // 정원 선택 모달 띄우기
+            setIsGardenModalOpen(true);
+        }
     };
 
 
@@ -78,39 +170,65 @@ function ShareBoardPage() {
         }));
     };
 
-    const handleBoardOnClick = () => {
-        if (!inputSeedRecord.body.trim()) {
-            alert("내용을 입력해주세요!");
+    const handleBoardOnClick = async () => {
+        if (!inputSeedRecord.body?.trim()) {
+            alert("내용을 입력해주세요.");
             return;
         }
 
-        if (!inputSeedRecord.userId) {
-            alert("로그인 정보가 없거나 유저 ID를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
-            console.error("🚨 현재 전송 시도하려는 유저 데이터 상태:", inputSeedRecord);
-            return;
+
+
+
+
+        // 2. 정원 첨부 데이터 처리 (객체일 경우 JSON 문자열화)
+        let gardenImgPayload = null;
+        if (isGardenAttached && selectedGarden) {
+            const rawData = selectedGarden.gardenData || selectedGarden.gardenImg || selectedGarden;
+            gardenImgPayload = typeof rawData === "object" ? JSON.stringify(rawData) : rawData;
         }
 
-        registerShareBoard(inputSeedRecord, {
-            onSuccess: () => {
-                setInputSeedRecord((prev) => ({
-                    ...prev,
-                    body: "",
-                }));
+        // 3. ShareBoardCreateRequest DTO 스펙에 맞춘 Payload 생성
+        const payload = {
+            userId: String(currentUserId),
+            typeId: isGardenAttached ? 2 : 1, // 텍스트만 작성 시 1
+            body: inputSeedRecord.body,
+            like: 0,                          // 💡 null 방지 (기본 0)
+            gardenImg: isGardenAttached ? gardenImgPayload : null, // 💡 미첨부 시 null
+        };
+
+        registerShareBoard(payload, {
+            onSuccess: (response) => {
+                alert("공유가 완료되었습니다.");
+                setInputSeedRecord((prev) => ({ ...prev, body: "" }));
+                setSelectedGarden(null);
+                setIsGardenAttached(false);
+            },
+            onError: (error) => {
+                alert(`공유 실패: ${error?.message || "서버 저장 실패"}`);
             }
         });
     };
-
 
     return (
         <>
             <div css={s.composerCard}>
                 <p css={s.composerLabel}>게시글 작성</p>
+
+                {selectedGarden && (
+                    <div style={{ marginBottom: "12px" }}>
+                        <p style={{ fontSize: "12px", color: "#2e7d32", fontWeight: "bold" }}>
+                            🌱 선택된 정원: {selectedGarden.name || "나의 정원"} (type_id: 2)
+                        </p>
+                        <GardenPreview gardenImgData={inputSeedRecord.gardenImg} />
+                    </div>
+                )}
                 <div css={s.composerRow}>
                     <input css={s.composerInput} type="text"
                         value={inputSeedRecord.body}
                         onChange={handleBoardInputChange}
                         placeholder="오늘의 한마디를 나눠보세요."
                     />
+                    <button css={s.composerButton} onClick={handleToggleGarden}>{selectedGarden ? "정원 취소" : "나의 정원"}</button>
                     <button css={s.composerButton} onClick={handleBoardOnClick} >공유</button>
                 </div>
             </div>
@@ -134,12 +252,64 @@ function ShareBoardPage() {
                             updateBoard={updateBoard}
                         />
                     ))
-                ): (
+                ) : (
                     <p css={s.boardEmpty}>
                         {isOnlyMyPosts ? "내가 작성한 글이 없습니다." : "등록된 게시글이 없습니다."}
                     </p>
                 )}
             </ul>
+
+            {isGardenModalOpen && (
+                <div style={modalOverlayStyle}>
+                    <div style={modalContentStyle}>
+                        <h3 style={{ marginBottom: "12px" }}>나의 정원 목록 선택</h3>
+                        <div style={{ maxHeight: "300px", overflowY: "auto", marginBottom: "12px" }}>
+                            {gardenList.length > 0 ? (
+                                gardenList.map((garden, index) => (
+                                    <div
+                                        key={garden.id || index}
+                                        onClick={() => handleSelectGarden(garden)}
+                                        style={{
+                                            padding: "12px",
+                                            borderBottom: "1px solid #eee",
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            flexDirection: "column", // 세로 레이아웃으로 설정하여 정원 이름을 위에, 썸네일을 아래에 배치
+                                            gap: "8px"
+                                        }}
+                                    >
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                            <span style={{ fontWeight: "600", fontSize: "13.5px" }}>
+                                                {garden.name || garden.gardenName || `정원 #${index + 1}`}
+                                            </span>
+                                            <button style={{
+                                                cursor: "pointer",
+                                                padding: "3px 10px",
+                                                borderRadius: "4px",
+                                                border: "1px solid #ddd",
+                                                background: "#fdfdfd",
+                                                fontSize: "12px"
+                                            }}>
+                                                선택
+                                            </button>
+                                        </div>
+
+                                        {/* 💡 각 정원의 좌표 데이터를 미니 높이(80px)로 렌더링 */}
+                                        <GardenPreview
+                                            gardenImgData={garden.gardenData || garden.gardenImg}
+                                            height="80px"
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <p style={{ padding: "10px", color: "#666" }}>불러올 정원이 없습니다.</p>
+                            )}
+                        </div>
+                        <button onClick={() => setIsGardenModalOpen(false)}>닫기</button>
+                    </div>
+                </div>
+            )}
+
         </>
     );
 }
@@ -157,6 +327,8 @@ function BoardItem({ board, currentUserId, user, handleDeleteOnClick, updateBoar
 
     const [isEditing, setIsEditing] = useState(false);
     const [editBody, setEditBody] = useState(board.body);
+
+    const gardenData = board.gardenImg;
 
     // 하트 토글 핸들러 (누르면 증감저장 / 감소삭제)
     const handleLikeToggle = () => {
@@ -189,6 +361,9 @@ function BoardItem({ board, currentUserId, user, handleDeleteOnClick, updateBoar
 
     return (
         <li css={s.boardItem}>
+            {(board.typeId === 2 || gardenData) && (
+                <GardenPreview gardenImgData={gardenData} />
+            )}
             {isEditing ? (
                 <div css={s.editRow}>
                     <input css={s.editInput} type="text" value={editBody} onChange={(e) => setEditBody(e.target.value)} />
@@ -398,4 +573,74 @@ function CommentRegister({ boardId, user }) {
             </form>
         </div>
     )
+}
+
+// 정원 데이터 시각화
+// height 매개변수를 기본값 "200px"로 설정하여 받습니다.
+function GardenPreview({ gardenImgData, height = "200px" }) {
+    const { data: directoryData } = useFlowerDirectoies();
+
+    if (!gardenImgData) return null;
+
+    let parsedData = null;
+    try {
+        if (typeof gardenImgData === "string") {
+            const cleanData = gardenImgData.trim();
+            if (!cleanData.startsWith("{") && !cleanData.startsWith("[")) {
+                return null;
+            }
+            parsedData = JSON.parse(cleanData);
+            if (typeof parsedData === "string" && (parsedData.startsWith("{") || parsedData.startsWith("["))) {
+                parsedData = JSON.parse(parsedData);
+            }
+        } else if (typeof gardenImgData === "object") {
+            parsedData = gardenImgData;
+        }
+    } catch (error) {
+        console.error("정원 JSON 파싱 오류:", error);
+        return null;
+    }
+
+    const flowers = parsedData?.freeformFlowers || [];
+    if (!Array.isArray(flowers) || flowers.length === 0) return null;
+
+    const flowerMap = Object.fromEntries(
+        (directoryData?.body || []).map((f) => [f.id, f])
+    );
+
+    return (
+        <div style={{
+            position: "relative",
+            width: "100%",
+            height: height, // 💡 전달받은 height를 동적으로 대입
+            background: "radial-gradient(130px 130px at 80% 16%, #fcf2bf, transparent 72%), linear-gradient(180deg,#d7eef6 0%,#e6f3df 40%,#cfe6b0 64%,#b6d78d 100%)",
+            borderRadius: "12px",
+            overflow: "hidden",
+            marginBottom: "12px",
+            border: "1px solid #e6f3df",
+            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.05)"
+        }}>
+            <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", overflow: "visible" }}>
+                {flowers.map((item, index) => {
+                    const flowerDef = flowerMap[item.flower];
+                    if (!flowerDef) return null;
+
+                    const x = Number(item.x) || 0;
+                    const y = Number(item.y) || 0;
+
+                    return (
+                        <image
+                            key={item.id || index}
+                            href={flowerImgUrl(flowerDef.flowerImg)}
+                            x={x - 6}
+                            y={y - 6}
+                            width="12"
+                            height="12"
+                            preserveAspectRatio="xMidYMid meet"
+                        />
+                    );
+                })}
+            </svg>
+        </div>
+    );
 }
