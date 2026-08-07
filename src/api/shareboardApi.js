@@ -13,7 +13,7 @@ export const getShareBoard = async () => {
 
 //게시글 인기순위 출력
 export const getRankShareBoard = async () => {
-    try{
+    try {
         const response = await axiosInstance.get("/api/shareboard/rank");
         return response.data;
     } catch (error) {
@@ -31,15 +31,26 @@ export const getComment = async (boardId) => {
     }
 }
 
-//게시글 입력
+//게시글 입력 원본
+// export const registerShareBoard = async (data) => {
+//     try {
+//         const response = await axiosInstance.post("/api/shareboard", data);
+//         return response.data;
+//     } catch (error) {
+//         return error.response.data;
+//     }
+// }
+//게시글 입력 부분 수정본
 export const registerShareBoard = async (data) => {
     try {
         const response = await axiosInstance.post("/api/shareboard", data);
+        // 💡 response.data를 명시적으로 return 해주어야 합니다!
         return response.data;
     } catch (error) {
-        return error.response.data;
+        console.error("공유 등록 에러:", error);
+        return error.response?.data || { success: false, message: error.message };
     }
-}
+};
 
 //댓글 입력
 export const registerComment = async (data) => {
@@ -52,64 +63,64 @@ export const registerComment = async (data) => {
 }
 
 //게시글 삭제
-export const deleteShareBoard = async ({id, userId}) => {
+export const deleteShareBoard = async ({ id, userId }) => {
     try {
         const response = await axiosInstance.delete(`/api/shareboard/${id}/${userId}`);
         return response.data;
-    } catch(error) {
+    } catch (error) {
         return error.response.data;
     }
 }
 
 // 댓글 삭제
-export const deleteComment = async ({boardId, userId, id}) => {
+export const deleteComment = async ({ boardId, userId, id }) => {
     try {
         const response = await axiosInstance.delete(`/api/shareboard/comments/${boardId}/${userId}/${id}`);
         return response.data;
-    } catch(error) {
+    } catch (error) {
         return error.response.data;
     }
 }
 
 // 게시글 수정
-export const putShareBoard = async ({userId, data}) => {
+export const putShareBoard = async ({ userId, data }) => {
     try {
         const response = await axiosInstance.put(`/api/shareboard/${userId}`, data);
         return response.data;
-    } catch(error) {
+    } catch (error) {
         return error.response.data;
     }
 
 }
 
 // 댓글 수정
-export const putComment = async ({userId, data}) => {
+export const putComment = async ({ userId, data }) => {
     try {
         const response = await axiosInstance.put(`/api/shareboard/comments/${userId}`, data);
         return response.data;
-    } catch(error) {
+    } catch (error) {
         return error.response.data;
     }
 }
 
 // 좋아요 증가
-export const putLikeUp = async ({id, data}) => {
+export const putLikeUp = async ({ id, data }) => {
     try {
         const response = await axiosInstance.put(`/api/shareboard/${id}/up`, data);
         return response.data;
-    } catch(error) {
+    } catch (error) {
         //throw error.response?.data || error;
         return error.response.data;
     }
 }
 
 // 좋아요 취소
-export const putLikeDown = async ({id, data}) => {
+export const putLikeDown = async ({ id, data }) => {
     try {
         const response = await axiosInstance.put(`/api/shareboard/${id}/down`, data);
         console.log("좋아요 취소" + response.data)
         return response.data;
-    } catch(error) {
+    } catch (error) {
         // throw error.response?.data || error;
         return error.response.data;
     }
@@ -118,14 +129,14 @@ export const putLikeDown = async ({id, data}) => {
 // 좋아요 테이블에 추가
 export const registerBoardLike = async (data) => {
     try {
-        const response = await axiosInstance.post("/api/shareboard/boardlike",data);
+        const response = await axiosInstance.post("/api/shareboard/boardlike", data);
         return response.data;
     } catch (error) {
         return error.response.data;
     }
 }
 // 좋아요 테이블에 삭제
-export const deleteBoardLike = async ({boardId,userId}) => {
+export const deleteBoardLike = async ({ boardId, userId }) => {
     try {
         const response = await axiosInstance.delete(`/api/shareboard/boardlike/${boardId}/${userId}`);
         return response.data;
@@ -134,7 +145,7 @@ export const deleteBoardLike = async ({boardId,userId}) => {
     }
 }
 // 좋아요 여부 확인 출력
-export const getBoardLike = async ({boardId, userId}) => {
+export const getBoardLike = async ({ boardId, userId }) => {
     try {
         const response = await axiosInstance.get(`/api/shareboard/boardlike/${boardId}?userId=${userId}`);
         return response.data;

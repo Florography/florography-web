@@ -35,3 +35,9 @@ export const getGardenById = async (id) => {
     const response = await axiosInstance.get(`/api/garden/${id}`);
     return response.data;
 };
+
+// 유저아이디로 본인 정원 불러오기
+export const getGardenByUserId = async (userId) => {
+    const response = await axiosInstance.get(`api/garden?userId=${userId}`);
+    return response.data;
+}
