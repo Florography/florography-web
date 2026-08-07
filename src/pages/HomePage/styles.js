@@ -20,9 +20,17 @@ export const card = css`
 `;
 
 export const cardLabel = css`
+    display: flex;
+    align-items: center;
     font-size: 15px;
     font-weight: 700;
     color: ${colors.text};
+
+    & > p {
+        font-size: 12px;
+        font-weight: 400;
+        color: ${colors.subtext};
+    }
 `;
 
 export const inputRow = css`
@@ -185,20 +193,47 @@ export const divider = css`
 export const historyRow = css`
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
+    padding: 6px 0 10px;
+`;
+
+export const historyRowTitle = css`
+    font-size: 16px;
+    font-weight: 700;
+    color: ${colors.text};
 `;
 
 export const dateInput = css`
-    padding: 10px 14px;
-    border-radius: ${radius.input};
-    border: 1px solid ${colors.border};
-    background: ${colors.background};
-    font-size: 13.5px;
-    color: ${colors.text};
+    padding: 8px 16px;
+    border-radius: ${radius.pill};
+    border: 1px solid transparent;
+    background: ${colors.primarySoft};
+    font-size: 14px;
+    font-weight: 600;
+    color: ${colors.primary};
+    cursor: pointer;
+    transition: all ${transition};
+    box-shadow: ${shadow.soft};
+
+    /* For webkit browsers to hide or style the calendar icon */
+    &::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity ${transition};
+    }
+
+    &::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+    }
 
     &:focus {
         outline: none;
         border-color: ${colors.primary};
+        background: ${colors.background};
+    }
+
+    &:hover {
+        background: ${colors.hover};
     }
 `;
 
@@ -282,4 +317,37 @@ export const dateLabel = css`
         color: ${colors.subtext};
         font-size: 15px;
     }
+`;
+
+export const paginationRow = css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+`;
+
+export const pageButton = css`
+    padding: 6px 12px;
+    border: 1px solid ${colors.border};
+    background: ${colors.background};
+    border-radius: ${radius.sm};
+    cursor: pointer;
+    font-size: 13.5px;
+    color: ${colors.text};
+    transition: background ${transition};
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+        background: ${colors.hover};
+    }
+`;
+
+export const pageIndicator = css`
+    font-size: 13.5px;
+    color: ${colors.subtext};
 `;

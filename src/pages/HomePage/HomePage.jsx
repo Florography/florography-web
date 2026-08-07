@@ -11,19 +11,19 @@ import { MonthNames } from "../../globalData";
 
 // 1. 프론트엔드에 기분 5단계 정의 (UI 매핑용)
 const MOOD_OPTIONS = [
-    { level: 0, label: "😭" },
-    { level: 1, label: "🙁" },
-    { level: 2, label: "😐" },
-    { level: 3, label: "🙂" },
-    { level: 4, label: "😆" },
+    { level: 1, label: "😭" },
+    { level: 2, label: "🙁" },
+    { level: 3, label: "😐" },
+    { level: 4, label: "🙂" },
+    { level: 5, label: "😆" },
 ];
 
 const DEFAULT_MOODS = [
-    { id: 0, mood: "많이 지침" },
-    { id: 1, mood: "가라앉음" },
-    { id: 2, mood: "괜찮음" },
-    { id: 3, mood: "좋음" },
-    { id: 4, mood: "매우 좋음" },
+    { id: 1, mood: "많이 지침" },
+    { id: 2, mood: "가라앉음" },
+    { id: 3, mood: "괜찮음" },
+    { id: 4, mood: "좋음" },
+    { id: 5, mood: "매우 좋음" },
 ];
 
 export const UNDER_NAV_ITEMS = [
@@ -39,9 +39,13 @@ function HomePage() {
     const queryClient = useQueryClient();
 
     const user = useMe();
+    console.log(user); 
     const userId = user.data?.body?.linkedAccounts?.[0]?.uid;
 
     const [date, setDate] = useState(todayStr); // 오늘 날짜를 기본값으로 설정
+    const [currentPage, setCurrentPage] = useState(1); // 쓴 글 목록 페이지네이션
+    const ITEMS_PER_PAGE = 7;
+
     const [inputSeedRecord, setInputSeedRecord] = useState({
         userId: userId,
         sentence: "",
@@ -160,10 +164,12 @@ function HomePage() {
 
             try {
                 await writeSeedRecord(createPayload);
+                console.log(createPayload);
                 alert("오늘의 한마디를 심었습니다! 🌱");
 
                 queryClient.invalidateQueries({ queryKey: ["seedRecord", userId] });
             } catch (error) {
+                console.log(createPayload);
                 alert("등록에 실패했습니다.");
             }
         }
@@ -179,168 +185,195 @@ function HomePage() {
         }
     }
 
+    const createOnClick = () => {
+        setInputSeedRecord({
+            ...inputSeedRecord,
+            moodIdx: Number(mood.id)
+        })
+    }
+
     return (
-            <div css={s.page}>
-                <div css={s.card}>
-                    <label css={s.cardLabel}>
-                        {existingRecord ? "✏️ 오늘의 한마디를 수정하시겠어요?" : "🌱 오늘 하루는 어땠나요?"}
-                    </label>
-                    <div css={s.inputRow}>
-                        <input css={s.textInput} type="text"
-                            value={inputSeedRecord.sentence} // value를 제어 컴포넌트로 연결
-                            onChange={(e) => setInputSeedRecord({ ...inputSeedRecord, sentence: e.target.value })}
-                            placeholder="오늘의 한 문장을 심어보세요 🌱"
-                        />
-                        <button css={s.primaryButton} onClick={handleSaveOnClick}>
-                            {existingRecord ? "수정" : "입력"}
-                        </button>
-                    </div>
-                    <label css={s.cardLabel}>오늘의 대표 감정을 골라주세요</label>
-                    {isLoading ? (
-                        <div css={s.mutedText}>감정 목록을 불러오는 중...</div>
+        <div css={s.page}>
+            <div css={s.card}>
+                <label css={s.cardLabel}>
+                    {existingRecord ? "✏️ 오늘의 한마디를 수정하시겠어요?" : "🌱 오늘 하루는 어땠나요?"}
+                </label>
+                <div css={s.inputRow}>
+                    <input css={s.textInput} type="text"
+                        value={inputSeedRecord.sentence} // value를 제어 컴포넌트로 연결
+                        onChange={(e) => setInputSeedRecord({ ...inputSeedRecord, sentence: e.target.value })}
+                        placeholder="오늘의 한 문장을 심어보세요 🌱"
+                    />
+                    <button css={s.primaryButton} onClick={handleSaveOnClick}>
+                        {existingRecord ? "수정" : "입력"}
+                    </button>
+                </div>
+                <label css={s.cardLabel}>오늘의 대표 감정을 골라주세요 <p>( 변경할 수 없으니 신중히 선택해 주세요! )</p></label>
+                {isLoading ? (
+                    <div css={s.mutedText}>감정 목록을 불러오는 중...</div>
+                ) : (
+                    moods.length > 0 ? (
+                        <div css={s.moodRow}>
+                            {moods.map((mood, index) => (
+                                <label css={s.moodLabel(Number(inputSeedRecord.moodIdx) === Number(mood.id))} key={mood.id}>
+                                    <input
+                                        type="radio"
+                                        name="mood"
+                                        value={mood.id}
+                                        disabled={!!todayRecord}
+                                        checked={Number(inputSeedRecord.moodIdx) === Number(mood.id)}
+                                        onClick={createOnClick}
+                                    />
+                                    <div>{MOOD_OPTIONS[index]?.label || "😐"}</div>
+                                    <span>{mood.mood}</span>
+                                </label>
+                            ))}
+                        </div>
                     ) : (
-                        moods.length > 0 ? (
-                            <div css={s.moodRow}>
-                                {moods.map((mood, index) => (
-                                    <label css={s.moodLabel(Number(inputSeedRecord.moodIdx) === Number(mood.id))} key={mood.id}>
-                                        <input
-                                            type="radio"
-                                            name="mood"
-                                            value={mood.id}
-                                            disabled={!!todayRecord}
-                                            checked={Number(inputSeedRecord.moodIdx) === Number(mood.id)}
-                                            onChange={() => setInputSeedRecord({
-                                                ...inputSeedRecord,
-                                                moodIdx: Number(mood.id)
-                                            })}
-                                        />
-                                        <div>{MOOD_OPTIONS[index]?.label || "😐"}</div>
-                                        <span>{mood.mood}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        ) : (
-                            <div css={s.mutedText}>감정을 불러올 수 없습니다.</div>
-                        )
+                        <div css={s.mutedText}>감정을 불러올 수 없습니다.</div>
+                    )
+                )}
+            </div>
+            <div css={s.divider}>-------------------------- 구분 선 --------------------------</div>
+            <div css={s.card}>
+                <div css={s.historyRow}>
+                    <span css={s.historyRowTitle}>그날의 나는?</span>
+                    <input
+                        css={s.dateInput}
+                        type="date"
+                        value={date}
+                        max={todayStr}
+                        onChange={dateOnChange}
+                    />
+                </div>
+                <div css={s.historyBlock}>
+                    <span css={s.historyBlockTitle}>그때 남긴 한마디</span>
+                    {isSeedRecordLoading ? (
+                        <div css={s.mutedText}>로딩 중...</div>
+                    ) : (
+                        <div css={s.historyBlock}>
+                            {filteredSeedRecords && filteredSeedRecords.length > 0 ? (
+                                <div css={s.recordChip} key={`${filteredSeedRecords[0].id}-latest`}>
+                                    <span>{filteredSeedRecords[0].sentence}</span>
+                                </div>
+                            ) : (
+                                <div css={s.emptyText}>해당 날짜에 작성된 한마디가 없습니다.</div>
+                            )}
+                        </div>
                     )}
                 </div>
                 <div css={s.divider}>-------------------------- 구분 선 --------------------------</div>
-                <div css={s.card}>
-                    <div css={s.historyRow}>
-                        그날의 나는?
-                        <input
-                            css={s.dateInput}
-                            type="date"
-                            value={date}
-                            max={todayStr}
-                            onChange={dateOnChange}
-                        />
-                    </div>
-                    <div css={s.historyBlock}>
-                        <span css={s.historyBlockTitle}>그때 남긴 한마디</span>
-                        {isSeedRecordLoading ? (
-                            <div css={s.mutedText}>로딩 중...</div>
-                        ) : (
-                            <div css={s.historyBlock}>
-                                {filteredSeedRecords && filteredSeedRecords.length > 0 ? (
-                                    filteredSeedRecords.map((seedRecord, index) => {
-                                        return (
-                                            <div css={s.recordChip} key={`${seedRecord.id}-${index}`}>
-                                                <span>{seedRecord.sentence}</span>
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    <div css={s.emptyText}>해당 날짜에 작성된 한마디가 없습니다.</div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                    <div css={s.divider}>-------------------------- 구분 선 --------------------------</div>
-                    <div css={s.historyBlock}>
-                        <span css={s.historyBlockTitle}>그때 남긴 편지</span>
-                        {isLetterLoading ? (
-                            <div css={s.mutedText}>로딩 중...</div>
-                        ) : (
-                            <div css={s.historyBlock}>
-                                {filteredLetters.length > 0 ? (
-                                    // 제일 최신 편지를 가지고 옴
-                                    <div css={s.recordChip} key={`${filteredLetters[filteredLetters.length - 1].userId}-latest`}>
-                                        <span>{filteredLetters[filteredLetters.length - 1].title}</span>
-                                    </div>
-                                ) : (
-                                    <div css={s.emptyText}>해당 날짜에 작성된 편지가 없습니다.</div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                    <div css={s.divider}>-------------------------- 구분 선 --------------------------</div>
-                    <div css={s.historyBlock}>
-                        <span css={s.historyBlockTitle}>그날의 감정 분석</span>
-                        {isSeedRecordLoading ? (
-                            <div css={s.mutedText}>로딩 중...</div>
-                        ) : (
-                            <div css={s.historyBlock}>
-                                {filteredSeedRecords && filteredSeedRecords.length > 0 ? (
-                                    filteredSeedRecords.map((seedRecord, index) => {
-                                        return (
-                                            <div css={s.recordChip} key={`${seedRecord.id}-${index}`}>
-                                                <span>{seedRecord.aiComment}</span>
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    <div css={s.emptyText}>해당 날짜에 작성된 한마디가 없습니다.</div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                <div css={s.historyBlock}>
+                    <span css={s.historyBlockTitle}>그때 남긴 편지</span>
+                    {isLetterLoading ? (
+                        <div css={s.mutedText}>로딩 중...</div>
+                    ) : (
+                        <div css={s.historyBlock}>
+                            {filteredLetters.length > 0 ? (
+                                // 제일 최신 편지를 가지고 옴
+                                <div css={s.recordChip} key={`${filteredLetters[0].userId}-latest`}>
+                                    <span>{filteredLetters[0].title}</span>
+                                </div>
+                            ) : (
+                                <div css={s.emptyText}>해당 날짜에 작성된 편지가 없습니다.</div>
+                            )}
+                        </div>
+                    )}
                 </div>
                 <div css={s.divider}>-------------------------- 구분 선 --------------------------</div>
-                <div css={s.shortcutSectionTitle}>
-                    <span></span>
-                    <span>바로가기</span>
-                    <span></span>
-                </div>
-                <div css={s.shortcutGrid}>
-                    {UNDER_NAV_ITEMS.map((n) => (
-                        <a
-                            css={s.shortcutCard}
-                            key={n.label}
-                            onClick={() => goTo(n)}
-                        >
-                            <span css={s.shortcutIcon(n.bg)}>{n.icon}</span>
-                            <span css={s.shortcutTitle}>{n.label}</span>
-                            <span css={s.shortcutDesc}>{n.desc}</span>
-                        </a>
-                    ))}
-                </div>
-                <div css={s.card}>
-                    <label css={s.cardLabel}>쓴 글 목록</label>
-                    <ul css={s.recordList}>
-                        {seedRecords && Array.isArray(seedRecords) ? (
-                            seedRecords.map((seedrecord, index) => {
-                                const matchedMood = moods.find(m => Number(m.id) === Number(seedrecord.moodIdx));
-                                const month = seedrecord.createdDate.substring(5, 7);
-                                const day = seedrecord.createdDate.substring(8, 10);
-
-                                return (
-                                    <li css={s.recordListItem} key={`${seedrecord.userId}-${index}`}>
-                                        <div css={s.dateLabel}>
-                                            <header>{day}</header>
-                                            <span>{MonthNames[parseInt(month) - 1]}</span>
-                                        </div>
-                                        <span>({matchedMood ? matchedMood.mood : seedrecord.moodIdx})</span>
-                                        <span css={s.sentence}>{seedrecord.sentence}</span>
-                                    </li>
-                                );
-                            })
-                        ) : (
-                            <li css={s.emptyText}>작성하신 한마디가 없습니다.</li>
-                        )}
-                    </ul>
+                <div css={s.historyBlock}>
+                    <span css={s.historyBlockTitle}>그날의 감정 분석</span>
+                    {isSeedRecordLoading ? (
+                        <div css={s.mutedText}>로딩 중...</div>
+                    ) : (
+                        <div css={s.historyBlock}>
+                            {filteredSeedRecords && filteredSeedRecords.length > 0 ? (
+                                <div css={s.recordChip} key={`${filteredSeedRecords[0].id}-latest-ai`}>
+                                    <span>{filteredSeedRecords[0].aiComment}</span>
+                                </div>
+                            ) : (
+                                <div css={s.emptyText}>해당 날짜에 작성된 한마디가 없습니다.</div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
+            <div css={s.divider}>-------------------------- 구분 선 --------------------------</div>
+            <div css={s.shortcutSectionTitle}>
+                <span></span>
+                <span>바로가기</span>
+                <span></span>
+            </div>
+            <div css={s.shortcutGrid}>
+                {UNDER_NAV_ITEMS.map((n) => (
+                    <a
+                        css={s.shortcutCard}
+                        key={n.label}
+                        onClick={() => goTo(n)}
+                    >
+                        <span css={s.shortcutIcon(n.bg)}>{n.icon}</span>
+                        <span css={s.shortcutTitle}>{n.label}</span>
+                        <span css={s.shortcutDesc}>{n.desc}</span>
+                    </a>
+                ))}
+            </div>
+            <div css={s.card}>
+                <label css={s.cardLabel}>쓴 글 목록</label>
+                <ul css={s.recordList}>
+                    {(() => {
+                        const allSeedRecordsForList = seedRecords && Array.isArray(seedRecords) ? seedRecords : [];
+                        const totalPages = Math.max(1, Math.ceil(allSeedRecordsForList.length / ITEMS_PER_PAGE));
+                        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+                        const currentRecords = allSeedRecordsForList.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+                        return (
+                            <>
+                                {currentRecords.length > 0 ? (
+                                    currentRecords.map((seedrecord, index) => {
+                                        const matchedMood = moods.find(m => Number(m.id) === Number(seedrecord.moodIdx));
+                                        const month = seedrecord.createdDate.substring(5, 7);
+                                        const day = seedrecord.createdDate.substring(8, 10);
+
+                                        return (
+                                            <li css={s.recordListItem} key={`${seedrecord.userId}-${index}`}>
+                                                <div css={s.dateLabel}>
+                                                    <header>{day}</header>
+                                                    <span>{MonthNames[parseInt(month) - 1]}</span>
+                                                </div>
+                                                <span>({matchedMood ? matchedMood.mood : seedrecord.moodIdx})</span>
+                                                <span css={s.sentence}>{seedrecord.sentence}</span>
+                                            </li>
+                                        );
+                                    })
+                                ) : (
+                                    <li css={s.emptyText}>작성하신 한마디가 없습니다.</li>
+                                )}
+                                
+                                {allSeedRecordsForList.length > ITEMS_PER_PAGE && (
+                                    <div css={s.paginationRow}>
+                                        <button 
+                                            css={s.pageButton} 
+                                            disabled={currentPage === 1}
+                                            onClick={() => setCurrentPage(p => p - 1)}
+                                        >
+                                            이전
+                                        </button>
+                                        <span css={s.pageIndicator}>{currentPage} / {totalPages}</span>
+                                        <button 
+                                            css={s.pageButton} 
+                                            disabled={currentPage === totalPages}
+                                            onClick={() => setCurrentPage(p => p + 1)}
+                                        >
+                                            다음
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        );
+                    })()}
+                </ul>
+            </div>
+        </div>
     );
 }
 

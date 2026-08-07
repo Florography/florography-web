@@ -45,7 +45,7 @@ function InformationPage() {
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         if (token) {
-            navigate("/mypage", { replace: true });
+            navigate("/home", { replace: true });
         }
     }, [navigate]);
 

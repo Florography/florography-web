@@ -37,14 +37,15 @@ function MyPage() {
     const meQuery = useMe();
     const linkedAccounts = meQuery.data?.body?.linkedAccounts || [];
     const loading = meQuery.isLoading;
+    const userId = meQuery.data?.body?.linkedAccounts?.[0]?.uid;
 
     const [toast, setToast] = useState(null);
     const [toastExiting, setToastExiting] = useState(false);
 
-    // 내가 쓴 한마디's
-    console.log({ userId: meQuery.data?.body?.linkedAccounts[0]?.uid });
-    const seedRecords = useSeedRecord({ userId: meQuery.data?.body?.linkedAccounts[0]?.uid });
-    console.log(seedRecords?.data?.body);
+    // 내가 쓴 한마디's 
+    console.log(userId);
+    const seedRecords = useSeedRecord(userId).data;
+    console.log(seedRecords);
 
     // 헤더 / 드로어
     const [menuOpen, setMenuOpen] = useState(false);
@@ -158,13 +159,13 @@ function MyPage() {
 
 
     // ─── 내 기록 (목업, 정적 표시) ───
-    const recordRows = seedRecords?.data?.body.map((r) => ({
+    const recordRows = (seedRecords || []).map((r) => ({
         text: r.sentence,
         date: r.createdDate ? r.createdDate.slice(5).replace('-', '.') : r.createdDate,
         icon: "🌱",
         iconBg: "#EAF0DE",
-        mood: r.mood.mood || "",
-        moodStyle: r.mood.mood ? MOOD_STYLES[r.mood.mood] : null,
+        mood: r?.mood?.mood || "",
+        moodStyle: r?.mood?.mood ? MOOD_STYLES[r.mood.mood] : null,
     }));
 
     // // ─── 내 기록 (목업, 정적 표시) ───
@@ -272,7 +273,7 @@ function MyPage() {
                                 </div>
                                 <div css={s.statItem}>
                                     <span css={s.statNumber}>
-                                        {seedRecords?.data?.body.length}
+                                        {seedRecords?.data?.body?.length || 0}
                                     </span>
                                     <span css={s.statLabel}>한마디</span>
                                 </div>
