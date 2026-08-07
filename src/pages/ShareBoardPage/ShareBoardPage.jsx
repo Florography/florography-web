@@ -8,6 +8,7 @@ import * as s from "./styles";
 import { useGardenById, useGardenByUserId } from "../../hooks/queries/useGarden";
 import { FLOWER_TYPES } from "../../globalData";
 import { useFlowerDirectoies } from "../../hooks/queries/flowerDirectory";
+import { useIsMutating } from "@tanstack/react-query";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 const flowerImgUrl = (path) => (path ? `${API_BASE}${path}` : "");
@@ -89,6 +90,7 @@ function ShareBoardPage() {
         }
     }, [currentUserId]); // 가 들어오거나 변경될 때마다 실행
 
+    const isMutating = useIsMutating() > 0;
 
     //본인글만보기 필터
     const displayedBoards = isOnlyMyPosts
@@ -211,105 +213,106 @@ function ShareBoardPage() {
 
     return (
         <>
-            <div css={s.composerCard}>
-                <p css={s.composerLabel}>게시글 작성</p>
+            <div style={{ pointerEvents: isMutating ? "none" : "auto" }}>
+                <div css={s.composerCard}>
+                    <p css={s.composerLabel}>게시글 작성</p>
 
-                {selectedGarden && (
-                    <div style={{ marginBottom: "12px" }}>
-                        <p style={{ fontSize: "12px", color: "#2e7d32", fontWeight: "bold" }}>
-                            🌱 선택된 정원: {selectedGarden.name || "나의 정원"} (type_id: 2)
-                        </p>
-                        <GardenPreview gardenImgData={inputSeedRecord.gardenImg} />
-                    </div>
-                )}
-                <div css={s.composerRow}>
-                    <input css={s.composerInput} type="text"
-                        value={inputSeedRecord.body}
-                        onChange={handleBoardInputChange}
-                        placeholder="오늘의 한마디를 나눠보세요."
-                    />
-                    <button css={s.composerButton} onClick={handleToggleGarden}>{selectedGarden ? "정원 취소" : "나의 정원"}</button>
-                    <button css={s.composerButton} onClick={handleBoardOnClick} >공유</button>
-                </div>
-            </div>
-            <div css={s.filterRow}>
-                <button css={s.filterButton} onClick={handleToggleFilter}>
-                    {isOnlyMyPosts ? "전체 글 보기" : "내가 쓴 글만 보기"}
-                </button>
-            </div>
-            <div>
-                <p css={s.sectionLabel}>게시글 목록</p>
-            </div>
-            <ul css={s.boardList}>
-                {displayedBoards.length > 0 ? (
-                    displayedBoards.map((board) => (
-                        <BoardItem
-                            key={board.id}
-                            board={board}
-                            currentUserId={currentUserId}
-                            user={user}
-                            handleDeleteOnClick={handleDeleteOnClick}
-                            updateBoard={updateBoard}
-                        />
-                    ))
-                ) : (
-                    <p css={s.boardEmpty}>
-                        {isOnlyMyPosts ? "내가 작성한 글이 없습니다." : "등록된 게시글이 없습니다."}
-                    </p>
-                )}
-            </ul>
-
-            {isGardenModalOpen && (
-                <div style={modalOverlayStyle}>
-                    <div style={modalContentStyle}>
-                        <h3 style={{ marginBottom: "12px" }}>나의 정원 목록 선택</h3>
-                        <div style={{ maxHeight: "300px", overflowY: "auto", marginBottom: "12px" }}>
-                            {gardenList.length > 0 ? (
-                                gardenList.map((garden, index) => (
-                                    <div
-                                        key={garden.id || index}
-                                        onClick={() => handleSelectGarden(garden)}
-                                        style={{
-                                            padding: "12px",
-                                            borderBottom: "1px solid #eee",
-                                            cursor: "pointer",
-                                            display: "flex",
-                                            flexDirection: "column", // 세로 레이아웃으로 설정하여 정원 이름을 위에, 썸네일을 아래에 배치
-                                            gap: "8px"
-                                        }}
-                                    >
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                            <span style={{ fontWeight: "600", fontSize: "13.5px" }}>
-                                                {garden.name || garden.gardenName || `정원 #${index + 1}`}
-                                            </span>
-                                            <button style={{
-                                                cursor: "pointer",
-                                                padding: "3px 10px",
-                                                borderRadius: "4px",
-                                                border: "1px solid #ddd",
-                                                background: "#fdfdfd",
-                                                fontSize: "12px"
-                                            }}>
-                                                선택
-                                            </button>
-                                        </div>
-
-                                        {/* 💡 각 정원의 좌표 데이터를 미니 높이(80px)로 렌더링 */}
-                                        <GardenPreview
-                                            gardenImgData={garden.gardenData || garden.gardenImg}
-                                            height="80px"
-                                        />
-                                    </div>
-                                ))
-                            ) : (
-                                <p style={{ padding: "10px", color: "#666" }}>불러올 정원이 없습니다.</p>
-                            )}
+                    {selectedGarden && (
+                        <div style={{ marginBottom: "12px" }}>
+                            <p style={{ fontSize: "12px", color: "#2e7d32", fontWeight: "bold" }}>
+                                🌱 선택된 정원: {selectedGarden.name || "나의 정원"} (type_id: 2)
+                            </p>
+                            <GardenPreview gardenImgData={inputSeedRecord.gardenImg} />
                         </div>
-                        <button onClick={() => setIsGardenModalOpen(false)}>닫기</button>
+                    )}
+                    <div css={s.composerRow}>
+                        <input css={s.composerInput} type="text"
+                            value={inputSeedRecord.body}
+                            onChange={handleBoardInputChange}
+                            placeholder="오늘의 한마디를 나눠보세요."
+                        />
+                        <button css={s.composerButton} onClick={handleToggleGarden}>{selectedGarden ? "정원 취소" : "나의 정원"}</button>
+                        <button css={s.composerButton} onClick={handleBoardOnClick} >공유</button>
                     </div>
                 </div>
-            )}
+                <div css={s.filterRow}>
+                    <button css={s.filterButton} onClick={handleToggleFilter}>
+                        {isOnlyMyPosts ? "전체 글 보기" : "내가 쓴 글만 보기"}
+                    </button>
+                </div>
+                <div>
+                    <p css={s.sectionLabel}>게시글 목록</p>
+                </div>
+                <ul css={s.boardList}>
+                    {displayedBoards.length > 0 ? (
+                        displayedBoards.map((board) => (
+                            <BoardItem
+                                key={board.id}
+                                board={board}
+                                currentUserId={currentUserId}
+                                user={user}
+                                handleDeleteOnClick={handleDeleteOnClick}
+                                updateBoard={updateBoard}
+                            />
+                        ))
+                    ) : (
+                        <p css={s.boardEmpty}>
+                            {isOnlyMyPosts ? "내가 작성한 글이 없습니다." : "등록된 게시글이 없습니다."}
+                        </p>
+                    )}
+                </ul>
 
+                {isGardenModalOpen && (
+                    <div style={modalOverlayStyle}>
+                        <div style={modalContentStyle}>
+                            <h3 style={{ marginBottom: "12px" }}>나의 정원 목록 선택</h3>
+                            <div style={{ maxHeight: "300px", overflowY: "auto", marginBottom: "12px" }}>
+                                {gardenList.length > 0 ? (
+                                    gardenList.map((garden, index) => (
+                                        <div
+                                            key={garden.id || index}
+                                            onClick={() => handleSelectGarden(garden)}
+                                            style={{
+                                                padding: "12px",
+                                                borderBottom: "1px solid #eee",
+                                                cursor: "pointer",
+                                                display: "flex",
+                                                flexDirection: "column", // 세로 레이아웃으로 설정하여 정원 이름을 위에, 썸네일을 아래에 배치
+                                                gap: "8px"
+                                            }}
+                                        >
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                                <span style={{ fontWeight: "600", fontSize: "13.5px" }}>
+                                                    {garden.name || garden.gardenName || `정원 #${index + 1}`}
+                                                </span>
+                                                <button style={{
+                                                    cursor: "pointer",
+                                                    padding: "3px 10px",
+                                                    borderRadius: "4px",
+                                                    border: "1px solid #ddd",
+                                                    background: "#fdfdfd",
+                                                    fontSize: "12px"
+                                                }}>
+                                                    선택
+                                                </button>
+                                            </div>
+
+                                            {/* 💡 각 정원의 좌표 데이터를 미니 높이(80px)로 렌더링 */}
+                                            <GardenPreview
+                                                gardenImgData={garden.gardenData || garden.gardenImg}
+                                                height="80px"
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p style={{ padding: "10px", color: "#666" }}>불러올 정원이 없습니다.</p>
+                                )}
+                            </div>
+                            <button onClick={() => setIsGardenModalOpen(false)}>닫기</button>
+                        </div>
+                    </div>
+                )}
+            </div>
         </>
     );
 }
