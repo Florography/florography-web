@@ -185,10 +185,10 @@ function HomePage() {
         }
     }
 
-    const createOnClick = () => {
+    const createOnClick = (moodId) => {
         setInputSeedRecord({
             ...inputSeedRecord,
-            moodIdx: Number(mood.id)
+            moodIdx: Number(moodId)
         })
     }
 
@@ -222,7 +222,7 @@ function HomePage() {
                                         value={mood.id}
                                         disabled={!!todayRecord}
                                         checked={Number(inputSeedRecord.moodIdx) === Number(mood.id)}
-                                        onClick={createOnClick}
+                                        onClick={() => createOnClick(mood.id)}
                                     />
                                     <div>{MOOD_OPTIONS[index]?.label || "😐"}</div>
                                     <span>{mood.mood}</span>

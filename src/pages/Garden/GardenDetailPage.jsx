@@ -56,11 +56,14 @@ function GardenDetailPage() {
             console.log(garden);
             try {
                 const parsedData = JSON.parse(garden.gardenData);
-                if (parsedData.freeformFlowers) {
+                if (Array.isArray(parsedData.freeformFlowers)) {
                     setFreeformFlowers(parsedData.freeformFlowers);
+                } else {
+                    setFreeformFlowers([]);
                 }
             } catch (e) {
                 console.error("정원 데이터 파싱 실패:", e);
+                setFreeformFlowers([]);
             }
         }
     }, [gardenQuery.data, setFreeformFlowers]);
@@ -184,12 +187,10 @@ function GardenDetailPage() {
                             </div>
                         </div>
                         <div css={s.mainActions}>
-                            <button css={s.themeButton} onClick={cycleTheme}>
+                            <button css={s.themeButton} onClick={cycleTheme} disabled>
                                 🎨 테마 · {theme.name}
                             </button>
-                            <button css={s.saveButton} onClick={handleSave}>
-                                {saved ? "저장됨 ✓" : "💾 저장"}
-                            </button>
+                            <span css={s.readOnlyLabel}>읽기 전용</span>
                         </div>
                     </div>
 

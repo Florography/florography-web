@@ -265,6 +265,16 @@ export const saveButton = css`
     }
 `;
 
+export const readOnlyLabel = css`
+    padding: 9px 16px;
+    border-radius: ${radius.sm};
+    border: 1px solid ${colors.border};
+    background: ${colors.surface};
+    font-size: 13px;
+    font-weight: 600;
+    color: ${colors.subtext};
+`;
+
 export const tabRow = css`
     display: flex;
     gap: 8px;
