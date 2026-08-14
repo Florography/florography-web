@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useAllGardens } from "../../hooks/queries/useGarden";
 import { useMe } from "../../hooks/queries/useUser";
+import GardenPreview from "../../components/GardenPreview";
 import {
     MENU_ITEMS,
     // NAV_ITEMS,
@@ -99,7 +100,9 @@ function GardenListPage() {
                                         key={garden.id}
                                         onClick={() => handleGardenClick(garden.id)}
                                     >
-                                        {garden.gardenImage ? (
+                                        {garden.gardenData ? (
+                                            <GardenPreview gardenData={garden.gardenData} height="180px" />
+                                        ) : garden.gardenImage ? (
                                             <img
                                                 src={garden.gardenImage}
                                                 alt={garden.name}
