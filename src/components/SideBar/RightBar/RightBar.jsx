@@ -1,8 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useLocation } from "react-router";
 import { useRankShareBoard } from "../../../hooks/queries/useShareboard";
-import { useMe } from "../../../hooks/queries/useUser";
-import { useSeedRecord } from "../../../hooks/queries/useSeedRecord";
+import { useSeedRecordStore } from "../../../stores/seedRecordStore";
 import * as s from "./styles";
 import Calendar from "./Calendar";
 
@@ -10,20 +9,12 @@ function RightBar() {
     const location = useLocation();
     const isShareBoard = location.pathname.startsWith("/shareboard");
 
-    const meQuery = useMe();
-    const userId = meQuery.data?.body?.linkedAccounts?.[0]?.uid;
-    const seedRecordsQuery = useSeedRecord(userId);
-
     const rankBoardQuery = useRankShareBoard();
     const ranks = rankBoardQuery.data?.body || [];
 
-    // 오늘의 기록에서 AI 코멘트 가져오기
-    const todayStr = new Date().toLocaleDateString("sv-SE");
-    const allSeedRecords = seedRecordsQuery.data?.body || [];
-    const todayRecord = allSeedRecords.find(record =>
-        record?.createdDate && record.createdDate.startsWith(todayStr)
-    );
-    const aiComment = todayRecord?.aiComment || "아직 오늘의 기록이 없어요. 한마디를 남겨보세요 🌱";
+    // zustand 스토어에서 오늘의 AI 코멘트 가져오기
+    const storedAiComment = useSeedRecordStore((state) => state.todayAiComment);
+    const aiComment = storedAiComment || "아직 오늘의 기록이 없어요. 한마디를 남겨보세요 🌱";
 
     return (
         <aside css={s.sidebar}>

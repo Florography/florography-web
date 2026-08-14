@@ -6,6 +6,7 @@ import { useMe } from "../../hooks/queries/useUser";
 import { useSeedRecord } from "../../hooks/queries/useSeedRecord";
 import { useHeartLetters } from "../../hooks/queries/useHeartLetter";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSeedRecordStore } from "../../stores/seedRecordStore";
 import * as s from "./styles";
 import { MonthNames } from "../../globalData";
 
@@ -120,6 +121,16 @@ function HomePage() {
             }
         }
     }, [todayRecord, userId, date, todayStr]);
+
+    // 오늘의 AI 코멘트를 zustand 스토어에 저장
+    const setTodayAiComment = useSeedRecordStore((state) => state.setTodayAiComment);
+    useEffect(() => {
+        if (todayRecord?.aiComment) {
+            setTodayAiComment(todayRecord.aiComment);
+        } else {
+            setTodayAiComment("");
+        }
+    }, [todayRecord, setTodayAiComment]);
 
     const handleSaveOnClick = async () => {
         // 빈 글 방지
