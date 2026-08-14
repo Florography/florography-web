@@ -21,6 +21,7 @@ function GardenListPage() {
     console.log(gardensQuery);
     const [currentPage, setCurrentPage] = useState(1);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [selectedGarden, setSelectedGarden] = useState(null);
     const gardens = gardensQuery.data?.body || [];
 
     const itemsPerPage = 9;
@@ -28,8 +29,8 @@ function GardenListPage() {
     const startIdx = (currentPage - 1) * itemsPerPage;
     const paginatedGardens = gardens.slice(startIdx, startIdx + itemsPerPage);
 
-    const handleGardenClick = (gardenId) => {
-        navigate(`/garden/${gardenId}`);
+    const handleGardenClick = (garden) => {
+        setSelectedGarden(garden);
     };
 
     const handleCreateNew = () => {
@@ -98,7 +99,7 @@ function GardenListPage() {
                                     <div
                                         css={s.gardenCard}
                                         key={garden.id}
-                                        onClick={() => handleGardenClick(garden.id)}
+                                        onClick={() => handleGardenClick(garden)}
                                     >
                                         {garden.gardenData ? (
                                             <GardenPreview gardenData={garden.gardenData} height="180px" />
@@ -157,6 +158,39 @@ function GardenListPage() {
                     )}
                 </main>
             </div>
+
+            {/* 정원 상세 모달 */}
+            {selectedGarden && (
+                <div css={s.modalBackdrop} onClick={() => setSelectedGarden(null)}>
+                    <div css={s.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div css={s.modalHeader}>
+                            <h2 css={s.modalTitle}>{selectedGarden.name || "제목없음"}</h2>
+                            <button
+                                css={s.modalCloseButton}
+                                onClick={() => setSelectedGarden(null)}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <div css={s.modalBody}>
+                            {selectedGarden.gardenData ? (
+                                <GardenPreview gardenData={selectedGarden.gardenData} height="500px" />
+                            ) : selectedGarden.gardenImage ? (
+                                <img
+                                    src={selectedGarden.gardenImage}
+                                    alt={selectedGarden.name}
+                                    css={s.modalImage}
+                                />
+                            ) : (
+                                <div css={s.modalPlaceholder}>🌸</div>
+                            )}
+                            <p css={s.modalDate}>
+                                생성일: {new Date(selectedGarden.createdAt).toLocaleDateString()}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

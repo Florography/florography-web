@@ -127,6 +127,96 @@ export const gardenCardDate = css`
     color: ${colors.subtext};
 `;
 
+export const modalBackdrop = css`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+`;
+
+export const modalContent = css`
+    background: ${colors.surface};
+    border-radius: ${radius.cardLg};
+    box-shadow: 0 20px 60px rgba(78, 90, 80, 0.15);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+`;
+
+export const modalHeader = css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    border-bottom: 1px solid ${colors.border};
+`;
+
+export const modalTitle = css`
+    font-family: ${font.serif};
+    font-size: 20px;
+    font-weight: 700;
+    color: ${colors.text};
+    margin: 0;
+`;
+
+export const modalCloseButton = css`
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: ${colors.hover};
+    border-radius: ${radius.sm};
+    color: ${colors.text};
+    font-size: 18px;
+    cursor: pointer;
+    transition: background ${transition};
+
+    &:hover {
+        background: ${colors.secondary};
+    }
+`;
+
+export const modalBody = css`
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+`;
+
+export const modalImage = css`
+    width: 100%;
+    height: auto;
+    border-radius: ${radius.card};
+    object-fit: cover;
+`;
+
+export const modalPlaceholder = css`
+    display: grid;
+    place-items: center;
+    height: 400px;
+    background: linear-gradient(160deg, ${colors.secondary}, ${colors.primarySoft});
+    border-radius: ${radius.card};
+    font-size: 48px;
+`;
+
+export const modalDate = css`
+    font-size: 13px;
+    color: ${colors.subtext};
+    margin: 0;
+`;
+
 export const paginationRow = css`
     display: flex;
     align-items: center;

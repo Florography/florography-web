@@ -6,13 +6,17 @@ const flowerImgUrl = (path) => (path ? `${API_BASE}${path}` : "");
 function GardenPreview({ gardenData, height = "200px" }) {
     const { data: directoryData } = useFlowerDirectoies();
 
-    if (!gardenData) return null;
+    if (!gardenData) {
+        console.warn("GardenPreview: gardenData is null or undefined");
+        return null;
+    }
 
     let parsedData = null;
     try {
         if (typeof gardenData === "string") {
             const cleanData = gardenData.trim();
             if (!cleanData.startsWith("{") && !cleanData.startsWith("[")) {
+                console.warn("GardenPreview: gardenData is not valid JSON");
                 return null;
             }
             parsedData = JSON.parse(cleanData);
@@ -23,12 +27,16 @@ function GardenPreview({ gardenData, height = "200px" }) {
             parsedData = gardenData;
         }
     } catch (error) {
-        console.error("정원 JSON 파싱 오류:", error);
+        console.error("정원 JSON 파싱 오류:", error, "gardenData:", gardenData);
         return null;
     }
 
+    console.log("GardenPreview parsed:", parsedData);
     const flowers = parsedData?.freeformFlowers || [];
-    if (!Array.isArray(flowers) || flowers.length === 0) return null;
+    if (!Array.isArray(flowers) || flowers.length === 0) {
+        console.warn("GardenPreview: no flowers found", flowers);
+        return null;
+    }
 
     const flowerMap = Object.fromEntries(
         (directoryData?.body || []).map((f) => [f.id, f])
